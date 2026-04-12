@@ -1,6 +1,4 @@
 /**
- * @author Alexander Breuer (alex.breuer AT uni-jena.de)
- *
  * @section DESCRIPTION
  * F-Wave solver for the shallow water equations.
  **/
