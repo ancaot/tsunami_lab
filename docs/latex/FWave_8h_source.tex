@@ -1,0 +1,49 @@
+\doxysection{FWave.\+h}
+\hypertarget{FWave_8h_source}{}\label{FWave_8h_source}\index{/home/ac/tsunami\_lab/src/solvers/FWave.h@{/home/ac/tsunami\_lab/src/solvers/FWave.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ }
+\DoxyCodeLine{00005\ \textcolor{preprocessor}{\#ifndef\ TSUNAMI\_LAB\_SOLVERS\_ROE}}
+\DoxyCodeLine{00006\ \textcolor{preprocessor}{\#define\ TSUNAMI\_LAB\_SOLVERS\_ROE}}
+\DoxyCodeLine{00007\ }
+\DoxyCodeLine{00008\ \textcolor{preprocessor}{\#include\ "{}../constants.h"{}}}
+\DoxyCodeLine{00009\ }
+\DoxyCodeLine{00010\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacetsunami__lab}{tsunami\_lab}}\ \{}
+\DoxyCodeLine{00011\ \ \ \textcolor{keyword}{namespace\ }solvers\ \{}
+\DoxyCodeLine{00012\ \ \ \ \ \textcolor{keyword}{class\ }FWave;}
+\DoxyCodeLine{00013\ \ \ \}}
+\DoxyCodeLine{00014\ \}}
+\DoxyCodeLine{00015\ }
+\DoxyCodeLine{00016\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classtsunami__lab_1_1solvers_1_1FWave}{tsunami\_lab::solvers::FWave}}\ \{}
+\DoxyCodeLine{00017\ \ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{00019\ \ \ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{namespacetsunami__lab_a2db0f215df0d48460ce6a8c1e7bfe5a9}{t\_real}}\ \textcolor{keyword}{constexpr}\ m\_g\ =\ 9.80665;}
+\DoxyCodeLine{00021\ \ \ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{namespacetsunami__lab_a2db0f215df0d48460ce6a8c1e7bfe5a9}{t\_real}}\ \textcolor{keyword}{constexpr}\ m\_gSqrt\ =\ 3.131557121;}
+\DoxyCodeLine{00022\ }
+\DoxyCodeLine{00033\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ waveSpeeds(\ \mbox{\hyperlink{namespacetsunami__lab_a2db0f215df0d48460ce6a8c1e7bfe5a9}{t\_real}}\ \ \ i\_hL,}
+\DoxyCodeLine{00034\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetsunami__lab_a2db0f215df0d48460ce6a8c1e7bfe5a9}{t\_real}}\ \ \ i\_hR,}
+\DoxyCodeLine{00035\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetsunami__lab_a2db0f215df0d48460ce6a8c1e7bfe5a9}{t\_real}}\ \ \ i\_uL,}
+\DoxyCodeLine{00036\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetsunami__lab_a2db0f215df0d48460ce6a8c1e7bfe5a9}{t\_real}}\ \ \ i\_uR,}
+\DoxyCodeLine{00037\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetsunami__lab_a2db0f215df0d48460ce6a8c1e7bfe5a9}{t\_real}}\ \&\ o\_waveSpeedL,}
+\DoxyCodeLine{00038\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetsunami__lab_a2db0f215df0d48460ce6a8c1e7bfe5a9}{t\_real}}\ \&\ o\_waveSpeedR\ );}
+\DoxyCodeLine{00039\ }
+\DoxyCodeLine{00052\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ waveStrengths(\ \mbox{\hyperlink{namespacetsunami__lab_a2db0f215df0d48460ce6a8c1e7bfe5a9}{t\_real}}\ \ \ i\_hL,}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetsunami__lab_a2db0f215df0d48460ce6a8c1e7bfe5a9}{t\_real}}\ \ \ i\_hR,}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetsunami__lab_a2db0f215df0d48460ce6a8c1e7bfe5a9}{t\_real}}\ \ \ i\_huL,}
+\DoxyCodeLine{00055\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetsunami__lab_a2db0f215df0d48460ce6a8c1e7bfe5a9}{t\_real}}\ \ \ i\_huR,}
+\DoxyCodeLine{00056\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetsunami__lab_a2db0f215df0d48460ce6a8c1e7bfe5a9}{t\_real}}\ \ \ i\_waveSpeedL,}
+\DoxyCodeLine{00057\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetsunami__lab_a2db0f215df0d48460ce6a8c1e7bfe5a9}{t\_real}}\ \ \ i\_waveSpeedR,}
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetsunami__lab_a2db0f215df0d48460ce6a8c1e7bfe5a9}{t\_real}}\ \&\ o\_strengthL,}
+\DoxyCodeLine{00059\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetsunami__lab_a2db0f215df0d48460ce6a8c1e7bfe5a9}{t\_real}}\ \&\ o\_strengthR\ );}
+\DoxyCodeLine{00060\ }
+\DoxyCodeLine{00061\ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00072\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classtsunami__lab_1_1solvers_1_1FWave_a6646244f89d6f84bba29186b16026b4f}{netUpdates}}(\ \mbox{\hyperlink{namespacetsunami__lab_a2db0f215df0d48460ce6a8c1e7bfe5a9}{t\_real}}\ i\_hL,}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetsunami__lab_a2db0f215df0d48460ce6a8c1e7bfe5a9}{t\_real}}\ i\_hR,}
+\DoxyCodeLine{00074\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetsunami__lab_a2db0f215df0d48460ce6a8c1e7bfe5a9}{t\_real}}\ i\_huL,}
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetsunami__lab_a2db0f215df0d48460ce6a8c1e7bfe5a9}{t\_real}}\ i\_huR,}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetsunami__lab_a2db0f215df0d48460ce6a8c1e7bfe5a9}{t\_real}}\ o\_netUpdateL[2],}
+\DoxyCodeLine{00077\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetsunami__lab_a2db0f215df0d48460ce6a8c1e7bfe5a9}{t\_real}}\ o\_netUpdateR[2]\ );}
+\DoxyCodeLine{00078\ \};}
+\DoxyCodeLine{00079\ }
+\DoxyCodeLine{00080\ \textcolor{preprocessor}{\#endif}}
+
+\end{DoxyCode}
