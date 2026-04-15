@@ -18,7 +18,6 @@ F-Wave Solver code
 
 This is the first submission, in which a f-wave solver was implemented and tested. 
 
-The implementation was straight forward.
 The given Roe solver was simply adjusted by P. Wächter to the different computation of the jump with the flux function.
 The computation of the wave speed is the same in both the Roe and the f-wave solver, so no changes made there.
 
