@@ -2,8 +2,8 @@
  * @section DESCRIPTION
  * F-Wave solver for the one-dimensional shallow water equations.
  **/
-#ifndef TSUNAMI_LAB_SOLVERS_ROE
-#define TSUNAMI_LAB_SOLVERS_ROE
+#ifndef TSUNAMI_LAB_SOLVERS_FWAVE
+#define TSUNAMI_LAB_SOLVERS_FWAVE
 
 #include "../constants.h"
 
