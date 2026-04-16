@@ -4,6 +4,7 @@
  * @section DESCRIPTION
  * Entry-point for simulations.
  **/
+
 #include "patches/WavePropagation1d.h"
 #include "setups/DamBreak1d.h"
 #include "io/Csv.h"
