@@ -8,12 +8,17 @@
  *
  **/
 #include "../macros.h"
-#include <catch2/catch.hpp>
+#include "../../submodules/Catch2/include/catch.hpp"
+//#include <catch2/catch.h>
 #include "WavePropagation1d.h"
 
 
   //fwave test case
 TEST_CASE( "Test the 1d wave propagation solver.", "[WaveProp1d]" ) {
+
+  // construct solver and setup a dambreak problem
+  tsunami_lab::patches::WavePropagation1d m_waveProp( 100 );
+
   switch(MODE) {
     case MODEFWAVE:
       /*
@@ -32,9 +37,6 @@ TEST_CASE( "Test the 1d wave propagation solver.", "[WaveProp1d]" ) {
       *      9.39467851749      |  -9.39467851749
       *    −88.259917223468     | −88.259917223468
       */
-
-      // construct solver and setup a dambreak problem
-      tsunami_lab::patches::WavePropagation1d m_waveProp( 100 );
 
       for( std::size_t l_ce = 0; l_ce < 50; l_ce++ ) {
         m_waveProp.setHeight( l_ce,
@@ -95,9 +97,6 @@ TEST_CASE( "Test the 1d wave propagation solver.", "[WaveProp1d]" ) {
       *      9.394671362 | -9.394671362
       *    -88.25985     | -88.25985
       */
-
-      // construct solver and setup a dambreak problem
-      tsunami_lab::patches::WavePropagation1d m_waveProp( 100 );
 
       for( std::size_t l_ce = 0; l_ce < 50; l_ce++ ) {
         m_waveProp.setHeight( l_ce,
