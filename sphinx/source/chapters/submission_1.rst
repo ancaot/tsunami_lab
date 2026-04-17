@@ -21,7 +21,7 @@ Test Cases for the f-wave solver
 
 The test cases for the new f-wave solver are also based on the given Roe solver test cases, 
 most of the test cases were adjusted by A. Otto with the exception of one, which was adjusted by P. Wächter.
-Most computations made in the comments of the test cases were made with 'Wolfram Alpha <https://www.wolframalpha.com/>'.
+Most computations made in the comments of the test cases were made with `Wolfram Alpha <https://www.wolframalpha.com>`.
 
 The test case for the wave speed is identical to the Roe solver on basis of using the same computation process.
 
