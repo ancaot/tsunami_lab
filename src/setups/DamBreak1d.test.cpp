@@ -4,8 +4,8 @@
  * @section DESCRIPTION
  * Tests the dam break setup.
  **/
-#include "../../submodules/Catch2/include/catch.hpp"
-//#include <catch2/catch.h>
+//#include "../../submodules/Catch2/include/catch.hpp"
+#include <catch2/catch.hpp>
 #include "DamBreak1d.h"
 
 TEST_CASE( "Test the one-dimensional dam break setup.", "[DamBreak1d]" ) {
