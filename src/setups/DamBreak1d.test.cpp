@@ -1,10 +1,11 @@
 /**
- * @author Alexander Breuer (alex.breuer AT uni-jena.de)
+ * @author 
  *
  * @section DESCRIPTION
  * Tests the dam break setup.
  **/
-#include <catch2/catch.hpp>
+#include "../../submodules/Catch2/include/catch.hpp"
+//#include <catch2/catch.h>
 #include "DamBreak1d.h"
 
 TEST_CASE( "Test the one-dimensional dam break setup.", "[DamBreak1d]" ) {

@@ -1,5 +1,5 @@
 /**
- * @author)
+ * @author
  *
  * @section DESCRIPTION
  * Unit tests for the one-dimensional wave propagation patch.
