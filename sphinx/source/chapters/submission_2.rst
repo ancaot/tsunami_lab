@@ -13,10 +13,18 @@ Tasks regarding the Shock and Rarefaction Waves
 
 The Setup for the shock-shock problem...
 
+Observations
+
 The Setup for the rare-rare problem...
+
+Observations
 
 Tasks regarding the Dam-Break
 -----------------------------
 
 The Setup for the dam-break problem...
+
+Observations
+
+Answer to Tasks 2 of 2.2:
 
