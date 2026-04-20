@@ -2,6 +2,7 @@
  * @section DESCRIPTION
  * Unit tests of the F-Wave solver.
  **/
+//#include "../../submodules/Catch2/include/catch.hpp"
 #include <catch2/catch.hpp>
 #define private public
 #include "FWave.h"
