@@ -6,20 +6,20 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Welcome to Otto and Wächter’s Tsunami Lab documentation! &mdash; tsunami_lab_otto_waechter  documentation</title>
+  <title>Welcome to Alabrash, Otto and Wächter’s Tsunami Lab documentation! &mdash; tsunami_lab_alabrash_otto_waechter  documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
-      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
 
   
       <script src="_static/jquery.js?v=5d32c60e"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="_static/documentation_options.js?v=5929fcd5"></script>
-      <script src="_static/doctools.js?v=9bcbadda"></script>
-      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
-      <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      <script src="_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" /> 
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Submission 1: Riemann Solver" href="chapters/submission_1.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -31,7 +31,7 @@
           
           
           <a href="#" class="icon icon-home">
-            tsunami_lab_otto_waechter
+            tsunami_lab_alabrash_otto_waechter
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -41,28 +41,20 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <!-- Local TOC -->
-              <div class="local-toc"><ul>
-<li><a class="reference internal" href="#">Welcome to Otto and Wächter’s Tsunami Lab documentation!</a></li>
-<li><a class="reference internal" href="#submission-1-riemann-solver">Submission 1: Riemann Solver</a><ul>
-<li><a class="reference internal" href="#f-wave-solver-code">F-Wave Solver code</a></li>
-<li><a class="reference internal" href="#test-cases-for-the-f-wave-solver">Test Cases for the f-wave solver</a></li>
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Welcome to Alabrash, Otto and Wächter’s Tsunami Lab documentation!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="chapters/submission_1.html">Submission 1: Riemann Solver</a></li>
+<li class="toctree-l1"><a class="reference internal" href="chapters/submission_2.html">Submission 2: Finite Volume Discretization</a></li>
 </ul>
-</li>
-<li><a class="reference internal" href="#submission-2-finite-volume-discretization">Submission 2: Finite Volume Discretization</a><ul>
-<li><a class="reference internal" href="#shock-and-rarefaction-waves">Shock and Rarefaction Waves</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
-</ul>
-</div>
+
         </div>
       </div>
     </nav>
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="#">tsunami_lab_otto_waechter</a>
+          <a href="#">tsunami_lab_alabrash_otto_waechter</a>
       </nav>
 
       <div class="wy-nav-content">
@@ -70,7 +62,7 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="#" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active">Welcome to Otto and Wächter’s Tsunami Lab documentation!</li>
+      <li class="breadcrumb-item active">Welcome to Alabrash, Otto and Wächter’s Tsunami Lab documentation!</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/index.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -80,69 +72,38 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="welcome-to-otto-and-wachter-s-tsunami-lab-documentation">
-<h1>Welcome to Otto and Wächter’s Tsunami Lab documentation!<a class="headerlink" href="#welcome-to-otto-and-wachter-s-tsunami-lab-documentation" title="Link to this heading"></a></h1>
+  <section id="welcome-to-alabrash-otto-and-wachter-s-tsunami-lab-documentation">
+<h1>Welcome to Alabrash, Otto and Wächter’s Tsunami Lab documentation!<a class="headerlink" href="#welcome-to-alabrash-otto-and-wachter-s-tsunami-lab-documentation" title="Link to this heading"></a></h1>
 <div class="toctree-wrapper compound">
-</div>
-</section>
-<section id="submission-1-riemann-solver">
-<h1>Submission 1: Riemann Solver<a class="headerlink" href="#submission-1-riemann-solver" title="Link to this heading"></a></h1>
-<section id="f-wave-solver-code">
-<h2>F-Wave Solver code<a class="headerlink" href="#f-wave-solver-code" title="Link to this heading"></a></h2>
-<p>This is the first submission, in which a f-wave solver was implemented and tested.</p>
-<p>The given Roe solver was simply adjusted by P. Wächter to the different computation of the jump with the flux function.
-The computation of the wave speed is the same in both the Roe and the f-wave solver, so no changes made there.</p>
-<p>This meant a change was made to the function computing the wave strengths.
-The eigenvector matrix was now multiplied with the difference of following flux function for the right side and left side:
-<span class="math notranslate nohighlight">\(f := [hu, hu^2 + \frac{1}{2}gh^2]^T\)</span>.</p>
-<p>The other change to the Roe solver is the computation of the scaled waves.
-In difference to the Roe solver, the f-wave solver only uses the wave strength to scale the waves and not both wave speed and strength.
-Thus the values of the output net-updates also changed.</p>
-</section>
-<section id="test-cases-for-the-f-wave-solver">
-<h2>Test Cases for the f-wave solver<a class="headerlink" href="#test-cases-for-the-f-wave-solver" title="Link to this heading"></a></h2>
-<p>The test cases for the new f-wave solver are also based on the given Roe solver test cases,
-most of the test cases were adjusted by A. Otto with the exception of one, which was adjusted by P. Wächter.
-Most computations made in the comments of the test cases were made with ‘Wolfram Alpha &lt;<a class="reference external" href="https://www.wolframalpha.com/">https://www.wolframalpha.com/</a>&gt;’.</p>
-<p>The test case for the wave speed is identical to the Roe solver on basis of using the same computation process.</p>
-<p>The test case for the wave strengths was adjusted to include the flux function as the f-wave solver uses it.
-As such the values for the wave strengths differ to the values in test cases of the Roe solver.</p>
-<p>The test cases for the net-updates were also adjusted according to the f-wave solver.
-The values computed differ only slightly to the values of the Roe solver test cases.</p>
-<p>A test case for net-updates unique to the f-wave solver for a supersonic problem was added.
-In this case the computed eigenvectors for both sides are positive (negative eigenvectors are analog to this case).
-This case was added according to how the net-updates are influenced by the direction of the waves, numerical the value of the eigenvectors.
-As such, this test confirms that one net-update stays at zero, as implied in the equations computing the net-updates.</p>
-</section>
-</section>
-<section id="submission-2-finite-volume-discretization">
-<h1>Submission 2: Finite Volume Discretization<a class="headerlink" href="#submission-2-finite-volume-discretization" title="Link to this heading"></a></h1>
-<section id="shock-and-rarefaction-waves">
-<h2>Shock and Rarefaction Waves<a class="headerlink" href="#shock-and-rarefaction-waves" title="Link to this heading"></a></h2>
-<p>For this task, I implemented the shock-shock and rare-rare setups.
-After that, I tested different initial water heights <span class="math notranslate nohighlight">\(h_l\)</span> and velocities <span class="math notranslate nohighlight">\(u_l\)</span> to see how the solution behaves.
-Rarefaction appears when the waves move away from each other, while shocks form when they move toward each other.</p>
-<p>This matches the wave speeds <span class="math notranslate nohighlight">\(\lambda_{1/2} = u \mp \sqrt{g h}\)</span> very well, since their signs decide whether the solution spreads out or becomes steeper.</p>
-</section>
-</section>
-<section id="indices-and-tables">
-<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Link to this heading"></a></h1>
-<ul class="simple">
-<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
-<li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
-<li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Welcome to Alabrash, Otto and Wächter’s Tsunami Lab documentation!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="chapters/submission_1.html">Submission 1: Riemann Solver</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="chapters/submission_1.html#f-wave-solver-code">F-Wave Solver code</a></li>
+<li class="toctree-l2"><a class="reference internal" href="chapters/submission_1.html#test-cases-for-the-f-wave-solver">Test Cases for the f-wave solver</a></li>
 </ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="chapters/submission_2.html">Submission 2: Finite Volume Discretization</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="chapters/submission_2.html#tasks-regarding-the-one-dimensional-implementation-of-wave-propagation">Tasks regarding the one-dimensional implementation of wave propagation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="chapters/submission_2.html#tasks-regarding-the-shock-and-rarefaction-waves">Tasks regarding the Shock and Rarefaction Waves</a></li>
+<li class="toctree-l2"><a class="reference internal" href="chapters/submission_2.html#tasks-regarding-the-dam-break">Tasks regarding the Dam-Break</a></li>
+</ul>
+</li>
+</ul>
+</div>
 </section>
 
 
            </div>
           </div>
-          <footer>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="chapters/submission_1.html" class="btn btn-neutral float-right" title="Submission 1: Riemann Solver" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2026, Otto, Wächter.</p>
+    <p>&#169; Copyright 2026, Alabrash, Otto, Wächter.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
