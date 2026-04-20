@@ -31,7 +31,11 @@ if vars.UnknownVariables():
   exit(1)
 
 # create environment
-env = Environment( variables = vars )
+env = Environment( variables = vars, tools = ['gcc', 'g++', 'gnulink'] )
+
+# set compiler explicitly for MinGW
+env['CC'] = 'gcc'
+env['CXX'] = 'g++'
 
 # generate help message
 Help( vars.GenerateHelpText( env ) )

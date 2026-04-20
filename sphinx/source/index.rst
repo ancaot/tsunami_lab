@@ -50,6 +50,18 @@ This case was added according to how the net-updates are influenced by the direc
 As such, this test confirms that one net-update stays at zero, as implied in the equations computing the net-updates.
 
 
+Submission 2: Finite Volume Discretization
+==========================================
+Shock and Rarefaction Waves
+---------------------------
+
+For this task, I implemented the shock-shock and rare-rare setups.
+After that, I tested different initial water heights :math:`h_l` and velocities :math:`u_l` to see how the solution behaves.
+Rarefaction appears when the waves move away from each other, while shocks form when they move toward each other.
+
+This matches the wave speeds :math:`\lambda_{1/2} = u \mp \sqrt{g h}` very well, since their signs decide whether the solution spreads out or becomes steeper.
+
+
 Indices and tables
 ==================
 
