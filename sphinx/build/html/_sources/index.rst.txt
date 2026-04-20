@@ -18,7 +18,6 @@ F-Wave Solver code
 
 This is the first submission, in which a f-wave solver was implemented and tested. 
 
-The implementation was straight forward.
 The given Roe solver was simply adjusted by P. Wächter to the different computation of the jump with the flux function.
 The computation of the wave speed is the same in both the Roe and the f-wave solver, so no changes made there.
 
@@ -49,6 +48,18 @@ A test case for net-updates unique to the f-wave solver for a supersonic problem
 In this case the computed eigenvectors for both sides are positive (negative eigenvectors are analog to this case).
 This case was added according to how the net-updates are influenced by the direction of the waves, numerical the value of the eigenvectors.
 As such, this test confirms that one net-update stays at zero, as implied in the equations computing the net-updates.
+
+
+Submission 2: Finite Volume Discretization
+==========================================
+Shock and Rarefaction Waves
+---------------------------
+
+For this task, I implemented the shock-shock and rare-rare setups.
+After that, I tested different initial water heights :math:`h_l` and velocities :math:`u_l` to see how the solution behaves.
+Rarefaction appears when the waves move away from each other, while shocks form when they move toward each other.
+
+This matches the wave speeds :math:`\lambda_{1/2} = u \mp \sqrt{g h}` very well, since their signs decide whether the solution spreads out or becomes steeper.
 
 
 Indices and tables

@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" data-content_root="./">
 <head>
@@ -5,17 +7,16 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Welcome to Otto and Wächter’s Tsunami Lab documentation! &mdash; tsunami_lab_otto_waechter  documentation</title>
-      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
-      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=86f27845" />
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
 
   
-  
-        <script src="_static/jquery.js?v=8dae8fb0"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="_static/documentation_options.js?v=5929fcd5"></script>
-        <script src="_static/doctools.js?v=888ff710"></script>
-        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
-        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" /> 
@@ -46,6 +47,10 @@
 <li><a class="reference internal" href="#submission-1-riemann-solver">Submission 1: Riemann Solver</a><ul>
 <li><a class="reference internal" href="#f-wave-solver-code">F-Wave Solver code</a></li>
 <li><a class="reference internal" href="#test-cases-for-the-f-wave-solver">Test Cases for the f-wave solver</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#submission-2-finite-volume-discretization">Submission 2: Finite Volume Discretization</a><ul>
+<li><a class="reference internal" href="#shock-and-rarefaction-waves">Shock and Rarefaction Waves</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
@@ -85,8 +90,7 @@
 <section id="f-wave-solver-code">
 <h2>F-Wave Solver code<a class="headerlink" href="#f-wave-solver-code" title="Link to this heading"></a></h2>
 <p>This is the first submission, in which a f-wave solver was implemented and tested.</p>
-<p>The implementation was straight forward.
-The given Roe solver was simply adjusted by P. Wächter to the different computation of the jump with the flux function.
+<p>The given Roe solver was simply adjusted by P. Wächter to the different computation of the jump with the flux function.
 The computation of the wave speed is the same in both the Roe and the f-wave solver, so no changes made there.</p>
 <p>This meant a change was made to the function computing the wave strengths.
 The eigenvector matrix was now multiplied with the difference of following flux function for the right side and left side:
@@ -109,6 +113,16 @@ The values computed differ only slightly to the values of the Roe solver test ca
 In this case the computed eigenvectors for both sides are positive (negative eigenvectors are analog to this case).
 This case was added according to how the net-updates are influenced by the direction of the waves, numerical the value of the eigenvectors.
 As such, this test confirms that one net-update stays at zero, as implied in the equations computing the net-updates.</p>
+</section>
+</section>
+<section id="submission-2-finite-volume-discretization">
+<h1>Submission 2: Finite Volume Discretization<a class="headerlink" href="#submission-2-finite-volume-discretization" title="Link to this heading"></a></h1>
+<section id="shock-and-rarefaction-waves">
+<h2>Shock and Rarefaction Waves<a class="headerlink" href="#shock-and-rarefaction-waves" title="Link to this heading"></a></h2>
+<p>For this task, I implemented the shock-shock and rare-rare setups.
+After that, I tested different initial water heights <span class="math notranslate nohighlight">\(h_l\)</span> and velocities <span class="math notranslate nohighlight">\(u_l\)</span> to see how the solution behaves.
+Rarefaction appears when the waves move away from each other, while shocks form when they move toward each other.</p>
+<p>This matches the wave speeds <span class="math notranslate nohighlight">\(\lambda_{1/2} = u \mp \sqrt{g h}\)</span> very well, since their signs decide whether the solution spreads out or becomes steeper.</p>
 </section>
 </section>
 <section id="indices-and-tables">
