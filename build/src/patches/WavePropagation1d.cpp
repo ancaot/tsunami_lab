@@ -4,7 +4,13 @@
  * @section DESCRIPTION
  * One-dimensional wave propagation patch.
  **/
+
+#define MODEFWAVE 1
+#define MODEROE 2
+#define MODE MODEFWAVE
+
 #include "WavePropagation1d.h"
+#include "../solvers/FWave.h"
 #include "../solvers/Roe.h"
 
 tsunami_lab::patches::WavePropagation1d::WavePropagation1d( t_idx i_nCells ) {
@@ -53,15 +59,27 @@ void tsunami_lab::patches::WavePropagation1d::timeStep( t_real i_scaling ) {
     t_idx l_ceL = l_ed;
     t_idx l_ceR = l_ed+1;
 
-    // compute net-updates
+    // compute net-updates f-wave or roe
     t_real l_netUpdates[2][2];
-
-    solvers::Roe::netUpdates( l_hOld[l_ceL],
+    switch(MODE) {
+      case MODEFWAVE :
+        solvers::FWave::netUpdates( l_hOld[l_ceL],
                               l_hOld[l_ceR],
                               l_huOld[l_ceL],
                               l_huOld[l_ceR],
                               l_netUpdates[0],
                               l_netUpdates[1] );
+        break;
+      case MODEROE :
+        solvers::Roe::netUpdates( l_hOld[l_ceL],
+                              l_hOld[l_ceR],
+                              l_huOld[l_ceL],
+                              l_huOld[l_ceR],
+                              l_netUpdates[0],
+                              l_netUpdates[1] );
+        break;
+    }
+    
 
     // update the cells' quantities
     l_hNew[l_ceL]  -= i_scaling * l_netUpdates[0][0];

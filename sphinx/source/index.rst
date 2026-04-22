@@ -4,7 +4,7 @@
    contain the root `toctree` directive.
 
 Welcome to Alabrash, Otto and Wächter's Tsunami Lab documentation!
-========================================================
+======================================================================
 
 .. toctree::
    :maxdepth: 2
