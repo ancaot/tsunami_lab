@@ -1,40 +1,22 @@
 /**
- * @author Alexander Breuer (alex.breuer AT uni-jena.de)
- *
  * @section DESCRIPTION
- * Tests the dam break setup.
+ * Tests the shock-shock setup.
  **/
 #include <catch2/catch.hpp>
-#include "DamBreak1d.h"
+#include "ShockShock1d.h"
 
-TEST_CASE( "Test the one-dimensional dam break setup.", "[DamBreak1d]" ) {
-  tsunami_lab::setups::DamBreak1d l_damBreak( 25,
-                                              55,
-                                               3 );
+TEST_CASE( "Test the one-dimensional shock-shock setup.", "[ShockShock1d]" ) {
+  tsunami_lab::setups::DamBreak1d l_damBreak( 10,
+                                              3,
+                                               5 );
 
-  // left side
-  REQUIRE( l_damBreak.getHeight( 2, 0 ) == 25 );
+  // left side: q_l = [h, +h*u]
+	REQUIRE( l_rareRare.getHeight( 4, 0 ) == Approx(10) );
+	REQUIRE( l_rareRare.getMomentumX( 4, 0 ) == Approx(30) );
+	REQUIRE( l_rareRare.getMomentumY( 4, 0 ) == Approx(0) );
 
-  REQUIRE( l_damBreak.getMomentumX( 2, 0 ) == 0 );
-
-  REQUIRE( l_damBreak.getMomentumY( 2, 0 ) == 0 );
-
-  REQUIRE( l_damBreak.getHeight( 2, 5 ) == 25 );
-
-  REQUIRE( l_damBreak.getMomentumX( 2, 5 ) == 0 );
-
-  REQUIRE( l_damBreak.getMomentumY( 2, 2 ) == 0 );
-
-  // right side
-  REQUIRE( l_damBreak.getHeight( 4, 0 ) == 55 );
-
-  REQUIRE( l_damBreak.getMomentumX( 4, 0 ) == 0 );
-
-  REQUIRE( l_damBreak.getMomentumY( 4, 0 ) == 0 );
-
-  REQUIRE( l_damBreak.getHeight( 4, 5 ) == 55 );
-
-  REQUIRE( l_damBreak.getMomentumX( 4, 5 ) == 0 );
-
-  REQUIRE( l_damBreak.getMomentumY( 4, 2 ) == 0 );  
+	// right side: q_r = [h, -h*u]
+	REQUIRE( l_rareRare.getHeight( 6, 0 ) == Approx(10) );
+	REQUIRE( l_rareRare.getMomentumX( 6, 0 ) == Approx(-30) );
+	REQUIRE( l_rareRare.getMomentumY( 6, 0 ) == Approx(0) );  
 }
