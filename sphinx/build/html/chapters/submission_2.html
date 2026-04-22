@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" data-content_root="../">
 <head>
@@ -7,16 +5,17 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Submission 2: Finite Volume Discretization &mdash; tsunami_lab_alabrash_otto_waechter  documentation</title>
-      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
-      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=86f27845" />
 
   
-      <script src="../_static/jquery.js?v=5d32c60e"></script>
-      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=5929fcd5"></script>
-      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
-      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
-      <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
+  
+        <script src="../_static/jquery.js?v=8dae8fb0"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../_static/doctools.js?v=888ff710"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -89,7 +88,10 @@ The modes to choose from are MODEFWAVE and MODEROE, which then follow the chosen
 </section>
 <section id="tasks-regarding-the-shock-and-rarefaction-waves">
 <h2>Tasks regarding the Shock and Rarefaction Waves<a class="headerlink" href="#tasks-regarding-the-shock-and-rarefaction-waves" title="Link to this heading"></a></h2>
-<p>The Setup for the shock-shock problem…</p>
+<p>The Setup for the shock-shock problem follows the formulas and conditions given in the task.
+The setup is given the height, velocity and location discontinuty as input.
+This means the getHeight method gives the height according to the conditions, meaning <span class="math notranslate nohighlight">\(h_l=h_r\)</span>.
+The getMomentumX method computes the method as given in the task with <span class="math notranslate nohighlight">\(q_l=(hu)_l\)</span> if the stream moves to the right and <span class="math notranslate nohighlight">\(q_r=-(hu)_l\)</span> if it moves to the left.</p>
 <p><strong>Observations for different sets:</strong></p>
 <blockquote>
 <div><ol class="arabic simple">
@@ -98,7 +100,10 @@ The modes to choose from are MODEFWAVE and MODEROE, which then follow the chosen
 <li><p>This behavior is consistent with the wave speeds <span class="math notranslate nohighlight">\(\lambda_{1/2} = u \mp \sqrt{g h}\)</span>.</p></li>
 </ol>
 </div></blockquote>
-<p>The Setup for the rare-rare problem…</p>
+<p>The Setup for the rare-rare problem was made following the given task.
+The setup input is the same as in the shock-shock problem.
+Thus the getHeight method is also the same.
+The difference comes in the getMomentumX method, where <span class="math notranslate nohighlight">\(q_l=-(hu)_l\)</span> if the stream moves left and <span class="math notranslate nohighlight">\(q_r=(hu)_l\)</span> if the stream moves right.</p>
 <p><strong>Observations for different sets:</strong></p>
 <blockquote>
 <div><ol class="arabic simple">
@@ -110,15 +115,19 @@ The modes to choose from are MODEFWAVE and MODEROE, which then follow the chosen
 </section>
 <section id="tasks-regarding-the-dam-break">
 <h2>Tasks regarding the Dam-Break<a class="headerlink" href="#tasks-regarding-the-dam-break" title="Link to this heading"></a></h2>
-<p>The Setup for the dam-break problem…</p>
+<p>The Setup for the dam-break problem given was adjusted to apply the f-wave solver.
+We added input variables for the momentum on the left side of the dam and the momentum on the right side.</p>
+<p>The getMomentumX method chooses based on if the currently observed x is on the left or right side of the dam and returning the corresponding momemntum.</p>
 <p><strong>Observations for different sets:</strong></p>
 <blockquote>
 <div><ol class="arabic simple">
-<li><p>Set - heights <span class="math notranslate nohighlight">\(h_l=\)</span> and <span class="math notranslate nohighlight">\(h_r=\)</span></p></li>
+<li><p>The impact of the particle velocity <span class="math notranslate nohighlight">\(u_r\)</span> is very low.</p></li>
 </ol>
 </div></blockquote>
 <p><strong>Answer to Tasks 2 of 2.2:</strong></p>
-<p><span class="math notranslate nohighlight">\(q_l=[14,0]^T\)</span> and <span class="math notranslate nohighlight">\(q_r=[3.5,0.7]^T\)</span></p>
+<p>The question asked is: how much time is needed for the evacuation of a village 25 km downstream of a water reservoir?
+<span class="math notranslate nohighlight">\(q_l=[14,0]^T\)</span> and <span class="math notranslate nohighlight">\(q_r=[3.5,0.7]^T\)</span> are the given values for the problem.</p>
+<p>Our simulation provides the answer of the wave taking 35 minutes to arrive at the village.</p>
 </section>
 </section>
 

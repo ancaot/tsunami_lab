@@ -38,15 +38,17 @@ Tasks regarding the Dam-Break
 -----------------------------
 
 The Setup for the dam-break problem given was adjusted to apply the f-wave solver.
-For this the getMomentumX method and the getMomentumY method were changed to compute a Rarefaction wave and a Shock wave.
-The Shock wave moves to the right, which means it's computed with the getMomentumX method.
-While the Rarefaction wave moves left and thus is computed with the getMomentumY method.
+We added input variables for the momentum on the left side of the dam and the momentum on the right side.
+
+The getMomentumX method chooses based on if the currently observed x is on the left or right side of the dam and returning the corresponding momemntum.
 
 **Observations for different sets:**
 
-    #. Set - heights :math:`h_l=` and :math:`h_r=`
+    #. The impact of the particle velocity :math:`u_r` is very low.
 
 **Answer to Tasks 2 of 2.2:**
 
-:math:`q_l=[14,0]^T` and :math:`q_r=[3.5,0.7]^T`
+The question asked is: how much time is needed for the evacuation of a village 25 km downstream of a water reservoir?
+:math:`q_l=[14,0]^T` and :math:`q_r=[3.5,0.7]^T` are the given values for the problem.
 
+Our simulation provides the answer of the wave taking 35 minutes to arrive at the village.
