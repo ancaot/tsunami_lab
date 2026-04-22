@@ -41,7 +41,7 @@ int main( int   i_argc,
       std::cerr << "invalid number of cells" << std::endl;
       return EXIT_FAILURE;
     }
-    l_dxy = 10.0 / l_nx;
+    l_dxy = 50000.0 / l_nx;
   }
   std::cout << "runtime configuration" << std::endl;
   std::cout << "  number of cells in x-direction: " << l_nx << std::endl;
@@ -50,9 +50,11 @@ int main( int   i_argc,
 
   // construct setup
   tsunami_lab::setups::Setup *l_setup;
-  l_setup = new tsunami_lab::setups::DamBreak1d( 10,
-                                                 5,
-                                                 5 );
+  l_setup = new tsunami_lab::setups::DamBreak1d( 14,
+                                                 3.5,
+                                                 0,
+                                                 0.7,
+                                                 25000 );
   // construct solver
   tsunami_lab::patches::WavePropagation *l_waveProp;
   l_waveProp = new tsunami_lab::patches::WavePropagation1d( l_nx );
@@ -105,7 +107,7 @@ int main( int   i_argc,
   // set up time and print control
   tsunami_lab::t_idx  l_timeStep = 0;
   tsunami_lab::t_idx  l_nOut = 0;
-  tsunami_lab::t_real l_endTime = 1.25;
+  tsunami_lab::t_real l_endTime = 3000;
   tsunami_lab::t_real l_simTime = 0;
 
   std::cout << "entering time loop" << std::endl;
