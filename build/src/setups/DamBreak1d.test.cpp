@@ -1,15 +1,18 @@
 /**
- * @author Alexander Breuer (alex.breuer AT uni-jena.de)
+ * @author 
  *
  * @section DESCRIPTION
  * Tests the dam break setup.
  **/
+//#include "../../submodules/Catch2/include/catch.hpp"
 #include <catch2/catch.hpp>
 #include "DamBreak1d.h"
 
 TEST_CASE( "Test the one-dimensional dam break setup.", "[DamBreak1d]" ) {
   tsunami_lab::setups::DamBreak1d l_damBreak( 25,
                                               55,
+                                              0,
+                                              0,
                                                3 );
 
   // left side

@@ -6,8 +6,8 @@ Tasks regarding the one-dimensional implementation of wave propagation
 
 The task was to include the f-wave solver in the given files implementing wave propagation, including the test file.
 Additionally we should find a solution to switch between Roe and f-wave solver.
-The switch was implemented with MODE macros and switch functions in the respective files.
-The modes to choose from are MODEFWAVE and MODEROE, which then follow the chosen solver computations and tests. 
+The switch was implemented with a macro MODE that switches functions based on its given value in the macros.h file.
+The values that MODE can take are currently given by MODEFWAVE and MODEROE but more could be added to the file. 
 
 Tasks regarding the Shock and Rarefaction Waves
 -----------------------------------------------
@@ -37,7 +37,6 @@ The difference comes in the getMomentumX method, where :math:`q_l=-(hu)_l` if th
 Tasks regarding the Dam-Break
 -----------------------------
 
-The Setup for the dam-break problem given was adjusted to apply the f-wave solver.
 We added input variables for the momentum on the left side of the dam and the momentum on the right side.
 
 The getMomentumX method chooses based on if the currently observed x is on the left or right side of the dam and returning the corresponding momemntum.
@@ -52,3 +51,5 @@ The question asked is: how much time is needed for the evacuation of a village 2
 :math:`q_l=[14,0]^T` and :math:`q_r=[3.5,0.7]^T` are the given values for the problem.
 
 Our simulation provides the answer of the wave taking 35 minutes to arrive at the village.
+This was achieved by implementating a Dam-Break situation with sufficient (50000) cells and simulating the Waves untill equlibrium is reached.
+From this the time of arrival was determined by finding the first time stamp in which the Schock Wave has crossed the 25000 meter mark.

@@ -5,10 +5,9 @@
  * One-dimensional wave propagation patch.
  **/
 
-#define MODEFWAVE 1
-#define MODEROE 2
-#define MODE MODEFWAVE
 
+
+#include "../macros.h"
 #include "WavePropagation1d.h"
 #include "../solvers/FWave.h"
 #include "../solvers/Roe.h"

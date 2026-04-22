@@ -4,6 +4,7 @@
  * @section DESCRIPTION
  * Unit tests of the Roe Riemann solver.
  **/
+//#include "../../submodules/Catch2/include/catch.hpp"
 #include <catch2/catch.hpp>
 #define private public
 #include "Roe.h"

@@ -5,7 +5,7 @@
 Import('env')
 
 # gather sources
-l_sources = [ 'solvers/Fwave.cpp',
+l_sources = [ 'solvers/FWave.cpp',
               'solvers/Roe.cpp',
               'patches/WavePropagation1d.cpp',
               'setups/DamBreak1d.cpp',
