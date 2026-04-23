@@ -5,6 +5,7 @@
 # Entry-point for builds.
 ##
 import SCons
+import os
 
 print( '####################################' )
 print( '### Tsunami Lab                  ###' )
@@ -31,7 +32,11 @@ if vars.UnknownVariables():
   exit(1)
 
 # create environment
-env = Environment( variables = vars, tools = ['gcc', 'g++', 'gnulink'] )
+# Pass through the full process environment so spawned compiler processes
+# can resolve toolchain executables from PATH on Windows.
+env = Environment( variables = vars,
+                   tools = ['gcc', 'g++', 'gnulink'],
+                   ENV = os.environ.copy() )
 
 # set compiler explicitly for MinGW
 env['CC'] = 'gcc'
