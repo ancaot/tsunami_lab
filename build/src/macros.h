@@ -1,3 +1,0 @@
-#define MODEFWAVE 1
-#define MODEROE 2
-#define MODE MODEFWAVE
