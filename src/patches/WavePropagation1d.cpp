@@ -20,13 +20,15 @@ tsunami_lab::patches::WavePropagation1d::WavePropagation1d( t_idx i_nCells ) {
     m_h[l_st] = new t_real[  m_nCells + 2 ];
     m_hu[l_st] = new t_real[ m_nCells + 2 ];
   }
+  m_b = new t_real[  m_nCells + 2 ];
 
   // init to zero
-  for( unsigned short l_st = 0; l_st < 2; l_st++ ) {
-    for( t_idx l_ce = 0; l_ce < m_nCells; l_ce++ ) {
+  for( t_idx l_ce = 0; l_ce < m_nCells; l_ce++ ) {
+    for( unsigned short l_st = 0; l_st < 2; l_st++ ) {
       m_h[l_st][l_ce] = 0;
       m_hu[l_st][l_ce] = 0;
     }
+    m_b[l_ce] = 0;
   }
 }
 
@@ -35,6 +37,7 @@ tsunami_lab::patches::WavePropagation1d::~WavePropagation1d() {
     delete[] m_h[l_st];
     delete[] m_hu[l_st];
   }
+  delete[] m_b;
 }
 
 void tsunami_lab::patches::WavePropagation1d::timeStep( t_real i_scaling ) {
@@ -66,6 +69,8 @@ void tsunami_lab::patches::WavePropagation1d::timeStep( t_real i_scaling ) {
                               l_hOld[l_ceR],
                               l_huOld[l_ceL],
                               l_huOld[l_ceR],
+                              m_b[l_ceL],
+                              m_b[l_ceR],
                               l_netUpdates[0],
                               l_netUpdates[1] );
         break;
