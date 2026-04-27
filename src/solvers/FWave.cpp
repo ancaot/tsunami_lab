@@ -76,6 +76,18 @@ void tsunami_lab::solvers::FWave::netUpdates( t_real i_hL,
                                             t_real i_bR,
                                             t_real o_netUpdateL[2],
                                             t_real o_netUpdateR[2] ) {
+  
+  if(i_bL >= 0) {
+    i_hL = i_hR;
+    i_huL = -i_huR;
+    i_bL = i_bR;
+  }
+  if(i_bR >= 0) {
+    i_hR = i_hL;
+    i_huR = -i_huL;
+    i_bR = i_bR;
+  }
+  
   // compute particle velocities
   t_real l_uL = i_huL / i_hL;
   t_real l_uR = i_huR / i_hR;
