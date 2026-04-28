@@ -1,0 +1,509 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Submission 3: Bathymetry &amp; Boundary Conditions &mdash; tsunami_lab_alabrash_otto_waechter  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="Submission 2: Finite Volume Discretization" href="submission_2.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            tsunami_lab_alabrash_otto_waechter
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../index.html">Welcome to Alabrash, Otto and Wächter’s Tsunami Lab documentation!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="submission_1.html">Submission 1: Riemann Solver</a></li>
+<li class="toctree-l1"><a class="reference internal" href="submission_2.html">Submission 2: Finite Volume Discretization</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Submission 3: Bathymetry &amp; Boundary Conditions</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#task-non-zero-source-term">Task Non-zero Source Term</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#task-reflecting-boundary-conditions">Task Reflecting Boundary Conditions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#task-hydraulic-jumps">Task Hydraulic Jumps</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#tasks-regarding-the-maximum-froude-number-at-t-0">Tasks regarding the maximum Froude number at t = 0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#the-setup-for-the-subcritical-case-eq-3-3-1">The Setup for the subcritical case (Eq. 3.3.1)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#the-setup-for-the-supercritical-case-eq-3-3-2">The Setup for the supercritical case (Eq. 3.3.2)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#tasks-regarding-the-implementation-of-setup-classes">Tasks regarding the implementation of setup classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#tasks-regarding-the-position-of-the-hydraulic-jump-and-solver-convergence">Tasks regarding the position of the hydraulic jump and solver convergence</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#answer-to-task-3">Answer to Task 3</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#task-1d-tsunami-simulation">Task 1D Tsunami Simulation</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">tsunami_lab_alabrash_otto_waechter</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Submission 3: Bathymetry &amp; Boundary Conditions</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/chapters/submission_3.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="submission-3-bathymetry-boundary-conditions">
+<h1>Submission 3: Bathymetry &amp; Boundary Conditions<a class="headerlink" href="#submission-3-bathymetry-boundary-conditions" title="Link to this heading"></a></h1>
+<section id="task-non-zero-source-term">
+<h2>Task Non-zero Source Term<a class="headerlink" href="#task-non-zero-source-term" title="Link to this heading"></a></h2>
+</section>
+<section id="task-reflecting-boundary-conditions">
+<h2>Task Reflecting Boundary Conditions<a class="headerlink" href="#task-reflecting-boundary-conditions" title="Link to this heading"></a></h2>
+</section>
+<section id="task-hydraulic-jumps">
+<h2>Task Hydraulic Jumps<a class="headerlink" href="#task-hydraulic-jumps" title="Link to this heading"></a></h2>
+</section>
+<section id="tasks-regarding-the-maximum-froude-number-at-t-0">
+<h2>Tasks regarding the maximum Froude number at t = 0<a class="headerlink" href="#tasks-regarding-the-maximum-froude-number-at-t-0" title="Link to this heading"></a></h2>
+<p>For this task, we compute the location and value of the maximum Froude number for the subcritical setting in Eq. 3.3.1 and the supercritical setting in Eq. 3.3.2 at the initial time <span class="math notranslate nohighlight">\(t = 0\)</span>.</p>
+<p>The maximum occurs at the center of the hump, because that is where the water depth is smallest and the velocity becomes largest.</p>
+<div class="math notranslate nohighlight">
+\[F = \frac{u}{\sqrt{g h}}, \qquad u = \frac{hu}{h}\]</div>
+<p>For the subcritical case, the deepest point of the hump is at <span class="math notranslate nohighlight">\(x = 10\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[h(10) = 1.8, \qquad u(10) = \frac{4.42}{1.8} = 2.4556\]</div>
+<div class="math notranslate nohighlight">
+\[F_{\max} = \frac{2.4556}{\sqrt{9.81 \cdot 1.8}} \approx 0.585\]</div>
+<p>For the supercritical case, the same point gives:</p>
+<div class="math notranslate nohighlight">
+\[h(10) = 0.13, \qquad u(10) = \frac{0.18}{0.13} = 1.3846\]</div>
+<div class="math notranslate nohighlight">
+\[F_{\max} = \frac{1.3846}{\sqrt{9.81 \cdot 0.13}} \approx 1.226\]</div>
+<p>So the final result is:</p>
+<ul class="simple">
+<li><p>subcritical: <span class="math notranslate nohighlight">\(x = 10\)</span>, <span class="math notranslate nohighlight">\(F_{\max} \approx 0.585\)</span></p></li>
+<li><p>supercritical: <span class="math notranslate nohighlight">\(x = 10\)</span>, <span class="math notranslate nohighlight">\(F_{\max} \approx 1.226\)</span></p></li>
+</ul>
+<p><strong>The Froude number is defined as:</strong></p>
+<div class="math notranslate nohighlight">
+\[F = \frac{u}{\sqrt{gh}}\]</div>
+<p>where <span class="math notranslate nohighlight">\(u = hu / h\)</span> is the flow velocity, <span class="math notranslate nohighlight">\(h\)</span> is water height, and <span class="math notranslate nohighlight">\(g = 9.81 \text{ m/s}^2\)</span> is gravitational acceleration.</p>
+</section>
+<section id="the-setup-for-the-subcritical-case-eq-3-3-1">
+<h2>The Setup for the subcritical case (Eq. 3.3.1)<a class="headerlink" href="#the-setup-for-the-subcritical-case-eq-3-3-1" title="Link to this heading"></a></h2>
+<p>Initial conditions:</p>
+<ul class="simple">
+<li><p>Bathymetry: <span class="math notranslate nohighlight">\(b(x) = \begin{cases} -1.8 - 0.05(x-10)^2 &amp; \text{if } x \in (8, 12) \\ -2 &amp; \text{else} \end{cases}\)</span></p></li>
+<li><p>Water height: <span class="math notranslate nohighlight">\(h(x,0) = -b(x)\)</span> for <span class="math notranslate nohighlight">\(x \in [0, 25]\)</span></p></li>
+<li><p>Momentum: <span class="math notranslate nohighlight">\(hu(x,0) = 4.42 \text{ m}^2\text{/s}\)</span> (constant everywhere)</p></li>
+</ul>
+<p><strong>Calculation of maximum Froude number at hump center (x = 10):</strong></p>
+<p>At the hump center, bathymetry is minimal:</p>
+<div class="math notranslate nohighlight">
+\[ \begin{align}\begin{aligned}b(10) = -1.8 - 0.05 \cdot 0^2 = -1.8 \text{ m}\\h(10) = -b(10) = 1.8 \text{ m}\\u(10) = \frac{hu(10)}{h(10)} = \frac{4.42}{1.8} = 2.4556 \text{ m/s}\\F_{\max} = \frac{u(10)}{\sqrt{g \cdot h(10)}} = \frac{2.4556}{\sqrt{9.81 \times 1.8}} = \frac{2.4556}{4.2012} \approx 0.585\end{aligned}\end{align} \]</div>
+<p><strong>Result for subcritical case:</strong></p>
+<blockquote>
+<div><ul class="simple">
+<li><p><strong>Location:</strong> <span class="math notranslate nohighlight">\(x = 10 \text{ m}\)</span></p></li>
+<li><p><strong>Maximum Froude number:</strong> <span class="math notranslate nohighlight">\(F_{\max} \approx 0.585\)</span></p></li>
+<li><p><strong>Regime:</strong> Subcritical (<span class="math notranslate nohighlight">\(F &lt; 1\)</span>)</p></li>
+</ul>
+</div></blockquote>
+<p><strong>Observations for subcritical case:</strong></p>
+<blockquote>
+<div><ol class="arabic simple">
+<li><p>The maximum Froude number occurs at the hump center where bathymetry reaches its minimum.</p></li>
+<li><p>The Froude number remains subcritical throughout the domain, indicating wave information can propagate upstream.</p></li>
+<li><p>The flow is subsonic: wave speeds <span class="math notranslate nohighlight">\(\lambda_{1/2} = u \pm \sqrt{gh}\)</span> dominate the flow velocity.</p></li>
+</ol>
+</div></blockquote>
+</section>
+<section id="the-setup-for-the-supercritical-case-eq-3-3-2">
+<h2>The Setup for the supercritical case (Eq. 3.3.2)<a class="headerlink" href="#the-setup-for-the-supercritical-case-eq-3-3-2" title="Link to this heading"></a></h2>
+<p>Initial conditions:</p>
+<ul class="simple">
+<li><p>Bathymetry: <span class="math notranslate nohighlight">\(b(x) = \begin{cases} -0.13 - 0.05(x-10)^2 &amp; \text{if } x \in (8, 12) \\ -0.33 &amp; \text{else} \end{cases}\)</span></p></li>
+<li><p>Water height: <span class="math notranslate nohighlight">\(h(x,0) = -b(x)\)</span> for <span class="math notranslate nohighlight">\(x \in [0, 25]\)</span></p></li>
+<li><p>Momentum: <span class="math notranslate nohighlight">\(hu(x,0) = 0.18 \text{ m}^2\text{/s}\)</span> (constant everywhere)</p></li>
+</ul>
+<p><strong>Calculation of maximum Froude number at hump center (x = 10):</strong></p>
+<p>At the hump center, bathymetry is minimal:</p>
+<div class="math notranslate nohighlight">
+\[ \begin{align}\begin{aligned}b(10) = -0.13 - 0.05 \cdot 0^2 = -0.13 \text{ m}\\h(10) = -b(10) = 0.13 \text{ m}\\u(10) = \frac{hu(10)}{h(10)} = \frac{0.18}{0.13} = 1.3846 \text{ m/s}\\F_{\max} = \frac{u(10)}{\sqrt{g \cdot h(10)}} = \frac{1.3846}{\sqrt{9.81 \times 0.13}} = \frac{1.3846}{1.1294} \approx 1.226\end{aligned}\end{align} \]</div>
+<p><strong>Result for supercritical case:</strong></p>
+<blockquote>
+<div><ul class="simple">
+<li><p><strong>Location:</strong> <span class="math notranslate nohighlight">\(x = 10 \text{ m}\)</span></p></li>
+<li><p><strong>Maximum Froude number:</strong> <span class="math notranslate nohighlight">\(F_{\max} \approx 1.226\)</span></p></li>
+<li><p><strong>Regime:</strong> Supercritical (<span class="math notranslate nohighlight">\(F &gt; 1\)</span>)</p></li>
+</ul>
+</div></blockquote>
+<p><strong>Observations for supercritical case:</strong></p>
+<blockquote>
+<div><ol class="arabic simple">
+<li><p>The maximum Froude number occurs at the hump center where water depth is minimal (0.13 m vs. 1.8 m in subcritical).</p></li>
+<li><p>The Froude number remains supercritical throughout, indicating flow dominates wave propagation.</p></li>
+<li><p>The flow is supersonic: flow velocity exceeds wave speeds, information propagates downstream only.</p></li>
+<li><p>Much shallower water and higher velocities compared to the subcritical case.</p></li>
+</ol>
+</div></blockquote>
+<p><strong>Comparison Table:</strong></p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Property</p></th>
+<th class="head"><p>Subcritical</p></th>
+<th class="head"><p>Supercritical</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Location (m)</p></td>
+<td><p>10.0</p></td>
+<td><p>10.0</p></td>
+</tr>
+<tr class="row-odd"><td><p>Froude Number</p></td>
+<td><p>0.585</p></td>
+<td><p>1.226</p></td>
+</tr>
+<tr class="row-even"><td><p>Water Height (m)</p></td>
+<td><p>1.8</p></td>
+<td><p>0.13</p></td>
+</tr>
+<tr class="row-odd"><td><p>Velocity (m/s)</p></td>
+<td><p>2.46</p></td>
+<td><p>1.38</p></td>
+</tr>
+<tr class="row-even"><td><p>Regime</p></td>
+<td><p>F &lt; 1</p></td>
+<td><p>F &gt; 1</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="tasks-regarding-the-implementation-of-setup-classes">
+<h2>Tasks regarding the implementation of setup classes<a class="headerlink" href="#tasks-regarding-the-implementation-of-setup-classes" title="Link to this heading"></a></h2>
+<p>To implement both cases, I used the abstract base class <code class="docutils literal notranslate"><span class="pre">tsunami_lab::setups::Setup</span></code> from <code class="docutils literal notranslate"><span class="pre">Setup.h</span></code>. It gives a common interface for the water height and the two momentum components, while the actual bathymetry and initial values are provided by the derived setup classes. A time window of <span class="math notranslate nohighlight">\(t \in [0, 200]\)</span> s is reasonable for the simulation.</p>
+<p><strong>Base class from ``Setup.h``:</strong></p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">tsunami_lab</span><span class="o">::</span><span class="n">setups</span><span class="o">::</span><span class="n">Setup</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">public</span><span class="o">:</span>
+<span class="w">    </span><span class="k">virtual</span><span class="w"> </span><span class="o">~</span><span class="n">Setup</span><span class="p">(){};</span>
+
+<span class="w">    </span><span class="k">virtual</span><span class="w"> </span><span class="n">t_real</span><span class="w"> </span><span class="nf">getHeight</span><span class="p">(</span><span class="w"> </span><span class="n">t_real</span><span class="w"> </span><span class="n">i_x</span><span class="p">,</span>
+<span class="w">                              </span><span class="n">t_real</span><span class="w"> </span><span class="n">i_y</span><span class="w"> </span><span class="p">)</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+
+<span class="w">    </span><span class="k">virtual</span><span class="w"> </span><span class="n">t_real</span><span class="w"> </span><span class="nf">getMomentumX</span><span class="p">(</span><span class="w"> </span><span class="n">t_real</span><span class="w"> </span><span class="n">i_x</span><span class="p">,</span>
+<span class="w">                                 </span><span class="n">t_real</span><span class="w"> </span><span class="n">i_y</span><span class="w"> </span><span class="p">)</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+
+<span class="w">    </span><span class="k">virtual</span><span class="w"> </span><span class="n">t_real</span><span class="w"> </span><span class="nf">getMomentumY</span><span class="p">(</span><span class="w"> </span><span class="n">t_real</span><span class="w"> </span><span class="n">i_x</span><span class="p">,</span>
+<span class="w">                                 </span><span class="n">t_real</span><span class="w"> </span><span class="n">i_y</span><span class="w"> </span><span class="p">)</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="p">};</span>
+</pre></div>
+</div>
+<p><strong>Explanation:</strong>
+- <code class="docutils literal notranslate"><span class="pre">Setup</span></code> is the common interface for all initial states.
+- Every setup has to provide water height and momentum in x- and y-direction.
+- The hydraulic-jump setups only change these values through inheritance, so the solver can use them in the same way as the other tasks.</p>
+<p><strong>Class hierarchy:</strong></p>
+<p>We created a hierarchical structure to share common bathymetry computation:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">HydraulicJump1d</span><span class="o">:</span><span class="w"> </span><span class="k">public</span><span class="w"> </span><span class="n">Setup</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">protected</span><span class="o">:</span>
+<span class="w">    </span><span class="n">t_real</span><span class="w"> </span><span class="n">m_humpCenter</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">10</span><span class="p">;</span>
+<span class="w">    </span><span class="n">t_real</span><span class="w"> </span><span class="n">m_humpHalfWidth</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span><span class="p">;</span>
+<span class="w">    </span><span class="n">t_real</span><span class="w"> </span><span class="n">m_bathymetryOutside</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">    </span><span class="n">t_real</span><span class="w"> </span><span class="n">m_bathymetryCurvature</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.05</span><span class="p">;</span>
+
+<span class="w">    </span><span class="n">t_real</span><span class="w"> </span><span class="nf">getBathymetry</span><span class="p">(</span><span class="w"> </span><span class="n">t_real</span><span class="w"> </span><span class="n">i_x</span><span class="w"> </span><span class="p">)</span><span class="w"> </span><span class="k">const</span><span class="p">;</span>
+<span class="w">  </span><span class="k">public</span><span class="o">:</span>
+<span class="w">    </span><span class="n">t_real</span><span class="w"> </span><span class="n">getHeight</span><span class="p">(</span><span class="w"> </span><span class="n">t_real</span><span class="w"> </span><span class="n">i_x</span><span class="p">,</span><span class="w"> </span><span class="n">t_real</span><span class="w"> </span><span class="n">i_y</span><span class="w"> </span><span class="p">)</span><span class="w"> </span><span class="k">const</span><span class="p">;</span>
+<span class="w">    </span><span class="n">t_real</span><span class="w"> </span><span class="nf">getMomentumX</span><span class="p">(</span><span class="w"> </span><span class="n">t_real</span><span class="w"> </span><span class="n">i_x</span><span class="p">,</span><span class="w"> </span><span class="n">t_real</span><span class="w"> </span><span class="n">i_y</span><span class="w"> </span><span class="p">)</span><span class="w"> </span><span class="k">const</span><span class="p">;</span>
+<span class="w">    </span><span class="n">t_real</span><span class="w"> </span><span class="nf">getMomentumY</span><span class="p">(</span><span class="w"> </span><span class="n">t_real</span><span class="w"> </span><span class="n">i_x</span><span class="p">,</span><span class="w"> </span><span class="n">t_real</span><span class="w"> </span><span class="n">i_y</span><span class="w"> </span><span class="p">)</span><span class="w"> </span><span class="k">const</span><span class="p">;</span>
+<span class="p">};</span>
+</pre></div>
+</div>
+<p><strong>Explanation:</strong>
+- Protected <code class="docutils literal notranslate"><span class="pre">getBathymetry()</span></code> computes the hump profile with quadratic shape
+- Height is derived as <span class="math notranslate nohighlight">\(h = -b(x)\)</span> (water surface equals negative bathymetry)
+- Base momentum defaults to zero (overridden by derived classes)
+- Domain parameters: hump center at x=10, half-width 2, curvature 0.05</p>
+<p><strong>Subcritical setup implementation:</strong></p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">HydraulicJumpSubcritical1d</span><span class="o">:</span><span class="w"> </span><span class="k">public</span><span class="w"> </span><span class="n">HydraulicJump1d</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">private</span><span class="o">:</span>
+<span class="w">    </span><span class="n">t_real</span><span class="w"> </span><span class="n">m_momentumX</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">  </span><span class="k">public</span><span class="o">:</span>
+<span class="w">    </span><span class="n">HydraulicJumpSubcritical1d</span><span class="p">();</span>
+<span class="w">    </span><span class="n">t_real</span><span class="w"> </span><span class="nf">getHeight</span><span class="p">(</span><span class="w"> </span><span class="n">t_real</span><span class="w"> </span><span class="n">i_x</span><span class="p">,</span><span class="w"> </span><span class="n">t_real</span><span class="w"> </span><span class="n">i_y</span><span class="w"> </span><span class="p">)</span><span class="w"> </span><span class="k">const</span><span class="p">;</span>
+<span class="w">    </span><span class="n">t_real</span><span class="w"> </span><span class="nf">getMomentumX</span><span class="p">(</span><span class="w"> </span><span class="n">t_real</span><span class="w"> </span><span class="n">i_x</span><span class="p">,</span><span class="w"> </span><span class="n">t_real</span><span class="w"> </span><span class="n">i_y</span><span class="w"> </span><span class="p">)</span><span class="w"> </span><span class="k">const</span><span class="p">;</span>
+<span class="w">    </span><span class="n">t_real</span><span class="w"> </span><span class="nf">getMomentumY</span><span class="p">(</span><span class="w"> </span><span class="n">t_real</span><span class="w"> </span><span class="n">i_x</span><span class="p">,</span><span class="w"> </span><span class="n">t_real</span><span class="w"> </span><span class="n">i_y</span><span class="w"> </span><span class="p">)</span><span class="w"> </span><span class="k">const</span><span class="p">;</span>
+<span class="p">};</span>
+
+<span class="n">HydraulicJumpSubcritical1d</span><span class="o">::</span><span class="n">HydraulicJumpSubcritical1d</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">m_bathymetryOutside</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">-2.0f</span><span class="p">;</span>
+<span class="w">  </span><span class="n">m_momentumX</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">4.42f</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="n">t_real</span><span class="w"> </span><span class="n">HydraulicJumpSubcritical1d</span><span class="o">::</span><span class="n">getMomentumX</span><span class="p">(</span>
+<span class="w">    </span><span class="n">t_real</span><span class="w"> </span><span class="n">i_x</span><span class="p">,</span><span class="w"> </span><span class="n">t_real</span><span class="w"> </span><span class="n">i_y</span><span class="w"> </span><span class="p">)</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="w"> </span><span class="n">i_x</span><span class="p">;</span>
+<span class="w">  </span><span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="w"> </span><span class="n">i_y</span><span class="p">;</span>
+<span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="n">m_momentumX</span><span class="p">;</span><span class="w">  </span><span class="c1">// Constant momentum hu = 4.42</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p><strong>Explanation:</strong>
+- Constructor initializes <code class="docutils literal notranslate"><span class="pre">m_bathymetryOutside</span> <span class="pre">=</span> <span class="pre">-2.0</span></code> (shallow domain)
+- Momentum is set to constant <code class="docutils literal notranslate"><span class="pre">4.42</span></code> m²/s throughout the domain (Eq. 3.3.1)
+- Unused parameters marked with <code class="docutils literal notranslate"><span class="pre">(void)</span></code> to suppress compiler warnings
+- <code class="docutils literal notranslate"><span class="pre">getHeight()</span></code> inherited from base class, returns <span class="math notranslate nohighlight">\(h(x) = -b(x)\)</span></p>
+<p><strong>Supercritical setup implementation:</strong></p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">HydraulicJumpSupercritical1d</span><span class="o">:</span><span class="w"> </span><span class="k">public</span><span class="w"> </span><span class="n">HydraulicJump1d</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">private</span><span class="o">:</span>
+<span class="w">    </span><span class="n">t_real</span><span class="w"> </span><span class="n">m_momentumX</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">  </span><span class="k">public</span><span class="o">:</span>
+<span class="w">    </span><span class="n">HydraulicJumpSupercritical1d</span><span class="p">();</span>
+<span class="w">    </span><span class="n">t_real</span><span class="w"> </span><span class="nf">getHeight</span><span class="p">(</span><span class="w"> </span><span class="n">t_real</span><span class="w"> </span><span class="n">i_x</span><span class="p">,</span><span class="w"> </span><span class="n">t_real</span><span class="w"> </span><span class="n">i_y</span><span class="w"> </span><span class="p">)</span><span class="w"> </span><span class="k">const</span><span class="p">;</span>
+<span class="w">    </span><span class="n">t_real</span><span class="w"> </span><span class="nf">getMomentumX</span><span class="p">(</span><span class="w"> </span><span class="n">t_real</span><span class="w"> </span><span class="n">i_x</span><span class="p">,</span><span class="w"> </span><span class="n">t_real</span><span class="w"> </span><span class="n">i_y</span><span class="w"> </span><span class="p">)</span><span class="w"> </span><span class="k">const</span><span class="p">;</span>
+<span class="w">    </span><span class="n">t_real</span><span class="w"> </span><span class="nf">getMomentumY</span><span class="p">(</span><span class="w"> </span><span class="n">t_real</span><span class="w"> </span><span class="n">i_x</span><span class="p">,</span><span class="w"> </span><span class="n">t_real</span><span class="w"> </span><span class="n">i_y</span><span class="w"> </span><span class="p">)</span><span class="w"> </span><span class="k">const</span><span class="p">;</span>
+<span class="p">};</span>
+
+<span class="n">HydraulicJumpSupercritical1d</span><span class="o">::</span><span class="n">HydraulicJumpSupercritical1d</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">m_bathymetryOutside</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">-0.33f</span><span class="p">;</span>
+<span class="w">  </span><span class="n">m_momentumX</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.18f</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="n">t_real</span><span class="w"> </span><span class="n">HydraulicJumpSupercritical1d</span><span class="o">::</span><span class="n">getMomentumX</span><span class="p">(</span>
+<span class="w">    </span><span class="n">t_real</span><span class="w"> </span><span class="n">i_x</span><span class="p">,</span><span class="w"> </span><span class="n">t_real</span><span class="w"> </span><span class="n">i_y</span><span class="w"> </span><span class="p">)</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="w"> </span><span class="n">i_x</span><span class="p">;</span>
+<span class="w">  </span><span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="w"> </span><span class="n">i_y</span><span class="p">;</span>
+<span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="n">m_momentumX</span><span class="p">;</span><span class="w">  </span><span class="c1">// Constant momentum hu = 0.18</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p><strong>Explanation:</strong>
+- Constructor initializes <code class="docutils literal notranslate"><span class="pre">m_bathymetryOutside</span> <span class="pre">=</span> <span class="pre">-0.33</span></code> (even shallower than subcritical)
+- Momentum is set to constant <code class="docutils literal notranslate"><span class="pre">0.18</span></code> m²/s (Eq. 3.3.2) – much smaller discharge
+- Unused parameters marked with <code class="docutils literal notranslate"><span class="pre">(void)</span></code> convention
+- Inherits bathymetry computation and height getter from base class</p>
+<p><strong>Common bathymetry function:</strong></p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">t_real</span><span class="w"> </span><span class="nf">HydraulicJump1d::getBathymetry</span><span class="p">(</span><span class="w"> </span><span class="n">t_real</span><span class="w"> </span><span class="n">i_x</span><span class="w"> </span><span class="p">)</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">if</span><span class="p">(</span><span class="w"> </span><span class="n">i_x</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">m_humpCenter</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">m_humpHalfWidth</span><span class="w"> </span><span class="o">&amp;&amp;</span>
+<span class="w">      </span><span class="n">i_x</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">m_humpCenter</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">m_humpHalfWidth</span><span class="w"> </span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">t_real</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">l_offset</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">i_x</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">m_humpCenter</span><span class="p">;</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">m_bathymetryOutside</span><span class="w"> </span><span class="o">-</span>
+<span class="w">           </span><span class="n">m_bathymetryCurvature</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">l_offset</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">l_offset</span><span class="p">;</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="n">m_bathymetryOutside</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p><strong>Explanation:</strong>
+- Quadratic hump profile: <span class="math notranslate nohighlight">\(b(x) = b_{\text{out}} - 0.05(x-10)^2\)</span> for <span class="math notranslate nohighlight">\(x \in (8, 12)\)</span>
+- Outside the hump interval: returns constant <code class="docutils literal notranslate"><span class="pre">m_bathymetryOutside</span></code>
+- Offset computation <code class="docutils literal notranslate"><span class="pre">l_offset</span> <span class="pre">=</span> <span class="pre">i_x</span> <span class="pre">-</span> <span class="pre">m_humpCenter</span></code> avoids repeated subtraction
+- Shared implementation reduces code duplication</p>
+<p><strong>Unit tests validation:</strong></p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">TEST_CASE</span><span class="p">(</span><span class="w"> </span><span class="s">&quot;Subcritical setup validation&quot;</span><span class="w"> </span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">tsunami_lab</span><span class="o">::</span><span class="n">setups</span><span class="o">::</span><span class="n">HydraulicJumpSubcritical1d</span><span class="w"> </span><span class="n">l_setup</span><span class="p">;</span>
+<span class="w">  </span><span class="n">REQUIRE</span><span class="p">(</span><span class="w"> </span><span class="n">l_setup</span><span class="p">.</span><span class="n">getHeight</span><span class="p">(</span><span class="w"> </span><span class="mf">10.0f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0f</span><span class="w"> </span><span class="p">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">Approx</span><span class="p">(</span><span class="w"> </span><span class="mf">1.8f</span><span class="w"> </span><span class="p">)</span><span class="w"> </span><span class="p">);</span>
+<span class="w">  </span><span class="n">REQUIRE</span><span class="p">(</span><span class="w"> </span><span class="n">l_setup</span><span class="p">.</span><span class="n">getHeight</span><span class="p">(</span><span class="w"> </span><span class="mf">0.0f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0f</span><span class="w"> </span><span class="p">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">Approx</span><span class="p">(</span><span class="w"> </span><span class="mf">2.0f</span><span class="w"> </span><span class="p">)</span><span class="w"> </span><span class="p">);</span>
+<span class="w">  </span><span class="n">REQUIRE</span><span class="p">(</span><span class="w"> </span><span class="n">l_setup</span><span class="p">.</span><span class="n">getMomentumX</span><span class="p">(</span><span class="w"> </span><span class="mf">0.0f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0f</span><span class="w"> </span><span class="p">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">Approx</span><span class="p">(</span><span class="w"> </span><span class="mf">4.42f</span><span class="w"> </span><span class="p">)</span><span class="w"> </span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="n">TEST_CASE</span><span class="p">(</span><span class="w"> </span><span class="s">&quot;Supercritical setup validation&quot;</span><span class="w"> </span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">tsunami_lab</span><span class="o">::</span><span class="n">setups</span><span class="o">::</span><span class="n">HydraulicJumpSupercritical1d</span><span class="w"> </span><span class="n">l_setup</span><span class="p">;</span>
+<span class="w">  </span><span class="n">REQUIRE</span><span class="p">(</span><span class="w"> </span><span class="n">l_setup</span><span class="p">.</span><span class="n">getHeight</span><span class="p">(</span><span class="w"> </span><span class="mf">10.0f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0f</span><span class="w"> </span><span class="p">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">Approx</span><span class="p">(</span><span class="w"> </span><span class="mf">0.13f</span><span class="w"> </span><span class="p">)</span><span class="w"> </span><span class="p">);</span>
+<span class="w">  </span><span class="n">REQUIRE</span><span class="p">(</span><span class="w"> </span><span class="n">l_setup</span><span class="p">.</span><span class="n">getHeight</span><span class="p">(</span><span class="w"> </span><span class="mf">0.0f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0f</span><span class="w"> </span><span class="p">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">Approx</span><span class="p">(</span><span class="w"> </span><span class="mf">0.33f</span><span class="w"> </span><span class="p">)</span><span class="w"> </span><span class="p">);</span>
+<span class="w">  </span><span class="n">REQUIRE</span><span class="p">(</span><span class="w"> </span><span class="n">l_setup</span><span class="p">.</span><span class="n">getMomentumX</span><span class="p">(</span><span class="w"> </span><span class="mf">0.0f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0f</span><span class="w"> </span><span class="p">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">Approx</span><span class="p">(</span><span class="w"> </span><span class="mf">0.18f</span><span class="w"> </span><span class="p">)</span><span class="w"> </span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p><strong>Explanation:</strong>
+- Tests verify height computation at hump center (x=10) and flat sections (x=0)
+- Tests verify constant momentum throughout domain
+- Uses Catch2 <code class="docutils literal notranslate"><span class="pre">Approx()</span></code> for floating-point comparison tolerance
+- Validates both setup scenarios before numerical simulations</p>
+</section>
+<section id="tasks-regarding-the-position-of-the-hydraulic-jump-and-solver-convergence">
+<h2>Tasks regarding the position of the hydraulic jump and solver convergence<a class="headerlink" href="#tasks-regarding-the-position-of-the-hydraulic-jump-and-solver-convergence" title="Link to this heading"></a></h2>
+<hr class="docutils" />
+<p>This part of the task is about the supercritical setup. First, we have to find where the stationary hydraulic jump appears in the numerical solution. Then we check whether the f-wave solver actually settles to the momentum that we expect from the analytical setup, or whether it keeps producing small but visible variations across the domain.</p>
+<p><strong>What we expect analytically:</strong></p>
+<p>For the smooth topography case, the momentum is supposed to stay constant. That means the velocity only changes because the water depth changes:</p>
+<div class="math notranslate nohighlight">
+\[u(x) = \frac{hu}{h(x)} \quad \text{(depends only on local depth)}\]</div>
+<p><strong>How I checked convergence:</strong></p>
+<p>To see whether the solver behaves well, I measured the velocity field at the end of the run and compared its spread. A small spread means the solution is close to the expected constant state, while a large spread means the solver is still introducing oscillations.</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">struct</span><span class="w"> </span><span class="nc">MomentumAnalysis</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">t_real</span><span class="w"> </span><span class="n">meanMomentum</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">  </span><span class="n">t_real</span><span class="w"> </span><span class="n">minMomentum</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">numeric_limits</span><span class="o">&lt;</span><span class="n">t_real</span><span class="o">&gt;::</span><span class="n">max</span><span class="p">();</span>
+<span class="w">  </span><span class="n">t_real</span><span class="w"> </span><span class="n">maxMomentum</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">numeric_limits</span><span class="o">&lt;</span><span class="n">t_real</span><span class="o">&gt;::</span><span class="n">lowest</span><span class="p">();</span>
+<span class="w">  </span><span class="n">t_real</span><span class="w"> </span><span class="n">stdDevMomentum</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">  </span><span class="n">t_real</span><span class="w"> </span><span class="n">expectedMomentum</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="p">};</span>
+
+<span class="n">MomentumAnalysis</span><span class="w"> </span><span class="nf">analyzeMomentum</span><span class="p">(</span>
+<span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="n">t_real</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">i_height</span><span class="p">,</span>
+<span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="n">t_real</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">i_hu</span><span class="p">,</span>
+<span class="w">    </span><span class="n">t_idx</span><span class="w"> </span><span class="n">i_nx</span><span class="p">,</span>
+<span class="w">    </span><span class="n">t_real</span><span class="w"> </span><span class="n">i_expectedHu</span><span class="w"> </span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">MomentumAnalysis</span><span class="w"> </span><span class="n">l_result</span><span class="p">;</span>
+<span class="w">  </span><span class="n">l_result</span><span class="p">.</span><span class="n">expectedMomentum</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">i_expectedHu</span><span class="p">;</span>
+
+<span class="w">  </span><span class="n">t_real</span><span class="w"> </span><span class="n">l_sum</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="n">l_count</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">  </span><span class="c1">// Compute mean velocity</span>
+<span class="w">  </span><span class="k">for</span><span class="p">(</span><span class="w"> </span><span class="n">t_idx</span><span class="w"> </span><span class="n">l_cx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">l_cx</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">i_nx</span><span class="p">;</span><span class="w"> </span><span class="o">++</span><span class="n">l_cx</span><span class="w"> </span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">if</span><span class="p">(</span><span class="w"> </span><span class="n">i_height</span><span class="p">[</span><span class="n">l_cx</span><span class="p">]</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="n">t_real</span><span class="w"> </span><span class="n">l_u</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">i_hu</span><span class="p">[</span><span class="n">l_cx</span><span class="p">]</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">i_height</span><span class="p">[</span><span class="n">l_cx</span><span class="p">];</span>
+<span class="w">      </span><span class="n">l_sum</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">l_u</span><span class="p">;</span>
+<span class="w">      </span><span class="n">l_count</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+<span class="w">      </span><span class="n">l_result</span><span class="p">.</span><span class="n">minMomentum</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">min</span><span class="p">(</span><span class="n">l_result</span><span class="p">.</span><span class="n">minMomentum</span><span class="p">,</span><span class="w"> </span><span class="n">l_u</span><span class="p">);</span>
+<span class="w">      </span><span class="n">l_result</span><span class="p">.</span><span class="n">maxMomentum</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">max</span><span class="p">(</span><span class="n">l_result</span><span class="p">.</span><span class="n">maxMomentum</span><span class="p">,</span><span class="w"> </span><span class="n">l_u</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="w">  </span><span class="n">l_result</span><span class="p">.</span><span class="n">meanMomentum</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">l_sum</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">l_count</span><span class="p">;</span>
+
+<span class="w">  </span><span class="c1">// Compute standard deviation</span>
+<span class="w">  </span><span class="n">t_real</span><span class="w"> </span><span class="n">l_variance</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">  </span><span class="k">for</span><span class="p">(</span><span class="w"> </span><span class="n">t_idx</span><span class="w"> </span><span class="n">l_cx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">l_cx</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">i_nx</span><span class="p">;</span><span class="w"> </span><span class="o">++</span><span class="n">l_cx</span><span class="w"> </span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">if</span><span class="p">(</span><span class="w"> </span><span class="n">i_height</span><span class="p">[</span><span class="n">l_cx</span><span class="p">]</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="n">t_real</span><span class="w"> </span><span class="n">l_u</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">i_hu</span><span class="p">[</span><span class="n">l_cx</span><span class="p">]</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">i_height</span><span class="p">[</span><span class="n">l_cx</span><span class="p">];</span>
+<span class="w">      </span><span class="n">t_real</span><span class="w"> </span><span class="n">l_diff</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">l_u</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">l_result</span><span class="p">.</span><span class="n">meanMomentum</span><span class="p">;</span>
+<span class="w">      </span><span class="n">l_variance</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">l_diff</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">l_diff</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="w">  </span><span class="n">l_result</span><span class="p">.</span><span class="n">stdDevMomentum</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">sqrt</span><span class="p">(</span><span class="n">l_variance</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">l_count</span><span class="p">);</span>
+<span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="n">l_result</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p><strong>Explanation:</strong>
+- The code computes the local velocity <span class="math notranslate nohighlight">\(u_i = hu_i / h_i\)</span> in each cell.
+- It then summarizes the field with mean, minimum, maximum, and standard deviation.
+- If the standard deviation stays noticeably above zero, the solver is not converging to the expected constant momentum.</p>
+<p><strong>How the jump position was estimated:</strong></p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">t_real</span><span class="w"> </span><span class="nf">estimateJumpPosition</span><span class="p">(</span>
+<span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="n">t_real</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">i_height</span><span class="p">,</span>
+<span class="w">    </span><span class="n">t_idx</span><span class="w"> </span><span class="n">i_nx</span><span class="p">,</span>
+<span class="w">    </span><span class="n">t_real</span><span class="w"> </span><span class="n">i_dxy</span><span class="w"> </span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">t_idx</span><span class="w"> </span><span class="n">l_bestCell</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">  </span><span class="n">t_real</span><span class="w"> </span><span class="n">l_bestJump</span><span class="w"> </span><span class="o">=</span>
+<span class="w">      </span><span class="n">std</span><span class="o">::</span><span class="n">numeric_limits</span><span class="o">&lt;</span><span class="n">t_real</span><span class="o">&gt;::</span><span class="n">lowest</span><span class="p">();</span>
+
+<span class="w">  </span><span class="c1">// Find steepest height gradient</span>
+<span class="w">  </span><span class="k">for</span><span class="p">(</span><span class="w"> </span><span class="n">t_idx</span><span class="w"> </span><span class="n">l_cx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">l_cx</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">i_nx</span><span class="p">;</span><span class="w"> </span><span class="o">++</span><span class="n">l_cx</span><span class="w"> </span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">t_real</span><span class="w"> </span><span class="n">l_jump</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">abs</span><span class="p">(</span>
+<span class="w">        </span><span class="n">i_height</span><span class="p">[</span><span class="n">l_cx</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">i_height</span><span class="p">[</span><span class="n">l_cx</span><span class="p">]</span><span class="w"> </span><span class="p">);</span>
+<span class="w">    </span><span class="k">if</span><span class="p">(</span><span class="w"> </span><span class="n">l_jump</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">l_bestJump</span><span class="w"> </span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="n">l_bestJump</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">l_jump</span><span class="p">;</span>
+<span class="w">      </span><span class="n">l_bestCell</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">l_cx</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">}</span>
+
+<span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="p">(</span><span class="n">l_bestCell</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mf">0.5f</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">i_dxy</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p><strong>Explanation:</strong>
+- The jump is taken as the point where the water height changes most strongly from one cell to the next.
+- That gives a practical estimate for the stationary discontinuity.
+- In the supercritical case, this should appear downstream of the hump, roughly around <span class="math notranslate nohighlight">\(x \approx 12-14\)</span> m.</p>
+<p><strong>Summary output format (hydraulic_jump_summary.csv):</strong></p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>scenario,max_froude,max_froude_x,jump_x,expected_u,final_mean_u,final_std_u,final_min_u,final_max_u
+subcritical,0.585,10.0,&lt;x&gt;,2.456,&lt;mean&gt;,&lt;std&gt;,&lt;min&gt;,&lt;max&gt;
+supercritical,1.226,10.0,&lt;x&gt;,1.385,&lt;mean&gt;,&lt;std&gt;,&lt;min&gt;,&lt;max&gt;
+</pre></div>
+</div>
+<p><strong>Interpretation of the results:</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">expected_u</span></code> is the velocity we would like to see from the analytical setup.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">final_std_u</span></code> tells us how much the numerical velocity still varies across the domain.</p></li>
+<li><p>If <code class="docutils literal notranslate"><span class="pre">final_std_u</span></code> is close to zero, the solver behaves well.</p></li>
+<li><p>If it stays clearly above zero, the solver is not well-balanced and leaves visible oscillations behind.</p></li>
+</ul>
+<p><strong>Expected finding for the supercritical case:</strong></p>
+<p>The important point here is that the f-wave solver does not completely recover the analytically expected constant momentum over the full domain. The velocity spread stays noticeably above zero, which is exactly the sign of the convergence problem we wanted to show.</p>
+<p><strong>Observations:</strong></p>
+<blockquote>
+<div><ol class="arabic simple">
+<li><p>The jump can be located directly from the steepest change in water height.</p></li>
+<li><p>In the supercritical case, the jump forms downstream of the hump.</p></li>
+<li><p>The velocity field is not perfectly constant, so the solver does not fully converge to the analytical state.</p></li>
+<li><p>A well-balanced method would be needed to remove these remaining oscillations.</p></li>
+</ol>
+</div></blockquote>
+</section>
+<section id="answer-to-task-3">
+<h2>Answer to Task 3<a class="headerlink" href="#answer-to-task-3" title="Link to this heading"></a></h2>
+<p><strong>Hydraulic jump position</strong></p>
+<p>The jump was estimated from the point where the water height changes most strongly. In the supercritical run, this lands a bit downstream of the hump, around <span class="math notranslate nohighlight">\(x \approx 12-14\)</span> m.</p>
+<p><strong>Convergence check</strong></p>
+<p>The solver does not end up with a perfectly constant momentum field. Instead, the final velocity still shows a noticeable spread, which means the f-wave solver is not fully well-balanced for this topography setup.</p>
+</section>
+<section id="task-1d-tsunami-simulation">
+<h2>Task 1D Tsunami Simulation<a class="headerlink" href="#task-1d-tsunami-simulation" title="Link to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="submission_2.html" class="btn btn-neutral float-left" title="Submission 2: Finite Volume Discretization" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, Alabrash, Otto, Wächter.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
