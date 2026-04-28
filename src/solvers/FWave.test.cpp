@@ -2,6 +2,8 @@
  * @section DESCRIPTION
  * Unit tests of the F-Wave solver.
  **/
+
+
 //#include "../../submodules/Catch2/include/catch.hpp"
 #include <catch2/catch.hpp>
 #define private public
@@ -84,6 +86,8 @@ TEST_CASE( "Test the derivation of the FWave wave speeds.", "[FWaveStrengths]" )
                                             27,
                                             -9.7311093998375095,
                                             9.5731051658991654,
+                                            -10,
+                                            -10,
                                             l_strengthL,
                                             l_strengthR );
 
@@ -119,6 +123,8 @@ TEST_CASE( "Test the derivation of the FWave net-updates.", "[FWaveUpdates]" ) {
                                          9,
                                          -30,
                                          27,
+                                         -10,
+                                         -10,
                                          l_netUpdatesL,
                                          l_netUpdatesR );
 
@@ -168,6 +174,8 @@ TEST_CASE( "Test the derivation of the FWave net-updates.", "[FWaveUpdates]" ) {
                                          8,
                                          0,
                                          0,
+                                         -10,
+                                         -10,
                                          l_netUpdatesL,
                                          l_netUpdatesR ); 
 
@@ -199,34 +207,42 @@ TEST_CASE( "Test the derivation of the FWave net-updates.", "[FWaveUpdates]" ) {
     *
     * Multiplicaton with the jump (computed with flux function) in quantities gives the wave strengths:
     *
+    *        |         180 - 200       |          |  -20     |   |  -5.17394 |
+    * Rinv * |                         | = Rinv * |          | = |           |
+    *        | 3997.169325 - 4490.3325 |          | -493.163 |   | -14.8261  |
+    *
+    *
+    *
     *        |         180 - 200       |   |  -5.17394 |   | a1 |
     * Rinv * |                         | = |           | = |    |
     *        | 3997.169325 - 4490.3325 |   | -14.8261  |   | a2 |
     *
     * The net-updates are given through the scaled eigenvectors.
     *
-    *                  |  1 |   |   -5.17394    |
-    * update #1:  a1 * |    | = |               |
-    *                  | s1 |   | -53.539413726 |
+    *                  |  1 |   |  -5.17395 |
+    * update #1:  a1 * |    | = |           |
+    *                  | s1 |   | -53.5394  |
     *
-    *                  |  1 |   |  -14.8261     |
-    * update #2:  a2 * |    | = |               |
-    *                  | s2 |   | -439.62499981 |
+    *                  |  1 |   |  -14.8261 |
+    * update #2:  a2 * |    | = |           |
+    *                  | s2 |   | -439.624  |
     *
     */
 
   tsunami_lab::solvers::FWave::netUpdates( 10,
                                          9,
-                                         20,
-                                         20,
+                                         200,
+                                         180,
+                                         -10,
+                                         -10,
                                          l_netUpdatesL,
                                          l_netUpdatesR ); 
 
   REQUIRE( l_netUpdatesL[0] == Approx(0) );
   REQUIRE( l_netUpdatesL[1] == Approx(0) );
 
-  REQUIRE( l_netUpdatesR[0] == -Approx(14.8261) );
-  REQUIRE( l_netUpdatesR[1] == -Approx(439.62499981) );
+  REQUIRE( l_netUpdatesR[0] == -Approx(20.) );
+  REQUIRE( l_netUpdatesR[1] == -Approx(493.163) );
 
   /*
    * Test case (trivial steady state):
@@ -239,6 +255,8 @@ TEST_CASE( "Test the derivation of the FWave net-updates.", "[FWaveUpdates]" ) {
                                          10,
                                          0,
                                          0,
+                                         -10,
+                                         -10,
                                          l_netUpdatesL,
                                          l_netUpdatesR );
 

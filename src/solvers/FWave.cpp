@@ -32,6 +32,8 @@ void tsunami_lab::solvers::FWave::waveStrengths( t_real   i_hL,
                                                  t_real   i_huR,
                                                  t_real   i_waveSpeedL,
                                                  t_real   i_waveSpeedR,
+                                                 t_real   i_bL,
+                                                 t_real   i_bR,
                                                  t_real & o_strengthL,
                                                  t_real & o_strengthR ) {
   
@@ -56,6 +58,7 @@ void tsunami_lab::solvers::FWave::waveStrengths( t_real   i_hL,
   l_fJump[1]  = (i_hR * i_hR) - (i_hL * i_hL);
   l_fJump[1] *= 0.5f * m_g;
   l_fJump[1] += (i_huR * i_huR / i_hR) - (i_huL * i_huL / i_hL);
+  l_fJump[1] -= -m_g * (i_hL + i_hR) * (i_bR - i_bL) * 0.5;
 
   // compute wave strengths
   o_strengthL  = l_rInv[0][0] * l_fJump[0];
@@ -69,8 +72,22 @@ void tsunami_lab::solvers::FWave::netUpdates( t_real i_hL,
                                             t_real i_hR,
                                             t_real i_huL,
                                             t_real i_huR,
+                                            t_real i_bL,
+                                            t_real i_bR,
                                             t_real o_netUpdateL[2],
                                             t_real o_netUpdateR[2] ) {
+  
+  if(i_bL >= 0) {
+    i_hL = i_hR;
+    i_huL = -i_huR;
+    i_bL = i_bR;
+  }
+  if(i_bR >= 0) {
+    i_hR = i_hL;
+    i_huR = -i_huL;
+    i_bR = i_bR;
+  }
+  
   // compute particle velocities
   t_real l_uL = i_huL / i_hL;
   t_real l_uR = i_huR / i_hR;
@@ -96,6 +113,8 @@ void tsunami_lab::solvers::FWave::netUpdates( t_real i_hL,
                  i_huR,
                  l_sL,
                  l_sR,
+                 i_bL,
+                 i_bR,
                  l_aL,
                  l_aR );
 
@@ -117,18 +136,18 @@ void tsunami_lab::solvers::FWave::netUpdates( t_real i_hL,
 
     // 1st wave
     if( l_sL < 0 ) {
-      o_netUpdateL[l_qt] = l_waveL[l_qt];
+      o_netUpdateL[l_qt] += l_waveL[l_qt];
     }
     else {
-      o_netUpdateR[l_qt] = l_waveL[l_qt];
+      o_netUpdateR[l_qt] += l_waveL[l_qt];
     }
 
     // 2nd wave
     if( l_sR > 0 ) {
-      o_netUpdateR[l_qt] = l_waveR[l_qt];
+      o_netUpdateR[l_qt] += l_waveR[l_qt];
     }
     else {
-      o_netUpdateL[l_qt] = l_waveR[l_qt];
+      o_netUpdateL[l_qt] += l_waveR[l_qt];
     }
   }
 }

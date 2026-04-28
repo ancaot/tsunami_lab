@@ -26,6 +26,12 @@ class tsunami_lab::setups::DamBreak1d: public Setup {
     //! height on the right side
     t_real m_heightRight = 0;
 
+    // momentum on the left side
+    t_real m_momentumLeft = 0;
+
+    // momentum on the left side
+    t_real m_momentumRight = 0;
+
     //! location of the dam
     t_real m_locationDam = 0;
 
@@ -35,10 +41,15 @@ class tsunami_lab::setups::DamBreak1d: public Setup {
      *
      * @param i_heightLeft water height on the left side of the dam.
      * @param i_heightRight water height on the right side of the dam.
+     * @param i_momentumLeft river momentum on the left side of the dam.
+     * @param i_momentumRight river momentum on the right side of the dam.
      * @param i_locationDam location (x-coordinate) of the dam.
+
      **/
     DamBreak1d( t_real i_heightLeft,
                 t_real i_heightRight,
+                t_real i_momentumLeft,
+                t_real i_momentumRight,
                 t_real i_locationDam );
 
     /**

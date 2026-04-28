@@ -84,12 +84,15 @@
 <h2>Tasks regarding the one-dimensional implementation of wave propagation<a class="headerlink" href="#tasks-regarding-the-one-dimensional-implementation-of-wave-propagation" title="Link to this heading"></a></h2>
 <p>The task was to include the f-wave solver in the given files implementing wave propagation, including the test file.
 Additionally we should find a solution to switch between Roe and f-wave solver.
-The switch was implemented with MODE macros and switch functions in the respective files.
-The modes to choose from are MODEFWAVE and MODEROE, which then follow the chosen solver computations and tests.</p>
+The switch was implemented with a macro MODE that switches functions based on its given value in the macros.h file.
+The values that MODE can take are currently given by MODEFWAVE and MODEROE but more could be added to the file.</p>
 </section>
 <section id="tasks-regarding-the-shock-and-rarefaction-waves">
 <h2>Tasks regarding the Shock and Rarefaction Waves<a class="headerlink" href="#tasks-regarding-the-shock-and-rarefaction-waves" title="Link to this heading"></a></h2>
-<p>The Setup for the shock-shock problem…</p>
+<p>The Setup for the shock-shock problem follows the formulas and conditions given in the task.
+The setup is given the height, velocity and location discontinuty as input.
+This means the getHeight method gives the height according to the conditions, meaning <span class="math notranslate nohighlight">\(h_l=h_r\)</span>.
+The getMomentumX method computes the method as given in the task with <span class="math notranslate nohighlight">\(q_l=(hu)_l\)</span> if the stream moves to the right and <span class="math notranslate nohighlight">\(q_r=-(hu)_l\)</span> if it moves to the left.</p>
 <p><strong>Observations for different sets:</strong></p>
 <blockquote>
 <div><ol class="arabic simple">
@@ -98,7 +101,10 @@ The modes to choose from are MODEFWAVE and MODEROE, which then follow the chosen
 <li><p>This behavior is consistent with the wave speeds <span class="math notranslate nohighlight">\(\lambda_{1/2} = u \mp \sqrt{g h}\)</span>.</p></li>
 </ol>
 </div></blockquote>
-<p>The Setup for the rare-rare problem…</p>
+<p>The Setup for the rare-rare problem was made following the given task.
+The setup input is the same as in the shock-shock problem.
+Thus the getHeight method is also the same.
+The difference comes in the getMomentumX method, where <span class="math notranslate nohighlight">\(q_l=-(hu)_l\)</span> if the stream moves left and <span class="math notranslate nohighlight">\(q_r=(hu)_l\)</span> if the stream moves right.</p>
 <p><strong>Observations for different sets:</strong></p>
 <blockquote>
 <div><ol class="arabic simple">
@@ -110,15 +116,20 @@ The modes to choose from are MODEFWAVE and MODEROE, which then follow the chosen
 </section>
 <section id="tasks-regarding-the-dam-break">
 <h2>Tasks regarding the Dam-Break<a class="headerlink" href="#tasks-regarding-the-dam-break" title="Link to this heading"></a></h2>
-<p>The Setup for the dam-break problem…</p>
+<p>We added input variables for the momentum on the left side of the dam and the momentum on the right side.</p>
+<p>The getMomentumX method chooses based on if the currently observed x is on the left or right side of the dam and returning the corresponding momemntum.</p>
 <p><strong>Observations for different sets:</strong></p>
 <blockquote>
 <div><ol class="arabic simple">
-<li><p>Set - heights <span class="math notranslate nohighlight">\(h_l=\)</span> and <span class="math notranslate nohighlight">\(h_r=\)</span></p></li>
+<li><p>The impact of the particle velocity <span class="math notranslate nohighlight">\(u_r\)</span> is very low.</p></li>
 </ol>
 </div></blockquote>
 <p><strong>Answer to Tasks 2 of 2.2:</strong></p>
-<p><span class="math notranslate nohighlight">\(q_l=[14,0]^T\)</span> and <span class="math notranslate nohighlight">\(q_r=[3.5,0.7]^T\)</span></p>
+<p>The question asked is: how much time is needed for the evacuation of a village 25 km downstream of a water reservoir?
+<span class="math notranslate nohighlight">\(q_l=[14,0]^T\)</span> and <span class="math notranslate nohighlight">\(q_r=[3.5,0.7]^T\)</span> are the given values for the problem.</p>
+<p>Our simulation provides the answer of the wave taking 35 minutes to arrive at the village.
+This was achieved by implementating a Dam-Break situation with sufficient (50000) cells and simulating the Waves untill equlibrium is reached.
+From this the time of arrival was determined by finding the first time stamp in which the Schock Wave has crossed the 25000 meter mark.</p>
 </section>
 </section>
 
