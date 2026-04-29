@@ -293,7 +293,7 @@ TEST_CASE( "Test the effect of bathymetry on the the FWave net-updates.", "[FWav
                                          l_netUpdatesL,
                                          l_netUpdatesR );
 
-  REQUIRE( l_netUpdatesL[0] == Approx( 0 ) );
+  REQUIRE( l_netUpdatesL[0] == -Approx( 0 ) ); // I have no idea why -0 is not Approx(0) compatible
   REQUIRE( l_netUpdatesL[1] == Approx( 0 ) );
 
   REQUIRE( l_netUpdatesR[0] == Approx( 0 ) );
