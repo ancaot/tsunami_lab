@@ -1,5 +1,4 @@
 /**
- * @author Alexander Breuer (alex.breuer AT uni-jena.de)
  *
  * @section DESCRIPTION
  * IO-routines for writing a snapshot as Comma Separated Values (CSV).
@@ -10,6 +9,10 @@
 #include "../constants.h"
 #include <cstring>
 #include <iostream>
+#include <istream>
+#include <string>
+#include <fstream> //file steam for read
+#include <vector>  //vectors for storing the read data
 
 namespace tsunami_lab {
   namespace io {
@@ -39,6 +42,14 @@ class tsunami_lab::io::Csv {
                        t_real       const * i_hu,
                        t_real       const * i_hv,
                        std::ostream       & io_stream );
+
+    /**
+     * Reads the data of a CSV file.
+     *
+     * @param i_filename CSV file which will be read.
+     *
+     **/
+    static std::vector<t_real> read( std::string     const & i_filename);
 };
 
 #endif

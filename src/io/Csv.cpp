@@ -1,10 +1,13 @@
 /**
- * @author Alexander Breuer (alex.breuer AT uni-jena.de)
  *
  * @section DESCRIPTION
  * IO-routines for writing a snapshot as Comma Separated Values (CSV).
  **/
 #include "Csv.h"
+#include <fstream>
+#include <sstream>
+#include <string>
+#include <vector>
 
 void tsunami_lab::io::Csv::write( t_real               i_dxy,
                                   t_idx                i_nx,
@@ -39,4 +42,48 @@ void tsunami_lab::io::Csv::write( t_real               i_dxy,
     }
   }
   io_stream << std::flush;
+}
+
+std::vector<tsunami_lab::t_real> tsunami_lab::io::Csv::read( std::string     const & i_filename){
+  //open file (and check if it works)
+  std::ifstream file(i_filename);
+  std::vector<t_real> o_bathymetry;
+
+  if(!file.is_open()){
+    throw std::runtime_error("Failed to open file: " + i_filename);
+    return o_bathymetry;
+  }
+
+  //helper variables
+  std::string line;
+  t_real l_bVal;
+
+  //read header row
+  std::getline(file, line);
+
+  //get relevant data of cells
+  while (std::getline(file, line)) {
+    std::stringstream l_str(line);
+    std::string longitude, latitude, track_location, height;
+
+    //skipping to height as other data is not needed
+    std::getline(l_str, longitude, ',');
+    std::getline(l_str, latitude, ',');
+    std::getline(l_str, track_location, ',');
+    std::getline(l_str, height, ',');
+
+    //converting string to float
+    try {
+      l_bVal = std::stof(height);
+    } catch (const std::exception& e) {
+      std::cerr << "Invalid value: " << height << std::endl;
+      continue;
+    }
+
+    //storing the bathymetry data
+    o_bathymetry.push_back(l_bVal);
+  }
+  file.close();
+  return o_bathymetry;
+
 }
