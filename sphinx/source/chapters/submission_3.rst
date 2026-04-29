@@ -441,3 +441,101 @@ The solver does not end up with a perfectly constant momentum field. Instead, th
 
 Task 1D Tsunami Simulation
 ---------------------------
+
+**Task 1 - Extracting Bathymetry Data**
+
+We followed the steps given in the lecture on 23.04.2026. 
+So the data was extracted with the command ``gmt grdtrack [followed by the needed commands]``.
+To store the new ``01_dem_02.csv`` file, we added a folder called data.
+
+The csv file contains the longitude, latitude, track_location and height, in that order and with these titles.
+The titles build the header row in accordance to csv format.
+After that the data with the 250m sampling between ::math::`p_1` and ::math::`p_2` follows in the rows below.
+
+**Task 2 - Reading the Bathymetry Data**
+
+To the class ``tsunami_lab::io::csv`` we added a reader to extract the bathymetry data.
+
+The CSV reader needs an input in form of a filename.
+With that the reader can open the file, operating under the asumption the file is build according to the format described in the task answer before.
+Thus the reader is able to skip the longitude, latitude and track_location data and only stores the height data.
+Before storing the data in the vector the strings are converted into floating-point variables to ensure easy ussage in the following tasks.
+
+So the reader returns a vector containing the bathymetry data and nothing else.
+
+**Task 3 - Seting up the Tsunami Event**
+
+The setup ``setups::TsunamiEvent1d`` introduces three new methods for computation of the height, momentum and bathymetry values.
+The three virtual methods of the Setup class are also adjusted according to the fomulas given in the tasks.
+We added a variable for setting delta to avoid numerical issues.
+
+In the setup class the reader is already used in the constructor to avoid repeatedly opening and extracting the data.
+
+The first new method introduced is extractBathymetry which returns the bathymetry for a given point from the read file.
+
+.. code-block:: cpp
+
+  tsunami_lab::t_real tsunami_lab::setups::TsunamiEvent1d::extractBathymetry(t_real i_x) const{
+    
+    if(i_x < bathymetryData.size()){
+        return bathymetryData.at(i_x);
+    }else{
+        return 0;
+    }
+  }
+
+The if function makes sure that a value is returned even if no bathymetry data is available anymore.
+
+The next new function is getDisplacement which calculates the vertical displacement according to the artifical displacement data equation.
+
+.. code-block:: cpp
+
+  tsunami_lab::t_real tsunami_lab::setups::TsunamiEvent1d::getDisplacement(t_real i_x) const{
+    //get displacement
+    if (175000 < i_x && i_x < 250000) {
+        t_real l_disTemp = (i_x - 175000);
+        l_disTemp /= 37500;
+        l_disTemp *= M_PI;
+        l_disTemp += M_PI;
+        return 10 * sin(l_disTemp);
+    }else{
+        return 0;
+    }
+  }
+
+The third method added is getBathymetry, which returns the bathymetry according to th given equation.
+
+.. code-block:: cpp
+
+  tsunami_lab::t_real tsunami_lab::setups::TsunamiEvent1d::getBathymetry(t_real i_x,
+                                                    t_real ) const{
+    t_real l_extBat = extractBathymetry(i_x);
+    t_real l_displ = getDisplacement(i_x);
+    //get the bathymetry for given point
+    if(l_extBat < 0){
+        t_real l_min = std::min(l_extBat, -(m_delta)) + l_displ;
+        return l_min;
+    }else {
+        t_real l_max = std::max(l_extBat, m_delta) + l_displ; 
+        return l_max;
+    }
+  }
+
+For this method the two previous methods are needed to return the value according to the equation.
+
+The getHeight method was also adjusted to the formula given.
+
+**Task 4 - Observations of the Tsunami Event**
+
+The TsunamiEvent1d was run with ``main.cpp`` with 200 cells and the data gained is stored in ``solution_1.csv``.
+
+Following observations were made:
+
+  #. At first the water height takes a while (relatively speaking)to rise.
+  #. A brief drop happens before the water height rises increasingly quicker to it peak.
+  #. After reaching its peak, the water height falls drastically.
+  #. At first the momentum doesn't switch between positive and negative.
+  #. Then it switches rapidly for a few moments.
+  #. Before slowing down with the switching.
+
+A visualisation was sadly not possible before the submission deadline.
