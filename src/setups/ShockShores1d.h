@@ -2,21 +2,21 @@
  * @section DESCRIPTION
  * One-dimensional shock-shock problem.
  **/
-#ifndef TSUNAMI_LAB_SETUPS_SHOCK_LAND_1D_H
-#define TSUNAMI_LAB_SETUPS_SHOCK_LAND_1D_H
+#ifndef TSUNAMI_LAB_SETUPS_SHOCK_SHORES_1D_H
+#define TSUNAMI_LAB_SETUPS_SHOCK_SHORES_1D_H
 
 #include "Setup.h"
 
 namespace tsunami_lab {
   namespace setups {
-    class ShockLand1d;
+    class ShockShores1d;
   }
 }
 
 /**
  * 1d shock-land setup
  **/
-class tsunami_lab::setups::ShockLand1d: public Setup {
+class tsunami_lab::setups::ShockShores1d: public Setup {
   private:
     //! water height on both sides
     t_real m_height = 0;
@@ -38,10 +38,10 @@ class tsunami_lab::setups::ShockLand1d: public Setup {
      * @param i_velocityLeft particle velocity on the left side.
      * @param i_locationDiscontinuity location (x-coordinate) of the discontinuity.
      **/
-    ShockLand1d( t_real i_height,
-                  t_real i_velocityLeft,
-                  t_real i_locationDiscontinuity,
-                  t_real i_bathymetry);
+    ShockShores1d(  t_real i_height,
+                    t_real i_velocityLeft,
+                    t_real i_locationDiscontinuity,
+                    t_real i_bathymetry);
 
     /**
      * Gets the water height at a given point.
