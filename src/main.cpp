@@ -8,6 +8,7 @@
 #include "patches/WavePropagation1d.h"
 #include "setups/DamBreak1d.h"
 #include "io/Csv.h"
+#include "setups/TsunamiEvent1d.h"
 #include <cstdlib>
 #include <iostream>
 #include <cmath>
@@ -41,7 +42,7 @@ int main( int   i_argc,
       std::cerr << "invalid number of cells" << std::endl;
       return EXIT_FAILURE;
     }
-    l_dxy = 50000.0 / l_nx;
+    l_dxy = 1000.0 / l_nx;
   }
   std::cout << "runtime configuration" << std::endl;
   std::cout << "  number of cells in x-direction: " << l_nx << std::endl;
@@ -50,11 +51,15 @@ int main( int   i_argc,
 
   // construct setup
   tsunami_lab::setups::Setup *l_setup;
-  l_setup = new tsunami_lab::setups::DamBreak1d( 14,
-                                                 3.5,
-                                                 0,
-                                                 0.7,
-                                                 25000 );
+  // l_setup = new tsunami_lab::setups::DamBreak1d( 14,
+  //                                                3.5,
+  //                                                0,
+  //                                                0.7,
+  //                                                25000 );
+  l_setup = new tsunami_lab::setups::TsunamiEvent1d(10, 0);
+  tsunami_lab::setups::TsunamiEvent1d *l_setupHelp = static_cast<tsunami_lab::setups::TsunamiEvent1d*>(l_setup);
+
+
   // construct solver
   tsunami_lab::patches::WavePropagation *l_waveProp;
   l_waveProp = new tsunami_lab::patches::WavePropagation1d( l_nx );
@@ -79,6 +84,10 @@ int main( int   i_argc,
       tsunami_lab::t_real l_hv = l_setup->getMomentumY( l_x,
                                                         l_y );
 
+      
+      tsunami_lab::t_real l_b = l_setupHelp->getBathymetry(l_x, 
+                                                        l_y);
+
       // set initial values in wave propagation solver
       l_waveProp->setHeight( l_cx,
                              l_cy,
@@ -91,6 +100,10 @@ int main( int   i_argc,
       l_waveProp->setMomentumY( l_cx,
                                 l_cy,
                                 l_hv );
+
+      l_waveProp->setBathymetry(l_cx,
+                                l_cy,
+                                l_b);
 
     }
   }
@@ -107,7 +120,7 @@ int main( int   i_argc,
   // set up time and print control
   tsunami_lab::t_idx  l_timeStep = 0;
   tsunami_lab::t_idx  l_nOut = 0;
-  tsunami_lab::t_real l_endTime = 3000;
+  tsunami_lab::t_real l_endTime = 1;
   tsunami_lab::t_real l_simTime = 0;
 
   std::cout << "entering time loop" << std::endl;
@@ -130,7 +143,7 @@ int main( int   i_argc,
                                    1,
                                    l_waveProp->getHeight(),
                                    l_waveProp->getMomentumX(),
-                                   nullptr,
+                                   l_waveProp->getMomentumY(),
                                    l_file );
       l_file.close();
       l_nOut++;
