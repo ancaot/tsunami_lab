@@ -116,6 +116,17 @@ class tsunami_lab::patches::WavePropagation1d: public WavePropagation {
     }
 
     /**
+     * Sets the bathymetry to the given value.
+     * @param i_ix id of the cell in x-direction.
+     * @param i_b  bathymetry.
+     **/
+    void setBathymetry( t_idx i_ix,
+                        t_idx,
+                        t_real i_b) {
+      m_b[i_ix] = i_b;
+    }
+
+    /**
      * Dummy function since there is no y-momentum in the 1d solver.
      **/
     void setMomentumY( t_idx,
