@@ -3,8 +3,13 @@ Submission 3: Bathymetry & Boundary Conditions
 Task Non-zero Source Term
 --------------------------
 
+The Non-zero Source term has been implemented into the FWave solver funktion, being added to the result of the flux function prior to it being used to compute the wave strenght.
+A "ShockShore" setup was added to demonstrate this effect, where in an existing shock wave impacts an area with less depth.
+
 Task Reflecting Boundary Conditions
 ------------------------------------
+The Reflcing Boundary Condition has been implementd into the Fwave solver funktion, where relevant values will be automatically adjusted, whenever values implying a dry cell are entered.
+A "ShockLand" setup was added to demeonstrate this effect, where a shock wave impacts a reflective boundary.
 
 Task Hydraulic Jumps
 ---------------------
