@@ -11,6 +11,7 @@ l_sources = [ 'solvers/FWave.cpp',
               'setups/DamBreak1d.cpp',
               'setups/RareRare1d.cpp',
               'setups/ShockShock1d.cpp',
+              'setups/ShockLand1d.cpp'
               'io/Csv.cpp' ]
 
 for l_so in l_sources:
