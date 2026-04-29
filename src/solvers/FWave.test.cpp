@@ -266,3 +266,37 @@ TEST_CASE( "Test the derivation of the FWave net-updates.", "[FWaveUpdates]" ) {
   REQUIRE( l_netUpdatesR[0] == Approx(0) );
   REQUIRE( l_netUpdatesR[1] == Approx(0) );
 }
+
+TEST_CASE( "Test the effect of bathymetry on the the FWave net-updates.", "[FWaveUpdates]" ) {
+  /*
+   * Test case:
+   *
+   *      left | right
+   *  h:     5 |  10
+   *  u:     0 |   0
+   *  hu:    0 |   0
+   *  b:    -5 | -10
+   *
+   * Sanity check - True hight of the water sourface is equal on both sides, as such nothing should happen
+   * for some reason this causes issues
+   *
+   */
+  float l_netUpdatesL[2] = { -5, 3 };
+  float l_netUpdatesR[2] = {  4, 7 };
+
+  tsunami_lab::solvers::FWave::netUpdates( 5,
+                                         10,
+                                         0,
+                                         0,
+                                         -5,
+                                         -10,
+                                         l_netUpdatesL,
+                                         l_netUpdatesR );
+
+  REQUIRE( l_netUpdatesL[0] == Approx( 0 ) );
+  REQUIRE( l_netUpdatesL[1] == Approx( 0 ) );
+
+  REQUIRE( l_netUpdatesR[0] == Approx( 0 ) );
+  REQUIRE( l_netUpdatesR[1] == Approx( 0 ) );
+
+}
