@@ -1,0 +1,5 @@
+# Example stations CSV: name,x,y
+# x,y in meters relative to domain origin
+center,25000,0
+near_left,10000,0
+near_right,40000,0

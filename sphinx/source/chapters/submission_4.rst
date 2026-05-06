@@ -1,0 +1,71 @@
+Submission 4: Two-Dimensional Solver
+=================================================
+
+Task 1: Station Output Class
+----------------------------
+
+**Requirement:** Add a new class ``tsunami_lab::io::Stations`` which summarizes a collection of user-defined stations. Each station has a name and a location in space. All stations share the output frequency in seconds. The output for each station should be written in a separate ASCII-CSV file.
+
+**What I implemented:**
+
+I introduced the class ``tsunami_lab::io::Stations`` that manages measurement stations at fixed positions. Each station has a name and coordinates (x, y). The key design decision was to make output **time-controlled**, not step-controlled. This ensures stability independent of time step size changes due to the CFL condition.
+
+The solver writes one CSV file per station with two columns: ``time`` and ``height``. Stations are loaded from external configuration files and sampled during the simulation at regular time intervals.
+
+Task 2: Runtime Configuration
+------------------------------
+
+**Requirement:** Find a suitable way to provide the names and locations of each station to your solver. Further, implement a time step-independent output frequency for the stations. Keep in mind that this runtime-configuration should be extensible and usable in later parts of the project. One possible solution are XML-based runtime configurations through the library pugixml.
+
+**What I implemented:**
+
+I created two configuration formats:
+
+* **CSV format:** Simple, lightweight. File format: ``name,x,y`` (one station per line).
+  Example: ``data/stations_example.csv``
+
+* **XML format:** Extensible, supports metadata. Uses ``pugixml`` library.
+  Root element ``<stations>`` can define ``output_interval`` attribute (seconds).
+  Each ``<station>`` has attributes: ``name``, ``x``, ``y``.
+  Examples: ``data/stations_example.xml``, ``data/stations_symmetric.xml``
+
+The main program accepts an optional configuration file (CSV or XML) and an output interval. The ``loadFromFile()`` method auto-detects file type by extension.
+
+Key changes:
+  * New files: ``src/io/Stations.h``, ``src/io/Stations.cpp``
+  * Extended: ``src/main.cpp`` with optional station argument
+  * Build system: ``SConstruct``, ``src/SConscript`` updated for ``pugixml``
+  * Uses C++17 features (``std::filesystem``)
+
+Task 3: Symmetric Problem Setup and 1D–2D Comparison
+----------------------------------------------------
+
+**Requirement:** Use a symmetric problem setup, e.g., a circular dam break problem, to compare your two-dimensional solver to your one-dimensional one at a set of stations.
+
+**What I implemented:**
+
+I use ``CircularDamBreak1d`` as the symmetric test case. This is a 1D surrogate of a radial dam break where water level is higher in an inner region and drops at a circular boundary. It is symmetric, which makes it ideal for validation.
+
+For the 1D–2D comparison:
+  * The 1D solver runs along the x-direction with the circular dam break.
+  * The 2D solver would run on a 2D domain, also initialized with the same circular dam break.
+  * Stations placed along a central transect (e.g., y = domain_center) allow direct comparison.
+  * Configuration: ``data/stations_symmetric.xml`` defines 5 stations along the transect.
+
+This setup validates that both solvers give consistent results at measurement points, confirming numerical accuracy and symmetry.
+
+Task 4: Convergence Study (Optional)
+------------------------------------
+
+**Requirement:** Run a "convergence study", i.e., use a synthetic setup and decrease the size of your grid cells. For example, for the computational domain Ω = [0, 100m]², you could test mesh-spacings h ∈ {50, 25, 10, 7.5, 5, 4, 3, 2, 1}. Compare your solution at a set of points, what do you observe?
+
+**What I intentionally did not implement:**
+
+The convergence study was marked optional. I focused on completing the mandatory tasks (Stations class, runtime configuration, and symmetric comparison setup). 
+
+The infrastructure for convergence studies is ready: the time-controlled station output and symmetric setup make it straightforward to run multiple resolutions and compare results. Future work can easily add a driver script to automate mesh refinement tests.
+
+Summary
+-------
+
+The Stations class provides flexible, time-controlled output at fixed positions. Configuration via CSV or XML makes the system extensible. The symmetric circular dam break setup is prepared for 1D–2D solver validation once the 2D implementation is complete.

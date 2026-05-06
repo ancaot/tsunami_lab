@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<stations output_interval="10">
+  <station name="center" x="25000" y="0" />
+  <station name="near_left" x="10000" y="0" />
+  <station name="near_right" x="40000" y="0" />
+</stations>

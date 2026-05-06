@@ -2,18 +2,24 @@
  * @author Alexander Breuer (alex.breuer AT uni-jena.de)
  *
  * @section DESCRIPTION
- * Entry-point for simulations.
+ * Simulationsprogramm: Lädt Setup, integriert optional Messstationen,
+ * schreibt Lösungen und Stationsdaten.
  **/
 
 #include "patches/WavePropagation1d.h"
 #include "setups/DamBreak1d.h"
 #include "io/Csv.h"
+<<<<<<< HEAD
 #include "setups/TsunamiEvent1d.h"
+=======
+#include "io/Stations.h"
+>>>>>>> origin/feat/added-documentation
 #include <cstdlib>
 #include <iostream>
 #include <cmath>
 #include <fstream>
 #include <limits>
+#include <string>
 
 int main( int   i_argc,
           char *i_argv[] ) {
@@ -30,12 +36,13 @@ int main( int   i_argc,
   std::cout << "### https://scalable.uni-jena.de ###" << std::endl;
   std::cout << "####################################" << std::endl;
 
-  if( i_argc != 2 ) {
+  if( i_argc < 2 || i_argc > 4 ) {
     std::cerr << "invalid number of arguments, usage:" << std::endl;
-    std::cerr << "  ./build/tsunami_lab N_CELLS_X" << std::endl;
+    std::cerr << "  ./build/tsunami_lab N_CELLS_X [stations.csv|stations.xml] [output_interval_seconds]" << std::endl;
     std::cerr << "where N_CELLS_X is the number of cells in x-direction." << std::endl;
     return EXIT_FAILURE;
   }
+<<<<<<< HEAD
   else {
     l_nx = atoi( i_argv[1] );
     if( l_nx < 1 ) {
@@ -43,7 +50,15 @@ int main( int   i_argc,
       return EXIT_FAILURE;
     }
     l_dxy = 1000.0 / l_nx;
+=======
+
+  l_nx = atoi( i_argv[1] );
+  if( l_nx < 1 ) {
+    std::cerr << "invalid number of cells" << std::endl;
+    return EXIT_FAILURE;
+>>>>>>> origin/feat/added-documentation
   }
+  l_dxy = 50000.0 / l_nx;
   std::cout << "runtime configuration" << std::endl;
   std::cout << "  number of cells in x-direction: " << l_nx << std::endl;
   std::cout << "  number of cells in y-direction: " << l_ny << std::endl;
@@ -125,6 +140,24 @@ int main( int   i_argc,
 
   std::cout << "entering time loop" << std::endl;
 
+  // optional stations configuration (argv[2]) and output interval (argv[3])
+  tsunami_lab::io::Stations * l_stations = nullptr;
+  if( i_argc >= 3 ) {
+    tsunami_lab::t_real l_interval = 1.0;
+    if( i_argc == 4 ) l_interval = static_cast< tsunami_lab::t_real >( std::atof( i_argv[3] ) );
+
+    l_stations = new tsunami_lab::io::Stations( l_interval );
+    if( l_stations->loadFromFile( i_argv[2] ) ) {
+      l_stations->openFiles( "station" );
+      std::cout << "stations loaded from " << i_argv[2] << ", output every " << l_interval << " s" << std::endl;
+    }
+    else {
+      std::cerr << "failed to load stations from " << i_argv[2] << std::endl;
+      delete l_stations;
+      l_stations = nullptr;
+    }
+  }
+
   // iterate over time
   while( l_simTime < l_endTime ){
     if( l_timeStep % 25 == 0 ) {
@@ -154,6 +187,10 @@ int main( int   i_argc,
 
     l_timeStep++;
     l_simTime += l_dt;
+
+    if( l_stations != nullptr ) {
+      l_stations->sampleAndMaybeWrite( l_waveProp, l_simTime, l_dxy, l_nx, l_ny );
+    }
   }
 
   std::cout << "finished time loop" << std::endl;
@@ -162,6 +199,7 @@ int main( int   i_argc,
   std::cout << "freeing memory" << std::endl;
   delete l_setup;
   delete l_waveProp;
+  if( l_stations != nullptr ) delete l_stations;
 
   std::cout << "finished, exiting" << std::endl;
   return EXIT_SUCCESS;

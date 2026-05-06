@@ -14,3 +14,4 @@ Welcome to Alabrsh, Otto and Wächter's Tsunami Lab documentation!
    chapters/submission_1.rst
    chapters/submission_2.rst
    chapters/submission_3.rst
+   chapters/submission_4.rst
