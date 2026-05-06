@@ -10,20 +10,14 @@ l_sources = [ 'solvers/FWave.cpp',
               'patches/WavePropagation1d.cpp',
               'patches/WavePropagation2d.cpp',
               'setups/DamBreak1d.cpp',
-<<<<<<< HEAD
               'setups/DamBreak2d.cpp',
               'setups/RareRare1d.cpp',
               'setups/ShockShock1d.cpp',
               'setups/TsunamiEvent1d.cpp',
               'setups/ShockLand1d.cpp',
-              'io/Csv.cpp' ]
-=======
               'setups/CircularDamBreak1d.cpp',
-              'setups/RareRare1d.cpp',
-              'setups/ShockShock1d.cpp',
               'io/Csv.cpp',
               'io/Stations.cpp' ]
->>>>>>> origin/feat/added-documentation
 
 for l_so in l_sources:
   env.sources.append( env.Object( l_so ) )

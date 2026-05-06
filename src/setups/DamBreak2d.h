@@ -18,10 +18,10 @@ class tsunami_lab::setups::DamBreak2d: public Setup{
     private:
         //variables
         //! height on the left side 
-        t_real m_heightLeft = 0;
+        t_real m_heightLeft = 10;
     
         //! height on the right side
-        t_real m_heightRight = 0;
+        t_real m_heightRight = 5;
 
         // momentum on the left side in x-direction
         t_real m_momentumXLeft = 0;

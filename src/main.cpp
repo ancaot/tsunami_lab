@@ -7,13 +7,12 @@
  **/
 
 #include "patches/WavePropagation1d.h"
+#include "patches/WavePropagation2d.h"
 #include "setups/DamBreak1d.h"
 #include "io/Csv.h"
-<<<<<<< HEAD
+#include "setups/DamBreak2d.h"
 #include "setups/TsunamiEvent1d.h"
-=======
 #include "io/Stations.h"
->>>>>>> origin/feat/added-documentation
 #include <cstdlib>
 #include <iostream>
 #include <cmath>
@@ -42,21 +41,11 @@ int main( int   i_argc,
     std::cerr << "where N_CELLS_X is the number of cells in x-direction." << std::endl;
     return EXIT_FAILURE;
   }
-<<<<<<< HEAD
-  else {
-    l_nx = atoi( i_argv[1] );
-    if( l_nx < 1 ) {
-      std::cerr << "invalid number of cells" << std::endl;
-      return EXIT_FAILURE;
-    }
-    l_dxy = 1000.0 / l_nx;
-=======
 
   l_nx = atoi( i_argv[1] );
   if( l_nx < 1 ) {
     std::cerr << "invalid number of cells" << std::endl;
     return EXIT_FAILURE;
->>>>>>> origin/feat/added-documentation
   }
   l_dxy = 50000.0 / l_nx;
   std::cout << "runtime configuration" << std::endl;
@@ -71,13 +60,22 @@ int main( int   i_argc,
   //                                                0,
   //                                                0.7,
   //                                                25000 );
-  l_setup = new tsunami_lab::setups::TsunamiEvent1d(10, 0);
-  tsunami_lab::setups::TsunamiEvent1d *l_setupHelp = static_cast<tsunami_lab::setups::TsunamiEvent1d*>(l_setup);
+  // l_setup = new tsunami_lab::setups::TsunamiEvent1d(10, 0);
+  // tsunami_lab::setups::TsunamiEvent1d *l_setupHelp = static_cast<tsunami_lab::setups::TsunamiEvent1d*>(l_setup);
 
+  l_setup = new tsunami_lab::setups::DamBreak2d(10, 
+                                              5, 
+                                              0, 
+                                              0, 
+                                              0, 
+                                              0, 
+                                              0, 
+                                              0);
 
   // construct solver
   tsunami_lab::patches::WavePropagation *l_waveProp;
-  l_waveProp = new tsunami_lab::patches::WavePropagation1d( l_nx );
+  //l_waveProp = new tsunami_lab::patches::WavePropagation1d( l_nx );
+  l_waveProp = new tsunami_lab::patches::WavePropagation2d(l_nx, l_ny);
 
   // maximum observed height in the setup
   tsunami_lab::t_real l_hMax = std::numeric_limits< tsunami_lab::t_real >::lowest();
@@ -100,8 +98,8 @@ int main( int   i_argc,
                                                         l_y );
 
       
-      tsunami_lab::t_real l_b = l_setupHelp->getBathymetry(l_x, 
-                                                        l_y);
+      // tsunami_lab::t_real l_b = l_setupHelp->getBathymetry(l_x, 
+      //                                                   l_y);
 
       // set initial values in wave propagation solver
       l_waveProp->setHeight( l_cx,
@@ -116,9 +114,9 @@ int main( int   i_argc,
                                 l_cy,
                                 l_hv );
 
-      l_waveProp->setBathymetry(l_cx,
-                                l_cy,
-                                l_b);
+      // l_waveProp->setBathymetry(l_cx,
+      //                           l_cy,
+      //                           l_b);
 
     }
   }
