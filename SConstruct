@@ -76,8 +76,7 @@ else:
 env.Append( CXXFLAGS = [ '-isystem', 'submodules/Catch2/single_include' ] )
 
 # add pugixml for XML runtime configuration
-env.Append( CXXFLAGS = [ '-DUSE_PUGIXML' ] )
-env.Append( LIBS = [ 'pugixml' ] )
+env.Append( CXXFLAGS = [ '-DUSE_PUGIXML', '-isystem', 'src' ] )
 
 # get source files
 VariantDir( variant_dir = 'build/src',
