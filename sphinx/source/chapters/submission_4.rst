@@ -1,6 +1,60 @@
 Submission 4: Two-Dimensional Solver
 =================================================
 
+4.1. Unsplit Method
+-------------------
+
+Task 1: Two-Dimensional Wave Propagation
+----------------------------------------
+
+**Requirement:** Add new class that supports two-dimensional problems.
+
+**What I implemented:**
+
+The class was built based on ``patches::WavePropagation1d`` with adjustments for the size of the arrays containing the new and old values for height, x-momentum and y-momentum.
+The size was computed with :math:`(x-cells + 2)*y-cells` and considers the ghost cells in the rows.
+
+The implementation for two-dimensional problems uses the unsplit method.
+Which means each row was treated as an one-dimensional problem and uses the f-wave solver accordingly.
+I added another instance of the f-wave solver method to compute the momentum in y-direction, which using hv as input inplace of hu.
+:math:`huv` is computed prior to updating height and momenta, so we can use it in the finalization of the new values.
+Additonally, the netupdates account now for the momentum in the y-direction.
+
+.. code-block:: cpp
+  l_hNew[l_off + l_ceL]  -= i_scaling * l_netUpdatesA[0][0] - i_scaling * l_netUpdatesB[0][0];
+  l_huNew[l_off + l_ceL] -= i_scaling * l_netUpdatesA[0][1] - i_scaling * l_huvL;
+  l_hvNew[l_off + l_ceL] -= i_scaling * l_huvL - i_scaling * l_netUpdatesB[0][1];
+
+  l_hNew[l_off + l_ceR]  -= i_scaling * l_netUpdatesA[1][0] - i_scaling * l_netUpdatesB[1][0];
+  l_huNew[l_off + l_ceR] -= i_scaling * l_netUpdatesA[1][1] - i_scaling * l_huvR;
+  l_hvNew[l_off + l_ceR] -= i_scaling * l_huvR - i_scaling * l_netUpdatesB[1][1];
+
+These operations follow the given equations.
+With using the f-wave solver method a second time, we can implement the two-dimensional problems while still supporting one-dimensional problems.
+
+Task 2: Circular Dam Break Setup
+--------------------------------
+
+**Requirement:** Set up for a circular dam break problem in :math:`[-50,50]^2`
+
+**What I implemented:**
+
+This setup is very similar to previous setups.
+The biggest difference comes with the added momentum in y-direction.
+Otherwise the initiation follows the given values for the height and momenta according to the given condition.
+
+The observations are incomplete, as while compling and running the setup the values for the y-coordinates and the momentum in the y-direction didn't correctly initalize.
+I couldn't find a fix for this problem before the deadline for the submission.
+
+Task 3: Bathymetry in two dimensions
+------------------------------------
+
+Not implemented as a major set-back happened which took some time to fix (and even then I wasn't able to completey fix it) and didn't leave time for implementing an actual obstacle.
+
+
+4.2. Stations
+-------------
+
 Task 1: Station Output Class
 ----------------------------
 

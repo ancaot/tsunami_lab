@@ -24,7 +24,7 @@ int main( int   i_argc,
           char *i_argv[] ) {
   // number of cells in x- and y-direction
   tsunami_lab::t_idx l_nx = 0;
-  tsunami_lab::t_idx l_ny = 1;
+  tsunami_lab::t_idx l_ny = 50;
 
   // set cell size
   tsunami_lab::t_real l_dxy = 1;
@@ -43,6 +43,7 @@ int main( int   i_argc,
   }
 
   l_nx = atoi( i_argv[1] );
+  l_ny = l_nx;
   if( l_nx < 1 ) {
     std::cerr << "invalid number of cells" << std::endl;
     return EXIT_FAILURE;
