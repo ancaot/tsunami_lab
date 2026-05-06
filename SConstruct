@@ -78,6 +78,9 @@ env.Append( CXXFLAGS = [ '-isystem', 'submodules/Catch2/single_include' ] )
 # add pugixml for XML runtime configuration
 env.Append( CXXFLAGS = [ '-DUSE_PUGIXML', '-isystem', 'src' ] )
 
+# add C++17 filesystem support for MinGW
+env.Append( LIBS = [ 'stdc++fs' ] )
+
 # get source files
 VariantDir( variant_dir = 'build/src',
             src_dir     = 'src' )
