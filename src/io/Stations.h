@@ -2,14 +2,12 @@
  * @author
  *
  * @section DESCRIPTION
- * Summarizes a collection of user-defined stations. Each station has a name
- * and a location (x,y). All stations share a common output interval in
- * seconds. The output for each station is written to a separate ASCII-CSV
- * file with two columns: time, height.
- *
- * This implementation supports a lightweight CSV-based station
- * configuration file with lines of the form: name,x,y.
- * XML loading uses pugixml when USE_PUGIXML is enabled at compile time.
+ * Stationen: Messstellen an definierten Orten speichern Zeit-Reihen.
+ * Jede Station hat einen Namen und Position (x, y).
+ * Ausgabe läuft zeitgesteuert, nicht schrittgesteuert.
+ * Eine CSV-Datei pro Station mit Spalten: Zeit, Wasserhöhe.
+ * 
+ * Konfigurierbar via CSV oder XML (mit pugixml).
  **/
 #ifndef TSUNAMI_LAB_IO_STATIONS
 #define TSUNAMI_LAB_IO_STATIONS

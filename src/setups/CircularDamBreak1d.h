@@ -1,9 +1,8 @@
 /**
  * @section DESCRIPTION
- * Symmetric 1d circular-dam-break surrogate.
- *
- * The inner region around a center has a higher water level than the outer
- * region. This mimics a radial/circular dam break in 1d along a transect.
+ * Zirkulärer Dammbruch als symmetrisches Problem für 1D.
+ * Innerer Bereich höher als äußerer.
+ * Gut zum Vergleichen von 1D und 2D Solver an gemeinsamen Stationen.
  **/
 #ifndef TSUNAMI_LAB_SETUPS_CIRCULAR_DAM_BREAK_1D_H
 #define TSUNAMI_LAB_SETUPS_CIRCULAR_DAM_BREAK_1D_H

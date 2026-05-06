@@ -2,7 +2,8 @@
  * @author Alexander Breuer (alex.breuer AT uni-jena.de)
  *
  * @section DESCRIPTION
- * Entry-point for simulations.
+ * Simulationsprogramm: Lädt Setup, integriert optional Messstationen,
+ * schreibt Lösungen und Stationsdaten.
  **/
 
 #include "patches/WavePropagation1d.h"
