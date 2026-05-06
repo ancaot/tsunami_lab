@@ -1,0 +1,14 @@
+************************************* Invoked: Tue May 5 22:31:17 2026
+[0] Arguments: C:\Users\R-A-H-~1\AppData\Local\Temp\WinGet\MSYS2.MSYS2.20260322\msys2-x86_64-20260322.exe, install, --confirm-command, --root, C:\msys64
+[7] Operations sanity check succeeded.
+[19] Using metadata cache from "C:/Users/R-a-h-a-f/AppData/Local/cache\\qt-installer-framework\\d75f1c19-3379-3717-ae8d-1404b51494a9"
+[19] Found 0 cached items.
+[21] Loaded control script ":/metadata/installer-config/control_js"
+[22] TargetDirectoryInUse : Error : The directory you selected already exists and contains an installation. Choose a different target for installation.
+************************************* Invoked: Tue May 5 22:33:05 2026
+[0] Arguments: C:\Users\R-A-H-~1\AppData\Local\Temp\WinGet\MSYS2.MSYS2.20260322\msys2-x86_64-20260322.exe, install, --confirm-command, --root,  C:\Users\R-a-h-a-f\AppData\Local\\msys64\
+[8] Operations sanity check succeeded.
+[16] Using metadata cache from "C:/Users/R-a-h-a-f/AppData/Local/cache\\qt-installer-framework\\d75f1c19-3379-3717-ae8d-1404b51494a9"
+[16] Found 0 cached items.
+[18] Loaded control script ":/metadata/installer-config/control_js"
+[18] Warning: The installation path cannot be relative, please specify an absolute path.

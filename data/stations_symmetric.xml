@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<stations output_interval="0.25">
+  <station name="left_far" x="20" y="0" />
+  <station name="left_mid" x="35" y="0" />
+  <station name="center" x="50" y="0" />
+  <station name="right_mid" x="65" y="0" />
+  <station name="right_far" x="80" y="0" />
+</stations>

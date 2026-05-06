@@ -46,7 +46,7 @@ env['CXX'] = 'g++'
 Help( vars.GenerateHelpText( env ) )
 
 # add default flags
-env.Append( CXXFLAGS = [ '-std=c++11',
+env.Append( CXXFLAGS = [ '-std=c++17',
                          '-Wall',
                          '-Wextra',
                          '-Wpedantic' ] )
@@ -75,6 +75,10 @@ else:
 # add Catch2
 env.Append( CXXFLAGS = [ '-isystem', 'submodules/Catch2/single_include' ] )
 
+# add pugixml for XML runtime configuration
+env.Append( CXXFLAGS = [ '-DUSE_PUGIXML' ] )
+env.Append( LIBS = [ 'pugixml' ] )
+
 # get source files
 VariantDir( variant_dir = 'build/src',
             src_dir     = 'src' )
@@ -87,7 +91,10 @@ SConscript( 'build/src/SConscript' )
 Import('env')
 
 env.Program( target = 'build/tsunami_lab',
-             source = env.sources + env.standalone )
+             source = env.sources + env.standalone_main )
+
+env.Program( target = 'build/symmetric_station_study',
+             source = env.sources + env.standalone_symmetry )
 
 env.Program( target = 'build/tests',
              source = env.sources + env.tests )
