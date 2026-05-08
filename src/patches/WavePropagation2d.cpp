@@ -147,19 +147,19 @@ void tsunami_lab::patches::WavePropagation2d::timeStep( t_real i_scaling ){
   }
 }
 
-t_idx tsunami_lab::patches::WavePropagation2d::getStride(){
+tsunami_lab::t_idx tsunami_lab::patches::WavePropagation2d::getStride(){
   return m_nx;
 }
 
-t_real const * tsunami_lab::patches::WavePropagation2d::getHeight(){
+tsunami_lab::t_real const * tsunami_lab::patches::WavePropagation2d::getHeight(){
   return m_compactH;
 }
 
-t_real const * tsunami_lab::patches::WavePropagation2d::getMomentumX(){
+tsunami_lab::t_real const * tsunami_lab::patches::WavePropagation2d::getMomentumX(){
   return m_compactHu;
 }
 
-t_real const * tsunami_lab::patches::WavePropagation2d::getMomentumY(){
+tsunami_lab::t_real const * tsunami_lab::patches::WavePropagation2d::getMomentumY(){
   return m_compactHv;
 }
 

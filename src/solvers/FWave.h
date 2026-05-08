@@ -14,7 +14,7 @@ namespace tsunami_lab {
 }
 
 class tsunami_lab::solvers::FWave {
-  private:
+  public:
     //! gravity
     static t_real constexpr m_g = 9.80665;
     //! square root of gravity

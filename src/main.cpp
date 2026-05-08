@@ -10,6 +10,9 @@
 #include "setups/DamBreak1d.h"
 #include "io/Csv.h"
 #include "io/Stations.h"
+#ifdef USE_NETCDF
+#include "io/NetCdf.h"
+#endif
 #include <cstdlib>
 #include <iostream>
 #include <cmath>
@@ -132,6 +135,34 @@ int main( int   i_argc,
     }
   }
 
+#ifdef USE_NETCDF
+  tsunami_lab::io::NetCdf l_netcdfWriter( "solution.nc",
+                                          l_dxy,
+                                          l_nx,
+                                          l_ny,
+                                          false );
+  bool l_netcdfEnabled = l_netcdfWriter.isOpen();
+  if( l_netcdfWriter.isOpen() ) {
+    l_netcdfEnabled = l_netcdfWriter.writeTimeStep( 0,
+                                                    l_nx,
+                                                    l_waveProp->getHeight(),
+                                                    l_waveProp->getMomentumX(),
+                                                    nullptr,
+                                                    0,
+                                                    0 );
+    if( !l_netcdfEnabled ) {
+      std::cerr << "  netCDF output disabled at runtime (failed writing initial step)" << std::endl;
+    }
+  }
+
+  if( l_netcdfEnabled ) {
+    std::cout << "  netCDF output enabled: solution.nc" << std::endl;
+  }
+  else if( !l_netcdfWriter.isOpen() ) {
+    std::cerr << "  netCDF output disabled at runtime (failed to initialize solution.nc)" << std::endl;
+  }
+#endif
+
   // iterate over time
   while( l_simTime < l_endTime ){
     if( l_timeStep % 25 == 0 ) {
@@ -165,6 +196,22 @@ int main( int   i_argc,
     if( l_stations != nullptr ) {
       l_stations->sampleAndMaybeWrite( l_waveProp, l_simTime, l_dxy, l_nx, l_ny );
     }
+
+#ifdef USE_NETCDF
+    if( l_netcdfEnabled ) {
+      bool l_ok = l_netcdfWriter.writeTimeStep( l_simTime,
+                                                l_nx,
+                                                l_waveProp->getHeight(),
+                                                l_waveProp->getMomentumX(),
+                                                nullptr,
+                                                0,
+                                                0 );
+      if( !l_ok ) {
+        l_netcdfEnabled = false;
+        std::cerr << "  netCDF output disabled at runtime (write failure)" << std::endl;
+      }
+    }
+#endif
   }
 
   std::cout << "finished time loop" << std::endl;
