@@ -29,6 +29,7 @@ Dependencies:
 Notes:
 
 - The NetCdf writer is intended to exclude ghost cells by default.
+
 - If your arrays already contain only physical cells, pass ghost offsets (0, 0)
 	when calling writeTimeStep.
 
