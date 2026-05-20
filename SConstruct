@@ -111,13 +111,11 @@ else:
 # add Catch2
 env.Append( CPPPATH = [ '#/submodules/Catch2/single_include' ] )
 
-<<<<<<< HEAD
 # add pugixml for XML runtime configuration
 env.Append( CXXFLAGS = [ '-DUSE_PUGIXML', '-isystem', 'src' ] )
 
 # add C++17 filesystem support for MinGW
 env.Append( LIBS = [ 'stdc++fs' ] )
-=======
 # optionally add pugixml for XML runtime configuration
 env['USE_PUGIXML'] = False
 l_confXml = Configure( env )
@@ -167,7 +165,6 @@ if env['netcdf'] != 'off':
       print( 'ERROR: netCDF support requested but libnetcdf/netcdf.h not found.' )
       Exit( 1 )
     print( 'netCDF support: disabled (libraries not found)' )
->>>>>>> origin/feat/added-documentation
 
 # get source files
 VariantDir( variant_dir = 'build/src',
