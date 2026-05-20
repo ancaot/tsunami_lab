@@ -1,0 +1,133 @@
+file D:\studium\tsunami_lab\SConstruct,line 116:
+	Configure(confdir = .sconf_temp)
+scons: Configure: Checking for C++ header file pugixml.hpp... 
+scons: Configure: ".sconf_temp\conftest_955da34152ba8c4ceb6358b53152d5e6_0.cpp" is up to date.
+scons: Configure: The original builder output was:
+  |.sconf_temp\conftest_955da34152ba8c4ceb6358b53152d5e6_0.cpp <-
+  |  |
+  |  |#include "pugixml.hpp"
+  |  |
+  |  |
+  |
+scons: Configure: Building ".sconf_temp\conftest_955da34152ba8c4ceb6358b53152d5e6_0_6675025f361cb8d1817bd696faf1957a.obj" failed in a previous run and all its sources are up to date.
+scons: Configure: The original builder output was:
+  |cl /Fo.sconf_temp\conftest_955da34152ba8c4ceb6358b53152d5e6_0_6675025f361cb8d1817bd696faf1957a.obj /c .sconf_temp\conftest_955da34152ba8c4ceb6358b53152d5e6_0.cpp /TP /std:c++17 /W4 /EHsc /O2 /nologo /Isubmodules\Catch2\single_include
+  |
+scons: Configure: (cached) no
+
+scons: Configure: Checking for C library pugixml... 
+scons: Configure: ".sconf_temp\conftest_e492448966d6e04631c094ba6d6e8a32_0.c" is up to date.
+scons: Configure: The original builder output was:
+  |.sconf_temp\conftest_e492448966d6e04631c094ba6d6e8a32_0.c <-
+  |  |
+  |  |
+  |  |
+  |  |int main(void) {
+  |  |  
+  |  |return 0;
+  |  |}
+  |  |
+  |
+scons: Configure: ".sconf_temp\conftest_e492448966d6e04631c094ba6d6e8a32_0.obj" is up to date.
+scons: Configure: The original builder output was:
+  |cl /Fo.sconf_temp\conftest_e492448966d6e04631c094ba6d6e8a32_0.obj /c .sconf_temp\conftest_e492448966d6e04631c094ba6d6e8a32_0.c /nologo /Isubmodules\Catch2\single_include
+  |
+scons: Configure: Building ".sconf_temp\conftest_e492448966d6e04631c094ba6d6e8a32_0_14cdfd0c2fe13a2742e380b3c3fbdd05.exe" failed in a previous run and all its sources are up to date.
+scons: Configure: The original builder output was:
+  |link /nologo /OUT:.sconf_temp\conftest_e492448966d6e04631c094ba6d6e8a32_0_14cdfd0c2fe13a2742e380b3c3fbdd05.exe pugixml.lib .sconf_temp\conftest_e492448966d6e04631c094ba6d6e8a32_0.obj
+  |
+scons: Configure: (cached) no
+
+
+file D:\studium\tsunami_lab\SConstruct,line 132:
+	Configure(confdir = .sconf_temp)
+scons: Configure: Checking for C library netcdf... 
+scons: Configure: ".sconf_temp\conftest_1ddd6b9627e69bc88093239e56660785_0.c" is up to date.
+scons: Configure: The original builder output was:
+  |.sconf_temp\conftest_1ddd6b9627e69bc88093239e56660785_0.c <-
+  |  |
+  |  |
+  |  |#include "netcdf.h"
+  |  |
+  |  |int main(void) {
+  |  |  
+  |  |return 0;
+  |  |}
+  |  |
+  |
+scons: Configure: Building ".sconf_temp\conftest_1ddd6b9627e69bc88093239e56660785_0.obj" failed in a previous run and all its sources are up to date.
+scons: Configure: The original builder output was:
+  |cl /Fo.sconf_temp\conftest_1ddd6b9627e69bc88093239e56660785_0.obj /c .sconf_temp\conftest_1ddd6b9627e69bc88093239e56660785_0.c /nologo /Isubmodules\Catch2\single_include
+  |
+scons: Configure: (cached) no
+
+scons: Configure: Checking for C library z... 
+scons: Configure: ".sconf_temp\conftest_e492448966d6e04631c094ba6d6e8a32_1.c" is up to date.
+scons: Configure: The original builder output was:
+  |.sconf_temp\conftest_e492448966d6e04631c094ba6d6e8a32_1.c <-
+  |  |
+  |  |
+  |  |
+  |  |int main(void) {
+  |  |  
+  |  |return 0;
+  |  |}
+  |  |
+  |
+scons: Configure: ".sconf_temp\conftest_e492448966d6e04631c094ba6d6e8a32_1.obj" is up to date.
+scons: Configure: The original builder output was:
+  |cl /Fo.sconf_temp\conftest_e492448966d6e04631c094ba6d6e8a32_1.obj /c .sconf_temp\conftest_e492448966d6e04631c094ba6d6e8a32_1.c /nologo /Isubmodules\Catch2\single_include
+  |
+scons: Configure: Building ".sconf_temp\conftest_e492448966d6e04631c094ba6d6e8a32_1_80baef1b02fd85f68395f4672d59e760.exe" failed in a previous run and all its sources are up to date.
+scons: Configure: The original builder output was:
+  |link /nologo /OUT:.sconf_temp\conftest_e492448966d6e04631c094ba6d6e8a32_1_80baef1b02fd85f68395f4672d59e760.exe z.lib .sconf_temp\conftest_e492448966d6e04631c094ba6d6e8a32_1.obj
+  |
+scons: Configure: (cached) no
+
+scons: Configure: Checking for C library hdf5... 
+scons: Configure: ".sconf_temp\conftest_e492448966d6e04631c094ba6d6e8a32_2.c" is up to date.
+scons: Configure: The original builder output was:
+  |.sconf_temp\conftest_e492448966d6e04631c094ba6d6e8a32_2.c <-
+  |  |
+  |  |
+  |  |
+  |  |int main(void) {
+  |  |  
+  |  |return 0;
+  |  |}
+  |  |
+  |
+scons: Configure: ".sconf_temp\conftest_e492448966d6e04631c094ba6d6e8a32_2.obj" is up to date.
+scons: Configure: The original builder output was:
+  |cl /Fo.sconf_temp\conftest_e492448966d6e04631c094ba6d6e8a32_2.obj /c .sconf_temp\conftest_e492448966d6e04631c094ba6d6e8a32_2.c /nologo /Isubmodules\Catch2\single_include
+  |
+scons: Configure: Building ".sconf_temp\conftest_e492448966d6e04631c094ba6d6e8a32_2_7fe19bb21cf113cf19b1f60c46c4651c.exe" failed in a previous run and all its sources are up to date.
+scons: Configure: The original builder output was:
+  |link /nologo /OUT:.sconf_temp\conftest_e492448966d6e04631c094ba6d6e8a32_2_7fe19bb21cf113cf19b1f60c46c4651c.exe hdf5.lib .sconf_temp\conftest_e492448966d6e04631c094ba6d6e8a32_2.obj
+  |
+scons: Configure: (cached) no
+
+scons: Configure: Checking for C library hdf5_hl... 
+scons: Configure: ".sconf_temp\conftest_e492448966d6e04631c094ba6d6e8a32_3.c" is up to date.
+scons: Configure: The original builder output was:
+  |.sconf_temp\conftest_e492448966d6e04631c094ba6d6e8a32_3.c <-
+  |  |
+  |  |
+  |  |
+  |  |int main(void) {
+  |  |  
+  |  |return 0;
+  |  |}
+  |  |
+  |
+scons: Configure: ".sconf_temp\conftest_e492448966d6e04631c094ba6d6e8a32_3.obj" is up to date.
+scons: Configure: The original builder output was:
+  |cl /Fo.sconf_temp\conftest_e492448966d6e04631c094ba6d6e8a32_3.obj /c .sconf_temp\conftest_e492448966d6e04631c094ba6d6e8a32_3.c /nologo /Isubmodules\Catch2\single_include
+  |
+scons: Configure: Building ".sconf_temp\conftest_e492448966d6e04631c094ba6d6e8a32_3_6ead7433f3f51df72706361b387f732d.exe" failed in a previous run and all its sources are up to date.
+scons: Configure: The original builder output was:
+  |link /nologo /OUT:.sconf_temp\conftest_e492448966d6e04631c094ba6d6e8a32_3_6ead7433f3f51df72706361b387f732d.exe hdf5_hl.lib .sconf_temp\conftest_e492448966d6e04631c094ba6d6e8a32_3.obj
+  |
+scons: Configure: (cached) no
+
+
