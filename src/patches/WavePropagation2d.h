@@ -139,10 +139,8 @@ class tsunami_lab::patches::WavePropagation2d: public WavePropagation{
          * @param i_b  bathymetry.
          **/
         void setBathymetry( t_idx i_ix,
-                            t_idx ,
-                            t_real i_b) {
-          m_b[i_ix] = i_b;
-        }
+                            t_idx i_iy,
+                            t_real i_b);
 };
 
 #endif

@@ -76,8 +76,7 @@ int main( int   i_argc,
   //                                             0, 
   //                                             0);
 
-  l_setup = new tsunami_lab::setups::ArtificialTsunami2d(10, -100);
-  tsunami_lab::setups::ArtificialTsunami2d *l_setupHelp = static_cast<tsunami_lab::setups::ArtificialTsunami2d*>(l_setup);
+  l_setup = new tsunami_lab::setups::ArtificialTsunami2d(100, -100);
 
   // construct solver
   tsunami_lab::patches::WavePropagation *l_waveProp;
@@ -87,12 +86,11 @@ int main( int   i_argc,
   // maximum observed height in the setup
   tsunami_lab::t_real l_hMax = std::numeric_limits< tsunami_lab::t_real >::lowest();
 
-  // set up solver
   for( tsunami_lab::t_idx l_cy = 0; l_cy < l_ny; l_cy++ ) {
-    tsunami_lab::t_real l_y = l_cy * l_dxy; 
+    tsunami_lab::t_real l_y = (l_cy + 0.5) * l_dxy - 25000.0; 
 
     for( tsunami_lab::t_idx l_cx = 0; l_cx < l_nx; l_cx++ ) {
-      tsunami_lab::t_real l_x = l_cx * l_dxy; 
+      tsunami_lab::t_real l_x = (l_cx + 0.5) * l_dxy - 25000.0;
 
       // get initial values of the setup
       tsunami_lab::t_real l_h = l_setup->getHeight(l_x,
@@ -107,7 +105,7 @@ int main( int   i_argc,
       
 
       
-      tsunami_lab::t_real l_b = l_setupHelp->getBathymetry(l_x, 
+      tsunami_lab::t_real l_b = l_setup->getBathymetry(l_x, 
                                                         l_y);
 
       // set initial values in wave propagation solver

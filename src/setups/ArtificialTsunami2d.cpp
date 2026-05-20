@@ -13,23 +13,22 @@ tsunami_lab::setups::ArtificialTsunami2d::ArtificialTsunami2d(t_real i_height, t
 }
 
 //Getter
-tsunami_lab::t_real tsunami_lab::setups::ArtificialTsunami2d::getHeight(t_real , t_real ) const {
-    //
+tsunami_lab::t_real tsunami_lab::setups::ArtificialTsunami2d::getHeight(t_real, t_real) const {
     return m_height;
 }
 
 tsunami_lab::t_real tsunami_lab::setups::ArtificialTsunami2d::getMomentumX(t_real , t_real ) const {
-    //
     return m_momentumX;
 }
 
 tsunami_lab::t_real tsunami_lab::setups::ArtificialTsunami2d::getMomentumY(t_real , t_real ) const {
-    //
     return m_momentumY;
 }
 
-tsunami_lab::t_real tsunami_lab::setups::ArtificialTsunami2d::getBathymetry(t_real , t_real ) const {
-    //
+tsunami_lab::t_real tsunami_lab::setups::ArtificialTsunami2d::getBathymetry(t_real i_x, t_real i_y) const {
+    if (i_x >= -500 && i_x <= 500 && i_y >= -500 && i_y <= 500) {
+        return m_bathymetry + getDisplacement(i_x, i_y);
+    }
     return m_bathymetry;
 }
 

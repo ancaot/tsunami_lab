@@ -157,10 +157,12 @@ void tsunami_lab::patches::WavePropagation2d::setGhostOutflow() {
     l_h[l_off + 0] = l_h[l_off + 1];
     l_hu[l_off + 0] = l_hu[l_off + 1];
     l_hv[l_off + 0] = l_hv[l_off + 1];
+    m_b[l_off + 0] = m_b[l_off + 1];
     // right ghost
     l_h[l_off + m_nx + 1] = l_h[l_off + m_nx];
     l_hu[l_off + m_nx + 1] = l_hu[l_off + m_nx];
     l_hv[l_off + m_nx + 1] = l_hv[l_off + m_nx];
+    m_b[l_off + m_nx + 1] = m_b[l_off + m_nx];
   }
 }
 
@@ -193,4 +195,8 @@ void tsunami_lab::patches::WavePropagation2d::setMomentumX( t_idx i_ix, t_idx i_
 void tsunami_lab::patches::WavePropagation2d::setMomentumY( t_idx i_ix, t_idx i_iy, t_real i_hv ){
   t_idx l_stride = m_nx + 2;
   m_hv[m_step][ i_iy * l_stride + 1 + i_ix ] = i_hv;
+}
+void tsunami_lab::patches::WavePropagation2d::setBathymetry( t_idx i_ix, t_idx i_iy, t_real i_b ){
+  t_idx l_stride = m_nx + 2;
+  m_b[ i_iy * l_stride + 1 + i_ix ] = i_b;
 }
