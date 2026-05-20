@@ -54,7 +54,22 @@ class tsunami_lab::setups::Setup {
      **/
     virtual t_real getMomentumY( t_real i_x,
                                  t_real i_y ) const = 0;
-      
+
+    /**
+     * Gets the bathymetry at a given point.
+     *
+     * @param i_x x-coordinate of the queried point.
+     * @param i_y y-coordinate of the queried point.
+     * @return bathymetry at the given point.
+     **/
+    virtual t_real getBathymetry( t_real i_x,
+                                  t_real i_y ) const {
+      // default implementation
+      (void)i_x;
+      (void)i_y;
+      return 0.0f;
+    }
+
 };
 
 #endif
