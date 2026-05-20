@@ -104,7 +104,8 @@ Dazu kommt, dass für das lesen der Dateien die Resolution benötigt wird, um de
 Also für die Höhenbestimmung, wird die Datei mit den Informationen über die Wassertiefe aufgerufen, um damit die gegeben Ansprüche zu erfüllen. 
 Die Bestimmung der Wassertiefe braucht zum einen die gelesenen Wassertiefen und dazu die gelesenen Bodenverschiebungsdaten.
 
-Um an die gewünschte Resolution und die Simulationszeit heranzukommen, wird bei ...
+Um an die gewünschte Resolution und die Simulationszeit heranzukommen, wird bei der Ausführung der ``main.cpp`` Datei neben der Zellengröße nach beidem gefragt.
+
 
 
 3. Vergleich von der künslichen Simulation und dem Tsunami Event
@@ -113,4 +114,4 @@ Um an die gewünschte Resolution und die Simulationszeit heranzukommen, wird bei
 Die Aufgabe **5.2.4** erwartet einen Korrektheitscheck für die Dateien-Input-Klasse, indem diese mit der künstlichen Tsunami Simulation verglichen wird. 
 Dafür soll die in der Aufgabenstellung verlinkten Input-Daten verwendet werden.
 
-**Test Ergebnisse**:
+**Test Ergebnisse**: nicht verfügbar
