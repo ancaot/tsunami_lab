@@ -68,6 +68,10 @@ Dank der Einhaltung der COARDS-Regeln und der Angabe des "since"-Keywords verste
 
 Ich habe mich diese Woche um die Aufgaben 5.2.1, 5.2.3 und 5.2.4 gekümmert.
 
+Auf Grund von Problemen bei der Kompilierung meinerseits, konnte ich leider nicht die neuen Setups vollständig testen.
+Deswegen gibt es keine konkrete Antwort zu Aufgabe 5.2.4. und die anderen beiden Aufgaben konnten nur teilweise gelöst werden.
+
+
 1. Das künstliche zwei-dimensionale Tsunami-Setups
 --------------------------------------------------
 
@@ -87,7 +91,8 @@ Die zweite Methode berechnet die Formel für :math:`f(x)` und die dritte berechn
 
 **Test Ergebnisse**:
     #. Die Wassertiefe ist, wie schon geschrieben überall -100m. Die Wasserhöhe wurde auf 10m gesetzt.
-    #. 
+    #. nicht verfügbar
+    
 
 2. Das zwei-dimensionale Tsunami Event
 --------------------------------------
