@@ -35,11 +35,9 @@ class tsunami_lab::setups::TsunamiEvent2d: public Setup {
         // bathymethry input of file
         t_real m_bathymetryIn = 0;
 
-        // displacement
+        // displacement of file
         t_real m_displacement = 0;
 
-        // displacement input of file
-        t_real m_displacementIn = 0;
 
         // file for bathymetry input
         std::string m_fileB;
@@ -47,18 +45,28 @@ class tsunami_lab::setups::TsunamiEvent2d: public Setup {
         // file for displacement input
         std::string m_fileD;
 
-        // resolution of simulation
-        t_real m_resolution;
+        // number of x cells
+        t_real m_nx = 0;
+
+        // number of y cells
+        t_real m_ny = 0;
+
 
     public:
         /**
         * Constructor
+        *
+        * @param i_nx number of x Cells.
+        * @param i_ny number of y Cells.
+        * @param i_fileBathymetry name of file with bathymetry data
+        * @param i_fileDisplacement name of file with displacement data
         */
-        TsunamiEvent2d(std::string i_fileBathymetry,
-                        std::string i_fileDisplacement,
-                        t_real i_resolution);
+        TsunamiEvent2d( t_real i_nx,
+                        t_real i_ny,
+                        std::string i_fileBathymetry,
+                        std::string i_fileDisplacement);
 
-                /**
+        /**
         * Gets the water height at a given point.
         *
         * @param i_x x-coordinate of the queried point.

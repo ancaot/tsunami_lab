@@ -46,8 +46,8 @@ class tsunami_lab::setups::ArtificialTsunami2d: public Setup {
         * @param i_y y-coordinate of the queried point.
         * @return water height at the given point.
         **/
-        t_real getHeight(t_real i_x,
-                        t_real i_y) const;
+        t_real getHeight(t_real ,
+                        t_real ) const;
 
         /**
         * Gets the momentum in x-direction.
@@ -56,8 +56,8 @@ class tsunami_lab::setups::ArtificialTsunami2d: public Setup {
         * @param i_y y-coordinate of the queried point.
         * @return momentum in x-direction.
         **/
-        t_real getMomentumX(t_real i_x,
-                            t_real i_y) const;
+        t_real getMomentumX(t_real ,
+                            t_real ) const;
 
         /**
         * Gets the momentum in y-direction.
@@ -66,8 +66,8 @@ class tsunami_lab::setups::ArtificialTsunami2d: public Setup {
         * @param i_y y-coordinate of the queried point.
         * @return momentum in y-direction.
         **/
-        t_real getMomentumY(t_real i_x,
-                            t_real i_y) const;
+        t_real getMomentumY(t_real ,
+                            t_real ) const;
 
         /**
         * Gets the bathymetry.
@@ -76,8 +76,8 @@ class tsunami_lab::setups::ArtificialTsunami2d: public Setup {
         * @param i_y y-coordinate of the queried point.
         * @return bathymetry.
         **/
-        t_real getBathymetry(t_real i_x,
-                            t_real i_y) const;
+        t_real getBathymetry(t_real ,
+                            t_real ) const;
 
         /**
         * Computes function d(x,y) given in task description

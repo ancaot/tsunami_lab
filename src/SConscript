@@ -16,6 +16,8 @@ l_sources = [ 'solvers/FWave.cpp',
               'setups/TsunamiEvent1d.cpp',
               'setups/ShockLand1d.cpp',
               'setups/CircularDamBreak1d.cpp',
+              'setups/ArtificialTsunami2d.cpp',
+              'setups/TsunamiEvent2d.cpp',
               'io/Csv.cpp',
               'io/Stations.cpp' ]
 

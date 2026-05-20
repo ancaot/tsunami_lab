@@ -1,5 +1,4 @@
 /**
- * @author Alexander Breuer (alex.breuer AT uni-jena.de)
  *
  * @section DESCRIPTION
  * Simulationsprogramm: Lädt Setup, integriert optional Messstationen,
@@ -12,6 +11,7 @@
 #include "io/Csv.h"
 #include "setups/DamBreak2d.h"
 #include "setups/TsunamiEvent1d.h"
+#include "setups/ArtificialTsunami2d.h"
 #include "io/Stations.h"
 #ifdef USE_NETCDF
 #include "io/NetCdf.h"
@@ -67,14 +67,17 @@ int main( int   i_argc,
   // l_setup = new tsunami_lab::setups::TsunamiEvent1d(10, 0);
   // tsunami_lab::setups::TsunamiEvent1d *l_setupHelp = static_cast<tsunami_lab::setups::TsunamiEvent1d*>(l_setup);
 
-  l_setup = new tsunami_lab::setups::DamBreak2d(10, 
-                                              5, 
-                                              0, 
-                                              0, 
-                                              0, 
-                                              0, 
-                                              0, 
-                                              0);
+  // l_setup = new tsunami_lab::setups::DamBreak2d(10, 
+  //                                             5, 
+  //                                             0, 
+  //                                             0, 
+  //                                             0, 
+  //                                             0, 
+  //                                             0, 
+  //                                             0);
+
+  l_setup = new tsunami_lab::setups::ArtificialTsunami2d(10, -100);
+  tsunami_lab::setups::ArtificialTsunami2d *l_setupHelp = static_cast<tsunami_lab::setups::ArtificialTsunami2d*>(l_setup);
 
   // construct solver
   tsunami_lab::patches::WavePropagation *l_waveProp;
@@ -92,7 +95,7 @@ int main( int   i_argc,
       tsunami_lab::t_real l_x = l_cx * l_dxy; 
 
       // get initial values of the setup
-      tsunami_lab::t_real l_h = l_setup->getHeight( l_x,
+      tsunami_lab::t_real l_h = l_setup->getHeight(l_x,
                                                     l_y );
       l_hMax = std::max( l_h, l_hMax );
 
@@ -102,8 +105,10 @@ int main( int   i_argc,
                                                         l_y );
 
       
-      // tsunami_lab::t_real l_b = l_setupHelp->getBathymetry(l_x, 
-      //                                                   l_y);
+
+      
+      tsunami_lab::t_real l_b = l_setupHelp->getBathymetry(l_x, 
+                                                        l_y);
 
       // set initial values in wave propagation solver
       l_waveProp->setHeight( l_cx,
@@ -118,9 +123,9 @@ int main( int   i_argc,
                                 l_cy,
                                 l_hv );
 
-      // l_waveProp->setBathymetry(l_cx,
-      //                           l_cy,
-      //                           l_b);
+      l_waveProp->setBathymetry(l_cx,
+                                l_cy,
+                                l_b);
 
     }
   }

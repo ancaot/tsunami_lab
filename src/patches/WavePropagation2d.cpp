@@ -1,5 +1,4 @@
 /**
-<<<<<<< HEAD
  * @section DESCRIPTION
  * Two-dimensional wave propagation patch.
  * Minimal 2D surrogate implementation: apply 1D updates along x for each
@@ -145,7 +144,6 @@ void tsunami_lab::patches::WavePropagation2d::timeStep(t_real i_scaling){
 
 }
 
-<<<<<<< HEAD
 void tsunami_lab::patches::WavePropagation2d::setGhostOutflow() {
 
   t_idx l_stride = m_nx + 2;
@@ -166,8 +164,6 @@ void tsunami_lab::patches::WavePropagation2d::setGhostOutflow() {
   }
 }
 
-=======
->>>>>>> origin/feat/added-documentation
 tsunami_lab::t_idx tsunami_lab::patches::WavePropagation2d::getStride(){
   return m_nx;
 }

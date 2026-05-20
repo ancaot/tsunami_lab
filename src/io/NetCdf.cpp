@@ -283,8 +283,6 @@ tsunami_lab::t_real tsunami_lab::io::NetCdf::getTime( t_idx i_timeStep ) const {
   return l_time;
 }
 
-<<<<<<< HEAD
-=======
 void tsunami_lab::io::NetCdf::read( std::string const & i_path,
                                     t_idx             & o_nx,
                                     t_idx             & o_ny,
@@ -377,7 +375,6 @@ int tsunami_lab::io::NetCdf::read( const char* filename,
   return 1;
 }
 
->>>>>>> origin/feat/added-documentation
 #else
 
 #include <iostream>
@@ -394,8 +391,6 @@ tsunami_lab::io::NetCdf::NetCdf( std::string const & ) {
   std::cerr << "netCDF support is disabled at compile time." << std::endl;
 }
 
-<<<<<<< HEAD
-=======
 void tsunami_lab::io::NetCdf::read( std::string const &,
                                     t_idx             &,
                                     t_idx             &,
@@ -412,7 +407,6 @@ int tsunami_lab::io::NetCdf::read( const char*,
   return -1;
 }
 
->>>>>>> origin/feat/added-documentation
 tsunami_lab::io::NetCdf::~NetCdf() {}
 
 bool tsunami_lab::io::NetCdf::check( int,

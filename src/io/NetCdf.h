@@ -6,10 +6,7 @@
 
 #include "../constants.h"
 #include <string>
-<<<<<<< HEAD
-=======
 #include <vector>
->>>>>>> origin/feat/added-documentation
 
 namespace tsunami_lab {
   namespace io {
@@ -77,8 +74,6 @@ class tsunami_lab::io::NetCdf {
                         t_idx                i_ghostX = 1,
                         t_idx                i_ghostY = 0 );
 
-<<<<<<< HEAD
-=======
     // Read interface for bathymetry/displacement (existing)
     static void read( std::string const & i_path,
                       t_idx             & o_nx,
@@ -92,7 +87,6 @@ class tsunami_lab::io::NetCdf {
                      const char* varname,
                      std::vector<t_real> &data );
 
->>>>>>> origin/feat/added-documentation
     // Read interface
     bool readTimeStep( t_idx                i_timeStep,
                        t_real       * o_h,
