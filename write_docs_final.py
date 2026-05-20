@@ -1,4 +1,6 @@
-##################################################
+import sys
+
+content = """##################################################
 Submission 5: Large Data I/O (Input/Output)
 ##################################################
 
@@ -43,3 +45,7 @@ Das ist wichtig, da wir reale topografische Daten für Wassertiefe und Bodenvers
 
 - Um die implementierte ``read``-Funktion über Unit-Tests abzusichern, nutze ich das Tool **``ncgen``**, um unkompliziert kleine NetCDF-Dateien zu generieren.
 - Wenn man schnell in der Konsole prüfen möchte, welche Variablen und Dimensionen in einer NetCDF-Datei existieren (z. B. in den Uni-Dateien), eignet sich am besten der Befehl: **``ncdump -h <file.nc>``**.
+"""
+
+with open("sphinx/source/chapters/submission_5.rst", "w", encoding="utf-8") as f:
+    f.write(content)

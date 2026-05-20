@@ -283,6 +283,98 @@ tsunami_lab::t_real tsunami_lab::io::NetCdf::getTime( t_idx i_timeStep ) const {
   return l_time;
 }
 
+void tsunami_lab::io::NetCdf::read( std::string const & i_path,
+                                    t_idx             & o_nx,
+                                    t_idx             & o_ny,
+                                    t_real           ** o_x,
+                                    t_real           ** o_y,
+                                    t_real           ** o_z ) {
+  int l_fileId;
+  int l_err = nc_open( i_path.c_str(), NC_NOWRITE, &l_fileId );
+  if( l_err != NC_NOERR ) {
+    std::cerr << "netCDF error: could not open " << i_path << std::endl;
+    return;
+  }
+
+  // Get dimensions
+  int l_dimXId, l_dimYId;
+  nc_inq_dimid( l_fileId, "x", &l_dimXId );
+  nc_inq_dimid( l_fileId, "y", &l_dimYId );
+
+  size_t l_nx, l_ny;
+  nc_inq_dimlen( l_fileId, l_dimXId, &l_nx );
+  nc_inq_dimlen( l_fileId, l_dimYId, &l_ny );
+
+  o_nx = static_cast<t_idx>(l_nx);
+  o_ny = static_cast<t_idx>(l_ny);
+
+  if( o_x != nullptr ) *o_x = new t_real[o_nx];
+  if( o_y != nullptr ) *o_y = new t_real[o_ny];
+  if( o_z != nullptr ) *o_z = new t_real[o_nx * o_ny];
+
+  // Get variables
+  int l_varXId, l_varYId, l_varZId;
+  nc_inq_varid( l_fileId, "x", &l_varXId );
+  nc_inq_varid( l_fileId, "y", &l_varYId );
+  nc_inq_varid( l_fileId, "z", &l_varZId );
+
+  // Read data
+  if( o_x != nullptr ) nc_get_var_float( l_fileId, l_varXId, *o_x );
+  if( o_y != nullptr ) nc_get_var_float( l_fileId, l_varYId, *o_y );
+  if( o_z != nullptr ) nc_get_var_float( l_fileId, l_varZId, *o_z );
+
+  nc_close( l_fileId );
+}
+
+int tsunami_lab::io::NetCdf::read( const char* filename,
+                                   const char* varname,
+                                   std::vector<t_real> &data) {
+  int l_ncId;
+  if( nc_open(filename, NC_NOWRITE, &l_ncId) != NC_NOERR ) {
+    std::cerr << "Error opening NetCDF file: " << filename << std::endl;
+    return -1;
+  }
+
+  int varid;
+  if( nc_inq_varid(l_ncId, varname, &varid) != NC_NOERR ) {
+    std::cerr << "Error getting variable ID for variable: " << varname << std::endl;
+    nc_close(l_ncId);
+    return -1;
+  }
+
+  int ndims;
+  int dimids[NC_MAX_VAR_DIMS];
+  if( nc_inq_var(l_ncId, varid, nullptr, nullptr, &ndims, dimids, nullptr) != NC_NOERR ) {
+    std::cerr << "Error getting variable information for variable: " << varname << std::endl;
+    nc_close(l_ncId);
+    return -1;
+  }
+
+  t_idx dataSize = 1;
+  for( int i = 0; i < ndims; ++i ) {
+    char dimname[NC_MAX_NAME + 1];
+    size_t dimlen;
+    if( nc_inq_dim(l_ncId, dimids[i], dimname, &dimlen) != NC_NOERR ) {
+      std::cerr << "Error getting dimension information." << std::endl;
+      nc_close(l_ncId);
+      return -1;
+    }
+    dataSize *= dimlen;
+  }
+
+  data.resize(dataSize);
+  if( nc_get_var_float(l_ncId, varid, &data[0]) != NC_NOERR ) {
+    std::cerr << "Error getting data." << std::endl;
+    nc_close(l_ncId);
+    return -1;
+  }
+
+  if( nc_close(l_ncId) != NC_NOERR ) {
+    std::cerr << "Error closing NetCDF file: " << filename << std::endl;
+  }
+  return 1;
+}
+
 #else
 
 #include <iostream>
@@ -297,6 +389,22 @@ tsunami_lab::io::NetCdf::NetCdf( std::string const &,
 
 tsunami_lab::io::NetCdf::NetCdf( std::string const & ) {
   std::cerr << "netCDF support is disabled at compile time." << std::endl;
+}
+
+void tsunami_lab::io::NetCdf::read( std::string const &,
+                                    t_idx             &,
+                                    t_idx             &,
+                                    t_real           **,
+                                    t_real           **,
+                                    t_real           ** ) {
+  std::cerr << "netCDF support is disabled at compile time." << std::endl;
+}
+
+int tsunami_lab::io::NetCdf::read( const char*,
+                                   const char*,
+                                   std::vector<t_real>& ) {
+  std::cerr << "netCDF support is disabled at compile time." << std::endl;
+  return -1;
 }
 
 tsunami_lab::io::NetCdf::~NetCdf() {}

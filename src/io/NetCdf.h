@@ -6,6 +6,7 @@
 
 #include "../constants.h"
 #include <string>
+#include <vector>
 
 namespace tsunami_lab {
   namespace io {
@@ -72,6 +73,19 @@ class tsunami_lab::io::NetCdf {
                         t_real       const * i_hv,
                         t_idx                i_ghostX = 1,
                         t_idx                i_ghostY = 0 );
+
+    // Read interface for bathymetry/displacement (existing)
+    static void read( std::string const & i_path,
+                      t_idx             & o_nx,
+                      t_idx             & o_ny,
+                      t_real           ** o_x,
+                      t_real           ** o_y,
+                      t_real           ** o_z );
+
+    // Read interface from the sphingx-tsunami documentation
+    static int read( const char* filename,
+                     const char* varname,
+                     std::vector<t_real> &data );
 
     // Read interface
     bool readTimeStep( t_idx                i_timeStep,
