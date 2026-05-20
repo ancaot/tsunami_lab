@@ -112,7 +112,21 @@ else:
 env.Append( CPPPATH = [ '#/submodules/Catch2/single_include' ] )
 
 # add pugixml for XML runtime configuration
-env.Append( CXXFLAGS = [ '-DUSE_PUGIXML', '-isystem', 'src' ] )
+env.pugixml_sources = []
+l_pugixmlHeader = File( 'libs/pugixml-1.15/src/pugixml.hpp' )
+l_pugixmlConfig = File( 'libs/pugixml-1.15/src/pugiconfig.hpp' )
+l_pugixmlSource = File( 'libs/pugixml-1.15/src/pugixml.cpp' )
+
+if os.path.isfile( str( l_pugixmlHeader ) ) and \
+   os.path.isfile( str( l_pugixmlConfig ) ) and \
+   os.path.isfile( str( l_pugixmlSource ) ):
+  env['USE_PUGIXML'] = True
+  env.AppendUnique( CPPPATH = [ '#/src' ] )
+  env.AppendUnique( CPPDEFINES = [ 'USE_PUGIXML' ] )
+  env.pugixml_sources = [ l_pugixmlSource ]
+  print( 'pugixml support: enabled from src/pugixml.cpp' )
+else:
+  print( 'pugixml support: disabled (expected src/pugixml.hpp, src/pugiconfig.hpp and src/pugixml.cpp)' )
 
 # add C++17 filesystem support for MinGW
 env.Append( LIBS = [ 'stdc++fs' ] )
@@ -176,6 +190,7 @@ env.tests = []
 Export('env')
 SConscript( 'build/src/SConscript' )
 Import('env')
+env.sources += env.pugixml_sources
 
 env.Program( target = 'build/tsunami_lab',
              source = env.sources + env.standalone_main )
