@@ -1,2 +1,36 @@
-/build/*
+# Build directory and generated files
+/build/
+
+# SCons build system
+.sconsign.dblite
+config.log
+
+# Sphinx documentation
 /sphinx/build/
+
+# Doxygen documentation
+/docs/html/
+/docs/latex/
+
+# Simulation output data (NetCDF, generated CSVs)
+*.nc
+# Ignore general solution CSVs unless they're in the data folder
+solution_*.csv
+symmetry_*.csv
+!/data/csv/
+
+# Python scripts (from tools)
+__pycache__/
+*.py[cod]
+*$py.class
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# IDEs and Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+
