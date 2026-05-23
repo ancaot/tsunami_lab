@@ -69,9 +69,9 @@ int main( int   i_argc,
 
   // l_setup = new tsunami_lab::setups::DamBreak2d(10, 
   //                                             5, 
+  //                                             3, 
   //                                             0, 
-  //                                             0, 
-  //                                             0, 
+  //                                             3, 
   //                                             0, 
   //                                             0, 
   //                                             0);
@@ -205,11 +205,12 @@ int main( int   i_argc,
 
       tsunami_lab::io::Csv::write( l_dxy,
                                    l_nx,
-                                   1,
+                                   l_ny,
                                    1,
                                    l_waveProp->getHeight(),
                                    l_waveProp->getMomentumX(),
                                    l_waveProp->getMomentumY(),
+                                   l_waveProp->getBathymetry(),
                                    l_file );
       l_file.close();
       l_nOut++;

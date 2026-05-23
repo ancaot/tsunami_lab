@@ -16,12 +16,14 @@ void tsunami_lab::io::Csv::write( t_real               i_dxy,
                                   t_real       const * i_h,
                                   t_real       const * i_hu,
                                   t_real       const * i_hv,
+                                  t_real       const * i_b,
                                   std::ostream       & io_stream ) {
   // write the CSV header
   io_stream << "x,y";
   if( i_h  != nullptr ) io_stream << ",height";
   if( i_hu != nullptr ) io_stream << ",momentum_x";
   if( i_hv != nullptr ) io_stream << ",momentum_y";
+  if( i_b != nullptr ) io_stream << ",bathymetry";
   io_stream << "\n";
 
   // iterate over all cells
@@ -38,6 +40,7 @@ void tsunami_lab::io::Csv::write( t_real               i_dxy,
       if( i_h  != nullptr ) io_stream << "," << i_h[l_id];
       if( i_hu != nullptr ) io_stream << "," << i_hu[l_id];
       if( i_hv != nullptr ) io_stream << "," << i_hv[l_id];
+      if( i_b != nullptr ) io_stream << "," << i_b[l_id];
       io_stream << "\n";
     }
   }

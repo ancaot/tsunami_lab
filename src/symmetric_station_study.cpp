@@ -146,6 +146,7 @@ int main( int i_argc,
                                l_wave1d.getHeight(),
                                l_wave1d.getMomentumX(),
                                nullptr,
+                               nullptr,
                                l_snapshot1d );
 
   std::ofstream l_snapshot2d( "symmetry_2d_final.csv" );
@@ -156,6 +157,7 @@ int main( int i_argc,
                                l_wave2d.getHeight(),
                                l_wave2d.getMomentumX(),
                                l_wave2d.getMomentumY(),
+                               nullptr,
                                l_snapshot2d );
 
   std::cout << "\nDone." << std::endl;

@@ -79,8 +79,11 @@ void tsunami_lab::patches::WavePropagation2d::timeStep(t_real i_scaling){
 
     // iterate over edges and update with Riemann solutions
 
-    for( t_idx l_row = 0; l_row < m_ny; l_row++ ){
+    for( t_idx l_row = m_ny; l_row > 0; l_row-- ){
       t_idx l_off = l_row * l_stride;
+      // helper for height and x-momentum computuation
+      t_real l_hAL = 0; t_real l_hAR = 0; t_real l_huAL = 0; t_real l_huAR = 0;
+      // x-coordinates
       for( t_idx l_ed = 0; l_ed < m_nx; l_ed++ ) {
         // determine left and right cell-id
         t_idx l_ceL = l_ed;
@@ -98,6 +101,14 @@ void tsunami_lab::patches::WavePropagation2d::timeStep(t_real i_scaling){
                               l_netUpdatesA[0],
                               l_netUpdatesA[1] );
 
+        l_hAL = l_netUpdatesA[0][0];
+        l_hAR = l_netUpdatesA[1][0];
+        l_huAL = l_netUpdatesA[0][1];
+        l_huAR = l_netUpdatesA[1][1];
+    }
+      // y-coordinates
+        t_idx l_ceL = l_row;
+        t_idx l_ceR = l_row-1;
         //provides hv and hv²+1/2gh²
         t_real l_netUpdatesB[2][2];
         solvers::FWave::netUpdates( l_hOld[l_off + l_ceL],
@@ -119,15 +130,13 @@ void tsunami_lab::patches::WavePropagation2d::timeStep(t_real i_scaling){
         *  | hv |   |     huv       |   | hv² + 1/2gh²  |
         */
 
-        l_hNew[l_off + l_ceL]  -= i_scaling * l_netUpdatesA[0][0] - i_scaling * l_netUpdatesB[0][0];
-        l_huNew[l_off + l_ceL] -= i_scaling * l_netUpdatesA[0][1] - i_scaling * l_huvL;
+        l_hNew[l_off + l_ceL]  -= i_scaling * l_hAL - i_scaling * l_netUpdatesB[0][0];
+        l_huNew[l_off + l_ceL] -= i_scaling * l_huAL - i_scaling * l_huvL;
         l_hvNew[l_off + l_ceL] -= i_scaling * l_huvL - i_scaling * l_netUpdatesB[0][1];
 
-        l_hNew[l_off + l_ceR]  -= i_scaling * l_netUpdatesA[1][0] - i_scaling * l_netUpdatesB[1][0];
-        l_huNew[l_off + l_ceR] -= i_scaling * l_netUpdatesA[1][1] - i_scaling * l_huvR;
+        l_hNew[l_off + l_ceR]  -= i_scaling * l_hAR - i_scaling * l_netUpdatesB[1][0];
+        l_huNew[l_off + l_ceR] -= i_scaling * l_huAR - i_scaling * l_huvR;
         l_hvNew[l_off + l_ceR] -= i_scaling * l_huvR - i_scaling * l_netUpdatesB[1][1];
-
-    }
   }
 
   // fill compact arrays (strip ghost cells)
@@ -159,10 +168,10 @@ void tsunami_lab::patches::WavePropagation2d::setGhostOutflow() {
     l_hv[l_off + 0] = l_hv[l_off + 1];
     m_b[l_off + 0] = m_b[l_off + 1];
     // right ghost
-    l_h[l_off + m_nx + 1] = l_h[l_off + m_nx];
-    l_hu[l_off + m_nx + 1] = l_hu[l_off + m_nx];
-    l_hv[l_off + m_nx + 1] = l_hv[l_off + m_nx];
-    m_b[l_off + m_nx + 1] = m_b[l_off + m_nx];
+    l_h[l_off + m_nx] = l_h[l_off + m_nx + 1];
+    l_hu[l_off + m_nx] = l_hu[l_off + m_nx + 1];
+    l_hv[l_off + m_nx] = l_hv[l_off + m_nx + 1];
+    m_b[l_off + m_nx] = m_b[l_off + m_nx + 1];
   }
 }
 
@@ -180,6 +189,10 @@ tsunami_lab::t_real const * tsunami_lab::patches::WavePropagation2d::getMomentum
 
 tsunami_lab::t_real const * tsunami_lab::patches::WavePropagation2d::getMomentumY(){
   return m_compactHv;
+}
+
+tsunami_lab::t_real const * tsunami_lab::patches::WavePropagation2d::getBathymetry(){
+  return m_b;
 }
 
 void tsunami_lab::patches::WavePropagation2d::setHeight( t_idx i_ix, t_idx i_iy, t_real i_h ){

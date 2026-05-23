@@ -92,6 +92,13 @@ class tsunami_lab::patches::WavePropagation1d: public WavePropagation {
     }
 
     /**
+     * Dummy function which returns a nullptr.
+     **/
+    t_real const * getBathymetry(){
+      return nullptr;
+    }
+
+    /**
      * Sets the height of the cell to the given value.
      *
      * @param i_ix id of the cell in x-direction.
