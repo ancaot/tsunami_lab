@@ -1,6 +1,6 @@
-########################################
+###########################################
 Submission 5: Large Data I/O (Input/Output)
-########################################
+###########################################
 
 Was bringt diese Woche?
 =======================
@@ -97,7 +97,10 @@ Die zweite Methode berechnet die Formel für :math:`f(x)` und die dritte berechn
 2. Das zwei-dimensionale Tsunami Event
 --------------------------------------
 
-Die Aufgabe **5.2.3** integriert eine neue Klassen ``setups::TsunamiEvent2d`` in unser Programm. 
+Die Aufgabe **5.2.3** integriert eine neue Klassen ``setups::TsunamiEvent2d`` in unser Programm.
+Um die Daten aus den NetCDF Dateien effizient auf unser Gitter zu projizieren, nutzt die Klasse nun eine **Nearest Neighbour Interpolation** für die Zuweisung der passenden Gitterwerte.
+
+Zur Ausführung einer Simulation: Die Startparameter in der `main.cpp` können nun so konfiguriert werden, dass das neue Setup simuliert und die Daten ausgegeben werden. Erste Testläufe wurden erfolgreich über die Einbindung im `SConscript` compiliert und durchlaufen. 
 Im Gegensatz zu Aufgabe **5.2.1** verwendet diese Klasse Datein Input für die Wassertiefe und Bodenverschiebung.
 Dazu wird die Methode aus **5.2.2** verwendet um die NetCDF-Dateien zu lesen.
 

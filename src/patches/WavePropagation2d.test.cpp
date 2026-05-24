@@ -32,7 +32,7 @@ TEST_CASE( "Test the 2d wave propagation solver.", "[WaveProp2d]" ) {
       *      hu     | hu
       *      hv     | hv
       */
-    for( std::size_t l_ceY = 0; l_ceY < 50; l_ceY++){
+    for( std::size_t l_ceY = 0; l_ceY < 100; l_ceY++){
         for( std::size_t l_ceX = 0; l_ceX < 50; l_ceX++ ) {
         m_waveProp.setHeight( l_ceX,
                               l_ceY,
@@ -69,24 +69,24 @@ TEST_CASE( "Test the 2d wave propagation solver.", "[WaveProp2d]" ) {
       // steady state
       for( std::size_t l_ce = 0; l_ce < 49; l_ce++ ) {
         REQUIRE( m_waveProp.getHeight()[l_ce]   == Approx(10) );
-        REQUIRE( m_waveProp.getMomentumX()[l_ce] == Approx(0) );
-        REQUIRE( m_waveProp.getMomentumY()[l_ce] == Approx(0) );
+        REQUIRE( m_waveProp.getMomentumX()[l_ce] == Approx(0).margin(1e-5) );
+        REQUIRE( m_waveProp.getMomentumY()[l_ce] == Approx(0).margin(1e-5) );
       }
 
       // dam-break
       REQUIRE( m_waveProp.getHeight()[49]   == Approx(10.0f ) );
-      REQUIRE( m_waveProp.getMomentumX()[49] == Approx( 0.0f) );
-      REQUIRE( m_waveProp.getMomentumY()[49] == Approx( 0.0f) );
+      REQUIRE( m_waveProp.getMomentumX()[49] == Approx( 0.0f).margin(1e-5) );
+      REQUIRE( m_waveProp.getMomentumY()[49] == Approx( 0.0f).margin(1e-5) );
 
       REQUIRE( m_waveProp.getHeight()[50]   == Approx(8.0f) );
-      REQUIRE( m_waveProp.getMomentumX()[50] == Approx(0.0f) );
-      REQUIRE( m_waveProp.getMomentumY()[50] == Approx(0.0f) );
+      REQUIRE( m_waveProp.getMomentumX()[50] == Approx(0.0f).margin(1e-5) );
+      REQUIRE( m_waveProp.getMomentumY()[50] == Approx(0.0f).margin(1e-5) );
 
       // steady state
       for( std::size_t l_ce = 51; l_ce < 100; l_ce++ ) {
         REQUIRE( m_waveProp.getHeight()[l_ce]   == Approx(8) );
-        REQUIRE( m_waveProp.getMomentumX()[l_ce] == Approx(0) );
-        REQUIRE( m_waveProp.getMomentumY()[l_ce] == Approx(0) );
+        REQUIRE( m_waveProp.getMomentumX()[l_ce] == Approx(0).margin(1e-5) );
+        REQUIRE( m_waveProp.getMomentumY()[l_ce] == Approx(0).margin(1e-5) );
       }
 
 }

@@ -23,34 +23,36 @@ namespace tsunami_lab {
 
 class tsunami_lab::setups::TsunamiEvent2d: public Setup {
     private:
-        // delts = 20m
+        // delta = 20m
         t_real delta = 20;
 
-        // height
-        t_real m_height = 0;
+        // bathymetry data
+        t_idx m_nx_b = 0;
+        t_idx m_ny_b = 0;
+        t_real* m_x_b = nullptr;
+        t_real* m_y_b = nullptr;
+        t_real* m_z_b = nullptr;
 
-        // bathymetry
-        t_real m_bathymetry = 0;
+        // displacement data
+        t_idx m_nx_d = 0;
+        t_idx m_ny_d = 0;
+        t_real* m_x_d = nullptr;
+        t_real* m_y_d = nullptr;
+        t_real* m_z_d = nullptr;
 
-        // bathymethry input of file
-        t_real m_bathymetryIn = 0;
-
-        // displacement of file
-        t_real m_displacement = 0;
-
-
-        // file for bathymetry input
-        std::string m_fileB;
-
-        // file for displacement input
-        std::string m_fileD;
-
-        // number of x cells
-        t_real m_nx = 0;
-
-        // number of y cells
-        t_real m_ny = 0;
-
+        /**
+         * @brief Nearest neighbour interpolation
+         * @param i_x x-coordinate
+         * @param i_y y-coordinate
+         * @param i_nx number of x cells in dataset
+         * @param i_ny number of y cells in dataset
+         * @param i_x_arr array of x coordinates in dataset
+         * @param i_y_arr array of y coordinates in dataset
+         * @param i_z_arr array of z values in dataset
+         * @return interpolated z value at (i_x, i_y)
+         */
+        t_real getNearestNeighbour(t_real i_x, t_real i_y, t_idx i_nx, t_idx i_ny,
+                                   t_real* i_x_arr, t_real* i_y_arr, t_real* i_z_arr) const;
 
     public:
         /**
@@ -61,10 +63,13 @@ class tsunami_lab::setups::TsunamiEvent2d: public Setup {
         * @param i_fileBathymetry name of file with bathymetry data
         * @param i_fileDisplacement name of file with displacement data
         */
-        TsunamiEvent2d( t_real i_nx,
-                        t_real i_ny,
-                        std::string i_fileBathymetry,
-                        std::string i_fileDisplacement);
+        TsunamiEvent2d( std::string i_fileBathymetry,
+                        std::string i_fileDisplacement );
+
+        /**
+        * Destructor
+        */
+        ~TsunamiEvent2d();
 
         /**
         * Gets the water height at a given point.

@@ -304,7 +304,7 @@ We created a hierarchical structure to share common bathymetry computation:
 - Validates both setup scenarios before numerical simulations
 
 Tasks regarding the position of the hydraulic jump and solver convergence
-----------------------------------------------------------------------
+-------------------------------------------------------------------------
 ---------------------------------------------------------------------------
 
 This part of the task is about the supercritical setup. First, we have to find where the stationary hydraulic jump appears in the numerical solution. Then we check whether the f-wave solver actually settles to the momentum that we expect from the analytical setup, or whether it keeps producing small but visible variations across the domain.

@@ -12,6 +12,7 @@
 #include "setups/DamBreak2d.h"
 #include "setups/TsunamiEvent1d.h"
 #include "setups/ArtificialTsunami2d.h"
+#include "setups/TsunamiEvent2d.h"
 #include "io/Stations.h"
 #ifdef USE_NETCDF
 #include "io/NetCdf.h"
@@ -76,7 +77,10 @@ int main( int   i_argc,
   //                                             0, 
   //                                             0);
 
-  l_setup = new tsunami_lab::setups::ArtificialTsunami2d(100, -100);
+  // l_setup = new tsunami_lab::setups::ArtificialTsunami2d(100, -100);
+
+  // TODO: paths to the actual NetCDF files need to be provided when running TsunamiEvent2d
+  l_setup = new tsunami_lab::setups::TsunamiEvent2d("data/nc/artificialtsunami_bathymetry_1000.nc", "data/nc/artificialtsunami_displacement_1000.nc");
 
   // construct solver
   tsunami_lab::patches::WavePropagation *l_waveProp;

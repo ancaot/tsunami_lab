@@ -21,6 +21,7 @@ I added another instance of the f-wave solver method to compute the momentum in 
 Additonally, the netupdates account now for the momentum in the y-direction.
 
 .. code-block:: cpp
+
   l_hNew[l_off + l_ceL]  -= i_scaling * l_netUpdatesA[0][0] - i_scaling * l_netUpdatesB[0][0];
   l_huNew[l_off + l_ceL] -= i_scaling * l_netUpdatesA[0][1] - i_scaling * l_huvL;
   l_hvNew[l_off + l_ceL] -= i_scaling * l_huvL - i_scaling * l_netUpdatesB[0][1];
