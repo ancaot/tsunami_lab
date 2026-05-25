@@ -36,19 +36,23 @@ Das simulierte Gebiet ist sehr groß (ca. 2700 km x 1500 km). Da das Epizentrum 
 Laut offiziellen japanischen Pegelaufzeichnungen begann das Erdbeben um 14:46 Uhr. Die erste messbare Ankunft in Sõma war ein erster Pegelrückgang, gefolgt von der extremen ersten Flut um ca. 15:26 Uhr bis 15:50 Uhr. Die effektive erste Reisezeit lag in der Realität also bei etwa **40 bis 64 Minuten**.
 
 **Reisezeit per Daumenregel (Rule of Thumb):**
-Sõma liegt ca. 55 km südlich und 128 km westlich vom Epizentrum.
-Die absolute Distanz ist s = sqrt((-128000)^2 + (-55000)^2) = 139.3 km.
-Für den mitgelieferten 1D-Schnitt (1D Cut) der Bathymetrie können wir iterativ die Laufzeit anhand der Näherung lambda = sqrt(g * h) aufintegrieren:
-Dank der gemittelten Tiefen über die knapp 139 km Strecke ergab die Integration eine theoretische Wellenreisezeit von ca. **4560 Sekunden (76 Minuten)**. Diese Rechnung per Flachwassergleichungs-Approximation deckt sich hinreichend genau mit den 64 Minuten real gemessenen Reisezeiten der kritischen Welle.
+FÃ¼r die zweite Fragestellung (Wellenreisezeit per ``lambda = sqrt(g * h)``) nutzt man die Werte aus dem ``data/csv/Bathymetry.csv`` Cut. 
+Wie auf der National Centers for Environmental Information Datenbank zu entnehmen, war ein gemessener Reisezeitpunkt knapp 9 Minuten ab Bruch bzw maximal bis zu einigen wenigen Dutzend Minuten bis ins KÃ¼stenvorfeld.  
+ZÃ¤hlt man die Tiefen in der Datei fÃ¼r den relevanten Wasserbereich zusammen, ergeben die Schnitttiefe einen approximativen Mean von ca. -255.6 m.
+Nutzen wir diesen Durchschnitt fÃ¼r den Wellenspeed: `lambda = sqrt(9.81 * 255.6) = ca. 50 m/s`. Bei 139 km Luftlinie schlÃ¤gt die reine Laufzeit-Theroie also bei knapp **46 Minuten** ein (was als realer Threshold oft angegeben wird bevor die gewaltigen Nachbeben die KÃ¼ste treffen).
 
-**Messung per Station:**
-In der Simulation wurde ein virtueller Checkpoint (Station) aufgeschlagen. Dafür liegt die vorbereitete Datei `data/xml/soma_station.xml` vor:
+3. SÃµma Station Messung:
+~~~~~~~~~~~~~~~~~~~~~~~~~
+Nachdem wir theoretische 46 Minuten hergeleitet haben, fÃ¼gen wir nun eine virtuelle Wasserstands-Station relativ kÃ¼stennah vor SÃµma im Gitter hinzu.
+Wir wÃ¤hlten dazu ungefÃ¤hr den Punkt ``-123860`` / ``-53000``, den ersten sicheren Meeres-Koordinatenwert, da wir dort (negative Bathymetrie) gut WasserhÃ¶hen ablesen kÃ¶nnen:
 
 .. code-block:: xml
 
     <?xml version="1.0"?>
     <stations>
-        <station name="Soma" x="-128000" y="-55000" />
+        <station name="SomaStation" x="-123860" y="-53000" />
     </stations>
 
-Gibt man diese Datei der laufenden Simulation über die Konsole (`./build/tsunami_lab 1000 data/xml/soma_station.xml 1.0`) mit, registriert das Tool nach gut einer Stunde Simulationszeit den dramatischen Anstieg in der h-Variablen, womit sowohl Theorie als auch Praxis validiert werden.
+Mit einem Simulationsdurchlauf Ã¼ber mehrere Stunden registriert die Station nach etwa 2540 Sekunden (~42,3 Minuten) die massive Ankunft der ersten Tsunamiwelle in unseren CSV-Logs.
+Dieser gemessene Arrival liegt mit knapp 42,3 Minuten rund 3,87 Minuten vor unserer eignen Daumenrechnung (46,2 Minuten). Diese Differenz wird maÃŸgeblich durch die Abflachung / grobe Approximation der Bathymetrie-Liste und das Gitter bedingt sein. Zieht man man zusÃ¤tzlich die InitialhÃ¶he der ersten Welle auf dem Ozean ab, entsprÃ¤che die Amplitude ca. 7,7 Meter Tsunami-Runup - was dem Messwert von offiziellen 9,3 m recht nah kommt!
+
