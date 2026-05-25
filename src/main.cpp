@@ -47,12 +47,19 @@ int main( int   i_argc,
   }
 
   l_nx = atoi( i_argv[1] );
-  l_ny = l_nx;
-  if( l_nx < 1 ) {
+  
+  // Tohoku domain size is ~2700km x 1500km. Let's adapt aspect ratio if requested or just map everything to user's desired width bounds
+  tsunami_lab::t_real l_domain_size_x = 2700000.0;
+  tsunami_lab::t_real l_domain_size_y = 1500000.0;
+  
+  l_dxy = l_domain_size_x / l_nx;
+  l_ny = l_domain_size_y / l_dxy;
+
+  if( l_nx < 1 || l_ny < 1 ) {
     std::cerr << "invalid number of cells" << std::endl;
     return EXIT_FAILURE;
   }
-  l_dxy = 50000.0 / l_nx;
+  
   std::cout << "runtime configuration" << std::endl;
   std::cout << "  number of cells in x-direction: " << l_nx << std::endl;
   std::cout << "  number of cells in y-direction: " << l_ny << std::endl;
@@ -60,41 +67,25 @@ int main( int   i_argc,
 
   // construct setup
   tsunami_lab::setups::Setup *l_setup;
-  // l_setup = new tsunami_lab::setups::DamBreak1d( 14,
-  //                                                3.5,
-  //                                                0,
-  //                                                0.7,
-  //                                                25000 );
-  // l_setup = new tsunami_lab::setups::TsunamiEvent1d(10, 0);
-  // tsunami_lab::setups::TsunamiEvent1d *l_setupHelp = static_cast<tsunami_lab::setups::TsunamiEvent1d*>(l_setup);
-
-  // l_setup = new tsunami_lab::setups::DamBreak2d(10, 
-  //                                             5, 
-  //                                             3, 
-  //                                             0, 
-  //                                             3, 
-  //                                             0, 
-  //                                             0, 
-  //                                             0);
-
-  // l_setup = new tsunami_lab::setups::ArtificialTsunami2d(100, -100);
-
   // TODO: paths to the actual NetCDF files need to be provided when running TsunamiEvent2d
-  l_setup = new tsunami_lab::setups::TsunamiEvent2d("data/nc/artificialtsunami_bathymetry_1000.nc", "data/nc/artificialtsunami_displacement_1000.nc");
+  l_setup = new tsunami_lab::setups::TsunamiEvent2d(
+      "c:/Users/R-a-h-a-f/Downloads/data_in/output/tohoku_gebco20_ucsb3_250m_bath.bin", 
+      "c:/Users/R-a-h-a-f/Downloads/data_in/output/tohoku_gebco20_ucsb3_250m_displ.bin"
+  );
 
   // construct solver
   tsunami_lab::patches::WavePropagation *l_waveProp;
-  //l_waveProp = new tsunami_lab::patches::WavePropagation1d( l_nx );
   l_waveProp = new tsunami_lab::patches::WavePropagation2d(l_nx, l_ny);
 
   // maximum observed height in the setup
   tsunami_lab::t_real l_hMax = std::numeric_limits< tsunami_lab::t_real >::lowest();
 
   for( tsunami_lab::t_idx l_cy = 0; l_cy < l_ny; l_cy++ ) {
-    tsunami_lab::t_real l_y = (l_cy + 0.5) * l_dxy - 25000.0; 
+    // Tohoku min offsets
+    tsunami_lab::t_real l_y = (l_cy + 0.5) * l_dxy - 750000.0; 
 
     for( tsunami_lab::t_idx l_cx = 0; l_cx < l_nx; l_cx++ ) {
-      tsunami_lab::t_real l_x = (l_cx + 0.5) * l_dxy - 25000.0;
+      tsunami_lab::t_real l_x = (l_cx + 0.5) * l_dxy - 200000.0;
 
       // get initial values of the setup
       tsunami_lab::t_real l_h = l_setup->getHeight(l_x,
@@ -144,7 +135,7 @@ int main( int   i_argc,
   // set up time and print control
   tsunami_lab::t_idx  l_timeStep = 0;
   tsunami_lab::t_idx  l_nOut = 0;
-  tsunami_lab::t_real l_endTime = 1;
+  tsunami_lab::t_real l_endTime = 4500; // 75 mins simulation for Soma
   tsunami_lab::t_real l_simTime = 0;
 
   std::cout << "entering time loop" << std::endl;

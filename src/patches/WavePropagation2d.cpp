@@ -211,24 +211,29 @@ tsunami_lab::t_real const * tsunami_lab::patches::WavePropagation2d::getMomentum
 }
 
 tsunami_lab::t_real const * tsunami_lab::patches::WavePropagation2d::getBathymetry(){
-  return m_b;
+  return m_compactB;
 }
 
 void tsunami_lab::patches::WavePropagation2d::setHeight( t_idx i_ix, t_idx i_iy, t_real i_h ){
   t_idx l_stride = m_nx + 2;
   m_h[m_step][ (i_iy + 1) * l_stride + 1 + i_ix ] = i_h;
+  m_compactH[ i_iy * m_nx + i_ix ] = i_h;
 }
 
 void tsunami_lab::patches::WavePropagation2d::setMomentumX( t_idx i_ix, t_idx i_iy, t_real i_hu ){
   t_idx l_stride = m_nx + 2;
   m_hu[m_step][ (i_iy + 1) * l_stride + 1 + i_ix ] = i_hu;
+  m_compactHu[ i_iy * m_nx + i_ix ] = i_hu;
 }
 
 void tsunami_lab::patches::WavePropagation2d::setMomentumY( t_idx i_ix, t_idx i_iy, t_real i_hv ){
   t_idx l_stride = m_nx + 2;
   m_hv[m_step][ (i_iy + 1) * l_stride + 1 + i_ix ] = i_hv;
+  m_compactHv[ i_iy * m_nx + i_ix ] = i_hv;
 }
 void tsunami_lab::patches::WavePropagation2d::setBathymetry( t_idx i_ix, t_idx i_iy, t_real i_b ){
   t_idx l_stride = m_nx + 2;
   m_b[ (i_iy + 1) * l_stride + 1 + i_ix ] = i_b;
+  if(!m_compactB) m_compactB = new t_real[m_nx * m_ny];
+  m_compactB[ i_iy * m_nx + i_ix ] = i_b;
 }

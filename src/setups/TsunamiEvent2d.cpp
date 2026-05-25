@@ -10,6 +10,51 @@
 #include "../io/NetCdf.h"
 #endif
 
+#include <fstream>
+#include <vector>
+
+void readBinary(std::string i_filePath,
+                tsunami_lab::t_idx &o_nx,
+                tsunami_lab::t_idx &o_ny,
+                tsunami_lab::t_real **o_x,
+                tsunami_lab::t_real **o_y,
+                tsunami_lab::t_real **o_z) {
+    
+    // Replace .nc with .bin
+    std::string binPath = i_filePath;
+    if(binPath.size() > 3 && binPath.substr(binPath.size()-3) == ".nc") {
+        binPath.replace(binPath.size()-3, 3, ".bin");
+    }
+
+    std::ifstream file(binPath, std::ios::binary);
+    if(!file.is_open()) {
+        std::cerr << "Failed to open binary file: " << binPath << std::endl;
+        return;
+    }
+
+    // Read nx, ny (uint64_t usually 8 bytes, reading as size_t)
+    uint64_t nx, ny;
+    file.read(reinterpret_cast<char*>(&nx), sizeof(uint64_t));
+    file.read(reinterpret_cast<char*>(&ny), sizeof(uint64_t));
+    
+    o_nx = nx;
+    o_ny = ny;
+
+    *o_x = new tsunami_lab::t_real[nx];
+    *o_y = new tsunami_lab::t_real[ny];
+    *o_z = new tsunami_lab::t_real[nx * ny];
+
+    // the python script wrote float64
+    std::vector<double> x_dbl(nx), y_dbl(ny), z_dbl(nx*ny);
+    file.read(reinterpret_cast<char*>(x_dbl.data()), nx * sizeof(double));
+    file.read(reinterpret_cast<char*>(y_dbl.data()), ny * sizeof(double));
+    file.read(reinterpret_cast<char*>(z_dbl.data()), nx * ny * sizeof(double));
+
+    for(size_t i = 0; i < nx; i++) (*o_x)[i] = x_dbl[i];
+    for(size_t i = 0; i < ny; i++) (*o_y)[i] = y_dbl[i];
+    for(size_t i = 0; i < nx*ny; i++) (*o_z)[i] = z_dbl[i];
+}
+
 //Constructor
 tsunami_lab::setups::TsunamiEvent2d::TsunamiEvent2d(std::string i_fileBathymetry, 
                                                     std::string i_fileDisplacement) {
@@ -17,9 +62,8 @@ tsunami_lab::setups::TsunamiEvent2d::TsunamiEvent2d(std::string i_fileBathymetry
     tsunami_lab::io::NetCdf::read(i_fileBathymetry, m_nx_b, m_ny_b, &m_x_b, &m_y_b, &m_z_b);
     tsunami_lab::io::NetCdf::read(i_fileDisplacement, m_nx_d, m_ny_d, &m_x_d, &m_y_d, &m_z_d);
 #else
-    (void)i_fileBathymetry;
-    (void)i_fileDisplacement;
-    std::cerr << "NetCDF is required for TsunamiEvent2d! (data won't be loaded)" << std::endl;
+    readBinary(i_fileBathymetry, m_nx_b, m_ny_b, &m_x_b, &m_y_b, &m_z_b);
+    readBinary(i_fileDisplacement, m_nx_d, m_ny_d, &m_x_d, &m_y_d, &m_z_d);
 #endif
 }
 
