@@ -22,11 +22,11 @@
     t_idx l_stride = m_nx + 2; // include ghost cells in x
 
     for( unsigned short l_st = 0; l_st < 2; l_st++ ) {
-        m_h[l_st] = new t_real[ (m_ny) * l_stride];
-        m_hu[l_st] = new t_real[ (m_ny) * l_stride ];
-        m_hv[l_st] = new t_real[ (m_ny) * l_stride ];
+        m_h[l_st] = new t_real[ (m_ny + 2) * l_stride ];
+        m_hu[l_st] = new t_real[ (m_ny + 2) * l_stride ];
+        m_hv[l_st] = new t_real[ (m_ny + 2) * l_stride ];
     }
-    m_b = new t_real[  (m_ny) * l_stride ];
+    m_b = new t_real[ (m_ny + 2) * l_stride ];
 
 
     m_compactH = new t_real[ m_ny * m_nx ];
@@ -34,7 +34,7 @@
     m_compactHv = new t_real[ m_ny * m_nx ];
 
     // init to zero
-    for( t_idx l_ce = 0; l_ce < ((m_ny) * l_stride); l_ce++ ) {
+    for( t_idx l_ce = 0; l_ce < ((m_ny + 2) * l_stride); l_ce++ ) {
         for( unsigned short l_st = 0; l_st < 2; l_st++ ) {
           m_h[l_st][l_ce] = 0;
           m_hu[l_st][l_ce] = 0;
@@ -71,77 +71,81 @@ void tsunami_lab::patches::WavePropagation2d::timeStep(t_real i_scaling){
     t_real * l_hvNew = m_hv[m_step];
 
     // init new cell quantities
-    for( t_idx l_ce = 1; l_ce < m_ny * l_stride; l_ce++ ) {
+    for( t_idx l_ce = 0; l_ce < (m_ny + 2) * l_stride; l_ce++ ) {
         l_hNew[l_ce] = l_hOld[l_ce];
         l_huNew[l_ce] = l_huOld[l_ce];
         l_hvNew[l_ce] = l_hvOld[l_ce];
     }
 
-    // iterate over edges and update with Riemann solutions
-
-    for( t_idx l_row = m_ny; l_row > 0; l_row-- ){
+    // iterate over X edges and update with Riemann solutions
+    for( t_idx l_row = 1; l_row <= m_ny; l_row++ ){
       t_idx l_off = l_row * l_stride;
-      // helper for height and x-momentum computuation
-      t_real l_hAL = 0; t_real l_hAR = 0; t_real l_huAL = 0; t_real l_huAR = 0;
-      // x-coordinates
-      for( t_idx l_ed = 0; l_ed < m_nx; l_ed++ ) {
-        // determine left and right cell-id
-        t_idx l_ceL = l_ed;
-        t_idx l_ceR = l_ed+1;
+      for( t_idx l_col = 0; l_col < m_nx + 1; l_col++ ) {
+        t_idx l_ceL = l_col;
+        t_idx l_ceR = l_col+1;
 
-        // compute net-updates f-wave
-        //provides hu and hu²+1/2gh²
-        t_real l_netUpdatesA[2][2];
+        t_real l_netUpdates[2][2];
         solvers::FWave::netUpdates( l_hOld[l_off + l_ceL],
                               l_hOld[l_off + l_ceR],
                               l_huOld[l_off + l_ceL],
                               l_huOld[l_off + l_ceR],
                               m_b[l_off + l_ceL],
                               m_b[l_off + l_ceR],
-                              l_netUpdatesA[0],
-                              l_netUpdatesA[1] );
+                              l_netUpdates[0],
+                              l_netUpdates[1] );
 
-        l_hAL = l_netUpdatesA[0][0];
-        l_hAR = l_netUpdatesA[1][0];
-        l_huAL = l_netUpdatesA[0][1];
-        l_huAR = l_netUpdatesA[1][1];
+        l_hNew[l_off + l_ceL]  -= i_scaling * l_netUpdates[0][0];
+        l_huNew[l_off + l_ceL] -= i_scaling * l_netUpdates[0][1];
+
+        l_hNew[l_off + l_ceR]  -= i_scaling * l_netUpdates[1][0];
+        l_huNew[l_off + l_ceR] -= i_scaling * l_netUpdates[1][1];
+      }
     }
-      // y-coordinates
-        t_idx l_ceL = l_row;
-        t_idx l_ceR = l_row-1;
-        //provides hv and hv²+1/2gh²
-        t_real l_netUpdatesB[2][2];
-        solvers::FWave::netUpdates( l_hOld[l_off + l_ceL],
-                              l_hOld[l_off + l_ceR],
-                              l_hvOld[l_off + l_ceL],
-                              l_hvOld[l_off + l_ceR],
-                              m_b[l_off + l_ceL],
-                              m_b[l_off + l_ceR],
-                              l_netUpdatesB[0],
-                              l_netUpdatesB[1] );
 
-        // compute huv
-        t_real l_huvL = (l_huOld[l_off + l_ceL] * l_hvOld[l_off + l_ceL])/l_hOld[l_off + l_ceL];
-        t_real l_huvR = (l_huOld[l_off + l_ceR] * l_hvOld[l_off + l_ceR])/l_hOld[l_off + l_ceR];
+    // copy x-updated h, hu, hv back to old for the y-sweep
+    for( t_idx l_ce = 0; l_ce < (m_ny+2) * l_stride; l_ce++ ) {
+        l_hOld[l_ce] = l_hNew[l_ce];
+        l_huOld[l_ce] = l_huNew[l_ce];
+        l_hvOld[l_ce] = l_hvNew[l_ce];
+    }
+    
+    // update top/bottom ghost boundaries for Y sweep
+    for( t_idx l_col = 0; l_col < l_stride; l_col++ ) {
+      l_hOld[l_col] = l_hOld[l_stride + l_col];
+      l_huOld[l_col] = l_huOld[l_stride + l_col];
+      l_hvOld[l_col] = l_hvOld[l_stride + l_col];
+      
+      l_hOld[(m_ny + 1) * l_stride + l_col] = l_hOld[m_ny * l_stride + l_col];
+      l_huOld[(m_ny + 1) * l_stride + l_col] = l_huOld[m_ny * l_stride + l_col];
+      l_hvOld[(m_ny + 1) * l_stride + l_col] = l_hvOld[m_ny * l_stride + l_col];
+    }
 
-        // update the cells' quantities
-        /* | h  |   |     hu        |   |      hv       |
-        *  | hu | + | hu² + 1/2gh²  | + |     huv       | for A+dQ, A-dQ, B+dQ, B-dQ
-        *  | hv |   |     huv       |   | hv² + 1/2gh²  |
-        */
+    // iterate over Y edges
+    for( t_idx l_row = 0; l_row < m_ny + 1; l_row++ ){
+      t_idx l_offL = l_row * l_stride;
+      t_idx l_offR = (l_row+1) * l_stride;
+      for( t_idx l_col = 1; l_col <= m_nx; l_col++ ) {
+        t_real l_netUpdates[2][2];
+        solvers::FWave::netUpdates( l_hOld[l_offL + l_col],
+                              l_hOld[l_offR + l_col],
+                              l_hvOld[l_offL + l_col],
+                              l_hvOld[l_offR + l_col],
+                              m_b[l_offL + l_col],
+                              m_b[l_offR + l_col],
+                              l_netUpdates[0],
+                              l_netUpdates[1] );
 
-        l_hNew[l_off + l_ceL]  -= i_scaling * l_hAL - i_scaling * l_netUpdatesB[0][0];
-        l_huNew[l_off + l_ceL] -= i_scaling * l_huAL - i_scaling * l_huvL;
-        l_hvNew[l_off + l_ceL] -= i_scaling * l_huvL - i_scaling * l_netUpdatesB[0][1];
+        l_hNew[l_offL + l_col]  -= i_scaling * l_netUpdates[0][0];
+        l_hvNew[l_offL + l_col] -= i_scaling * l_netUpdates[0][1];
 
-        l_hNew[l_off + l_ceR]  -= i_scaling * l_hAR - i_scaling * l_netUpdatesB[1][0];
-        l_huNew[l_off + l_ceR] -= i_scaling * l_huAR - i_scaling * l_huvR;
-        l_hvNew[l_off + l_ceR] -= i_scaling * l_huvR - i_scaling * l_netUpdatesB[1][1];
-  }
+        l_hNew[l_offR + l_col]  -= i_scaling * l_netUpdates[1][0];
+        l_hvNew[l_offR + l_col] -= i_scaling * l_netUpdates[1][1];
+      }
+    }
 
   // fill compact arrays (strip ghost cells)
   for( t_idx l_row = 0; l_row < m_ny; l_row++ ){
-    t_idx l_off = l_row * l_stride;
+    t_idx l_off = (l_row + 1) * l_stride; // shift by 1 for Y ghost
     for( t_idx l_col = 0; l_col < m_nx; l_col++ ){
       t_idx l_src = l_off + 1 + l_col;
       t_idx l_dst = l_row * m_nx + l_col;
@@ -160,7 +164,7 @@ void tsunami_lab::patches::WavePropagation2d::setGhostOutflow() {
   t_real * l_hu = m_hu[m_step];
   t_real * l_hv = m_hv[m_step];
   
-  for( t_idx l_row = 0; l_row < m_ny; l_row++ ){
+  for( t_idx l_row = 1; l_row <= m_ny; l_row++ ){
     t_idx l_off = l_row * l_stride;
     // left ghost
     l_h[l_off + 0] = l_h[l_off + 1];
@@ -168,10 +172,25 @@ void tsunami_lab::patches::WavePropagation2d::setGhostOutflow() {
     l_hv[l_off + 0] = l_hv[l_off + 1];
     m_b[l_off + 0] = m_b[l_off + 1];
     // right ghost
-    l_h[l_off + m_nx] = l_h[l_off + m_nx + 1];
-    l_hu[l_off + m_nx] = l_hu[l_off + m_nx + 1];
-    l_hv[l_off + m_nx] = l_hv[l_off + m_nx + 1];
-    m_b[l_off + m_nx] = m_b[l_off + m_nx + 1];
+    l_h[l_off + m_nx + 1] = l_h[l_off + m_nx];
+    l_hu[l_off + m_nx + 1] = l_hu[l_off + m_nx];
+    l_hv[l_off + m_nx + 1] = l_hv[l_off + m_nx];
+    m_b[l_off + m_nx + 1] = m_b[l_off + m_nx];
+  }
+
+  // top and bottom ghosts
+  for( t_idx l_col = 0; l_col < l_stride; l_col++ ) {
+    // bottom ghost (row 0)
+    l_h[l_col] = l_h[l_stride + l_col];
+    l_hu[l_col] = l_hu[l_stride + l_col];
+    l_hv[l_col] = l_hv[l_stride + l_col];
+    m_b[l_col] = m_b[l_stride + l_col];
+
+    // top ghost (row m_ny + 1)
+    l_h[(m_ny + 1) * l_stride + l_col] = l_h[m_ny * l_stride + l_col];
+    l_hu[(m_ny + 1) * l_stride + l_col] = l_hu[m_ny * l_stride + l_col];
+    l_hv[(m_ny + 1) * l_stride + l_col] = l_hv[m_ny * l_stride + l_col];
+    m_b[(m_ny + 1) * l_stride + l_col] = m_b[m_ny * l_stride + l_col];
   }
 }
 
@@ -197,19 +216,19 @@ tsunami_lab::t_real const * tsunami_lab::patches::WavePropagation2d::getBathymet
 
 void tsunami_lab::patches::WavePropagation2d::setHeight( t_idx i_ix, t_idx i_iy, t_real i_h ){
   t_idx l_stride = m_nx + 2;
-  m_h[m_step][ i_iy * l_stride + 1 + i_ix ] = i_h;
+  m_h[m_step][ (i_iy + 1) * l_stride + 1 + i_ix ] = i_h;
 }
 
 void tsunami_lab::patches::WavePropagation2d::setMomentumX( t_idx i_ix, t_idx i_iy, t_real i_hu ){
   t_idx l_stride = m_nx + 2;
-  m_hu[m_step][ i_iy * l_stride + 1 + i_ix ] = i_hu;
+  m_hu[m_step][ (i_iy + 1) * l_stride + 1 + i_ix ] = i_hu;
 }
 
 void tsunami_lab::patches::WavePropagation2d::setMomentumY( t_idx i_ix, t_idx i_iy, t_real i_hv ){
   t_idx l_stride = m_nx + 2;
-  m_hv[m_step][ i_iy * l_stride + 1 + i_ix ] = i_hv;
+  m_hv[m_step][ (i_iy + 1) * l_stride + 1 + i_ix ] = i_hv;
 }
 void tsunami_lab::patches::WavePropagation2d::setBathymetry( t_idx i_ix, t_idx i_iy, t_real i_b ){
   t_idx l_stride = m_nx + 2;
-  m_b[ i_iy * l_stride + 1 + i_ix ] = i_b;
+  m_b[ (i_iy + 1) * l_stride + 1 + i_ix ] = i_b;
 }

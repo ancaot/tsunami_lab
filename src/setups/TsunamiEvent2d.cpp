@@ -5,14 +5,22 @@
 */
 #include "TsunamiEvent2d.h"
 #include <cmath>
+#include <iostream>
 #ifdef USE_NETCDF
 #include "../io/NetCdf.h"
+#endif
 
 //Constructor
 tsunami_lab::setups::TsunamiEvent2d::TsunamiEvent2d(std::string i_fileBathymetry, 
                                                     std::string i_fileDisplacement) {
+#ifdef USE_NETCDF
     tsunami_lab::io::NetCdf::read(i_fileBathymetry, m_nx_b, m_ny_b, &m_x_b, &m_y_b, &m_z_b);
     tsunami_lab::io::NetCdf::read(i_fileDisplacement, m_nx_d, m_ny_d, &m_x_d, &m_y_d, &m_z_d);
+#else
+    (void)i_fileBathymetry;
+    (void)i_fileDisplacement;
+    std::cerr << "NetCDF is required for TsunamiEvent2d! (data won't be loaded)" << std::endl;
+#endif
 }
 
 //Destructor
@@ -104,5 +112,3 @@ tsunami_lab::t_real tsunami_lab::setups::TsunamiEvent2d::getBathymetry(t_real i_
         return std::max(m_bathymetryIn, delta) + m_displacement;
     }
 }
-
-#endif

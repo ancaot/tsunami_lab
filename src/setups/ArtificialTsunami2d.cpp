@@ -4,7 +4,13 @@
  *
 */
 #include "ArtificialTsunami2d.h"
+#define _USE_MATH_DEFINES
 #include <cmath>
+
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#endif
+
 
 //Constructor
 tsunami_lab::setups::ArtificialTsunami2d::ArtificialTsunami2d(t_real i_height, t_real i_bathymetry){

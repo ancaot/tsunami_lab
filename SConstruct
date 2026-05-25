@@ -129,7 +129,8 @@ else:
   print( 'pugixml support: disabled (expected src/pugixml.hpp, src/pugiconfig.hpp and src/pugixml.cpp)' )
 
 # add C++17 filesystem support for MinGW
-env.Append( LIBS = [ 'stdc++fs' ] )
+if not l_isMsvc:
+  env.Append( LIBS = [ 'stdc++fs' ] )
 # optionally add pugixml for XML runtime configuration
 env['USE_PUGIXML'] = False
 l_confXml = Configure( env )

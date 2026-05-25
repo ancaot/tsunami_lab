@@ -74,12 +74,12 @@ TEST_CASE( "Test the 2d wave propagation solver.", "[WaveProp2d]" ) {
       }
 
       // dam-break
-      REQUIRE( m_waveProp.getHeight()[49]   == Approx(10.0f ) );
-      REQUIRE( m_waveProp.getMomentumX()[49] == Approx( 0.0f).margin(1e-5) );
+      REQUIRE( m_waveProp.getHeight()[49]   == Approx(10 - 0.1 * 9.39467851749) );
+      REQUIRE( m_waveProp.getMomentumX()[49] == Approx( 0 + 0.1 * 88.259917223468) );
       REQUIRE( m_waveProp.getMomentumY()[49] == Approx( 0.0f).margin(1e-5) );
 
-      REQUIRE( m_waveProp.getHeight()[50]   == Approx(8.0f) );
-      REQUIRE( m_waveProp.getMomentumX()[50] == Approx(0.0f).margin(1e-5) );
+      REQUIRE( m_waveProp.getHeight()[50]   == Approx(8 + 0.1 * 9.39467851749) );
+      REQUIRE( m_waveProp.getMomentumX()[50] == Approx(0 + 0.1 * 88.259917223468) );
       REQUIRE( m_waveProp.getMomentumY()[50] == Approx(0.0f).margin(1e-5) );
 
       // steady state

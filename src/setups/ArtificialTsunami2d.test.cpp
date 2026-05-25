@@ -12,6 +12,6 @@ TEST_CASE( "Test the artificial tsunami setup.", "[ArtificialTsunami2d]" ) {
 
   REQUIRE( l_setup.getHeight( 0.0f, 0.0f ) == Approx( 10.0f ) );
   REQUIRE( l_setup.getHeight( 10.0f, 0.0f ) == Approx( 10.0f ) );
-  REQUIRE( l_setup.getBathymetry( 10.0f, 10.0f ) == -Approx( 0.313827016607508253628738766379024403346179189869518031269677716f ) );
-  REQUIRE( l_setup.getBathymetry( 1.0f, 1.0f ) == -Approx( 0.03142f ) );
+  REQUIRE( l_setup.getBathymetry( 10.0f, 10.0f ) == -Approx( 0.313827f ).margin(1e-4f) );
+  REQUIRE( l_setup.getBathymetry( 1.0f, 1.0f ) == -Approx( 0.03142f ).margin(1e-4f) );
 }

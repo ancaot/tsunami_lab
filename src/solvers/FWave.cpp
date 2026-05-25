@@ -17,8 +17,10 @@ void tsunami_lab::solvers::FWave::waveSpeeds( t_real   i_hL,
 
   // compute Roe averages
   t_real l_hRoe = 0.5f * ( i_hL + i_hR );
-  t_real l_uRoe = l_hSqrtL * i_uL + l_hSqrtR * i_uR;
-  l_uRoe /= l_hSqrtL + l_hSqrtR;
+  t_real l_uRoe = 0;
+  if( l_hSqrtL + l_hSqrtR > 0 ) {
+    l_uRoe = (l_hSqrtL * i_uL + l_hSqrtR * i_uR) / (l_hSqrtL + l_hSqrtR);
+  }
 
   // compute wave speeds
   t_real l_ghSqrtRoe = m_gSqrt * std::sqrt( l_hRoe );
@@ -77,12 +79,12 @@ void tsunami_lab::solvers::FWave::netUpdates( t_real i_hL,
                                             t_real o_netUpdateL[2],
                                             t_real o_netUpdateR[2] ) {
   
-  if(i_bL <= 0) {
+  if(i_bL > 0) {
     i_hL = i_hR;
     i_huL = -i_huR;
     i_bL = i_bR;
   }
-  if(i_bR <= 0) {
+  if(i_bR > 0) {
     i_hR = i_hL;
     i_huR = -i_huL;
     i_bR = i_bL;
