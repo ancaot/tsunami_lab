@@ -43,6 +43,7 @@ class tsunami_lab::patches::WavePropagation2d: public WavePropagation{
         t_real * m_compactH = nullptr;
         t_real * m_compactHu = nullptr;
         t_real * m_compactHv = nullptr;
+        t_real * m_compactB = nullptr;
     
     public:
         /**

@@ -32,7 +32,7 @@
     m_compactH = new t_real[ m_ny * m_nx ];
     m_compactHu = new t_real[ m_ny * m_nx ];
     m_compactHv = new t_real[ m_ny * m_nx ];
-
+    m_compactB = new t_real[ m_ny * m_nx ];
     // init to zero
     for( t_idx l_ce = 0; l_ce < ((m_ny + 2) * l_stride); l_ce++ ) {
         for( unsigned short l_st = 0; l_st < 2; l_st++ ) {
@@ -54,6 +54,7 @@ tsunami_lab::patches::WavePropagation2d::~WavePropagation2d() {
     delete[] m_compactH;
     delete[] m_compactHu;
     delete[] m_compactHv;
+    delete[] m_compactB;
 }
 
 void tsunami_lab::patches::WavePropagation2d::timeStep(t_real i_scaling){
@@ -152,6 +153,7 @@ void tsunami_lab::patches::WavePropagation2d::timeStep(t_real i_scaling){
       m_compactH[l_dst] = l_hNew[l_src];
       m_compactHu[l_dst] = l_huNew[l_src];
       m_compactHv[l_dst] = l_hvNew[l_src];
+      m_compactB[l_dst] = m_b[l_src];
     }
   }
 
