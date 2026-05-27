@@ -2,11 +2,7 @@
     "frequency": 20,
     "stations":
     [
-        {
-            "i_name": "SomaNearshore",
-            "i_x": -123860,
-            "i_y": -53000
-        }
+
     ]
 
 }
