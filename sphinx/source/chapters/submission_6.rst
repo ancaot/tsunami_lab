@@ -248,6 +248,14 @@ Die 1000-m-Variante ist deshalb für Tests und erste Visualisierungen deutlich
 praktischer. Die 250-m-Variante ist näher an den Eingangsdaten, aber
 entsprechend teuer.
 
+**Gemessene Laufzeiten**
+
+Im Folgenden sind die tatsächlichen Ausführungszeiten für unsere Durchläufe mit unterschiedlichen Auflösungen aufgelistet. Der enorme Anstieg der Rechenzeit bei feinerem Gitter ist hier deutlich zu erkennen:
+
+* **Tohoku 3500m:** Duration:  1 minutes, 9 seconds, 854 milliseconds, 491 microseconds, 399 nanoseconds
+* **Tohoku 2500m:** Duration:  3 minutes, 17 seconds, 856 milliseconds, 741 microseconds, 700 nanoseconds
+* **Tohoku 1000m:** Duration:  58 minutes, 11 seconds, 613 milliseconds, 132 microseconds, 200 nanoseconds
+
 6.2.2. Zeit zwischen Erdbebenbruch und Ankunft der ersten Tsunamiwellen in Soma
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
