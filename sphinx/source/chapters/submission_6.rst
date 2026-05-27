@@ -323,7 +323,7 @@ Quelle:
 Abschätzung der Laufzeit nach Soma
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-In der Aufgabe soll die Wellengeschwindigkeit mit folgender äherung
+In der Aufgabe soll die Wellengeschwindigkeit mit folgender Näherung
 abgeschätzt werden:
 
 ``lambda = sqrt(g * h)``.
@@ -363,7 +363,7 @@ westlich des Epizentrums. Die direkte Distanz ist daher
 
 ``distance = sqrt(55000^2 + 128000^2) = 139316 m``.
 
-Die abgeschaetzte Laufzeit betraegt damit
+Die abgeschätzte Laufzeit beträgt damit
 
 ``time = 139316 / 50.08 = 2782 s = 46.2 min``.
 
@@ -406,7 +406,7 @@ Verglichen mit der Abschätzung ergibt sich
 ``46.2 min - 42.33 min = 3.87 min``.
 
 Die simulierte erste Ankunft liegt also etwa **3.87 Minuten frueher** als die
-einfache bathymetriebasierte Abschaetzung. Diese Abweichung ist plausibel, da
+einfache bathymetriebasierte Abschätzung. Diese Abweichung ist plausibel, da
 die Rechnung mehrere Vereinfachungen verwendet: gemittelte Bathymetrie,
 vereinfachte Distanz, grobe Gitterposition und eine eindimensionale
 Wellengeschwindigkeit.
@@ -416,7 +416,7 @@ Vergleich der maximalen Wellenhöhe
 
 Um die simulierten Stationsdaten mit dem gemessenen NCEI-Wert zu vergleichen,
 vergleichen wir den maximalen ankommenden Wasserstand mit dem Anfangswasserstand
-an der Station. In der Stationsausgabe betraegt die Anfangshoehe
+an der Station. In der Stationsausgabe beträgt die Anfangshöhe
 
 ``21.6348 m``,
 
@@ -424,15 +424,15 @@ und die höchste gemessene Höhe in der Simulation ist
 
 ``29.4237 m``.
 
-Damit ergibt sich fuer die simulierte ankommende Wellenhöhe
+Damit ergibt sich für die simulierte ankommende Wellenhöhe
 
 ``29.4237 m - 21.6348 m = 7.7889 m``.
 
-Die gemessene maximale Wasserhöhe betraegt ``9.3 m``. Die Differenz ist daher
+Die gemessene maximale Wasserhöhe beträgt ``9.3 m``. Die Differenz ist daher
 
 ``9.3 m - 7.7889 m = 1.5111 m``.
 
 Die simulierte maximale Wellenhöhe ist also etwa **1.51 m niedriger** als der
 gemessene NCEI-Wert. Mit Blick auf das grobe ``1000 m``-Gitter und die
-vereinfachte Stationsposition ist das fuer diese Simulation trotzdem ein
+vereinfachte Stationsposition ist das für diese Simulation trotzdem ein
 plausibles Ergebnis.
