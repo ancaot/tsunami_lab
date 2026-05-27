@@ -16,12 +16,14 @@ Dazu werden die vorgegebenen Daten eingelesen und für die Simulation verwendet.
 .. figure:: tsunami_lab/sphinx/source/_static/chile_250m_displacement.0000.png
     :alt: Die Displacement Daten vom Chile Event
 
-
+Für unser Setup verwenden wir ``setups::tsunamievent2d`` und haben drei verschiedene Grid Resolutionen simuliert.
+Alle drei verwenden eine ähnliche Simulationskonfiguration.
 
 Simulationskonfiguration
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-Die Simulation wird mithilfe von ``configs/config.json`` konfiguriert.
+Die Simulation wird mithilfe von ``configs/config.json`` konfiguriert. 
+Wir untersuchen im Chile-Event die Resolutionen von 1000m, 2500m und 5000m. 
 
 .. code-block:: json
 
@@ -29,17 +31,77 @@ Die Simulation wird mithilfe von ``configs/config.json`` konfiguriert.
       "numerical_solver": "fwave",
       "scenario": "tsunamievent2d",
       "wave_model": "2d",
-      "domain_size_x": 2700000,
-      "domain_size_y": 1500000,
-      "cells_x": 2700,
-      "cells_y": 1500,
-      "origin_x": -200000,
-      "origin_y": -750000,
+      "domain_size_x": 3500000,
+      "domain_size_y": 2950000,
+      "cells_x": 3500,
+      "cells_y": 2950,
+      "origin_x": -3000000,
+      "origin_y": -1500000,
       "simulation_end_time": 36000,
       "output_format": "csv",
-      "output_name": "tohoku_soma_1km_open_boundary.csv",
-      "reflective_boundary": false
+      "output_name": "chile_simu_1000_closed_boundary.csv",
+      "reflective_boundary": true
     }
+
+Damit ergibt sich eine Zellweite von :math:`dx = 3500000 m / 3500 = 1000 m`. 
+Das heißt, dass wir hier :math:`3500*2950` Zellen untersuchen. 
+
+Für die 2500m und 5000m wurde jeweils die Zellenweite angepasst. 
+Folgende Tabelle beschreibt die benötigten Berechnungsdaten, also Zellenanzahl, Anzahl an Zellenupdates etc.
+
+.. list-table::
+   :header-rows: 1
+
+   * - Zellweite
+     - ``nx``
+     - ``ny``
+     - Zellen
+     - Zellupdates fuer 1 Stunde bei ca. 20515 Schritten
+   * - 1000 m
+     - 3500
+     - 2950
+     - 10.325.000
+     - ca. 211.8 Milliarden
+   * - 2500 m
+     - 1400
+     - 1180
+     - 1.652.000
+     - ca. 33.9 Milliarden
+   * - 5000 m
+     - 700
+     - 590
+     - 413.000
+     - ca. 8.5 Milliarden
+
+An diesen Werten erkennt man auch: je kleiner die Resolution, desto genauer ist die Simulation, da mehr Zellen untersucht werden. 
+Jedoch erfordert das extrem viele Zellupdates und somit auch Berechnungszeit. 
+
+Hier beim Chile-Event haben wir aber die Simulationen mit reflektierenden Grenzen durchgeführt. (Bei Tohoku haben wir darauf verzichtet.) 
+Demnach beobachten wir eher wann die erste Welle an den Grenzen reflektiert wird, anstatt wann die Welle die Grenzen verlässt.
+
+Visualisierung
+~~~~~~~~~~~~~~
+
+Zuerst zeigen wir die Simulation mit der Resolution von 1000m.
+//simulation 1000-m-Variante
+
+
+Die zweite Simulation hat eine Resolution von 2500m.
+
+.. raw:: html
+  <video src="../_static/chile_2500.mp4" controls="True"></video>
+
+Die dritte Simulation geht in 5000m Schritten voran.
+
+.. video:: ../_static/chile_5000.mp4
+
+
+Wann verlassen erste Wellen die Domain?
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Das Domain geht von ``-3000 km`` bis ``500 km`` in x-Richtung und von ``-1500km`` bis ``1500km`` in y-Richtung. 
+Das Epizentrum liegt bei 
+
 
 6.2. 2011 M 9.1 Tohoku Event
 ============================
@@ -96,6 +158,23 @@ sich insbesondere:
 
 Fuer eine Animation werden die CSV-Dateien als zeitliche Serie geladen und mit
 einer Hoehen- oder Diverging-Color-Map visualisiert.
+
+**Tohoku: 1000m Resolution**
+
+.. raw:: html
+  <video src="../_static/tohoku_1000.mp4" controls="True"></video>
+
+**Tohoku: 2500m Resolution*+
+
+.. raw:: html
+  <video src="../_static/tohoku_2500.mp4" controls="True"></video>
+
+**Tohoku: 3500m Resolution**
+
+.. raw:: html
+  <video src="../_static/tohoku_3500.mp4" controls="True"></video>
+
+
 
 Wann verlassen erste Wellen die Domain?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
