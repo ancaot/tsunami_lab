@@ -187,19 +187,6 @@ sich insbesondere:
 Fuer eine Animation werden die CSV-Dateien als zeitliche Serie geladen und mit
 einer Hoehen- oder Diverging-Color-Map visualisiert.
 
-**Tohoku Input-Daten**
-
-.. figure:: ../_static/tohoku_20_250m_bathymetry.0000.png
-    :width: 70%
-    :align: center
-    
-    Die Bathymetrie Daten vom Tohoku Event
-
-.. figure:: ../_static/tohoku_20_250m_displacement.0000.png
-    :width: 70%
-    :align: center
-    
-    Die Displacement Daten vom Tohoku Event
 
 **Tohoku: 1000m Resolution**
 
