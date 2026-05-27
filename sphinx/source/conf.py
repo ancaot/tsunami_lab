@@ -6,9 +6,9 @@
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
-project = 'tsunami_lab_alabrsh_otto_waechter'
-copyright = '2026, Alabrsh, Otto, Wächter'
-author = 'Alabrsh, Otto, Wächter'
+project = 'tsunami_lab_alabrsh_otto'
+copyright = '2026, Alabrsh, Otto'
+author = 'Alabrsh, Otto'
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration

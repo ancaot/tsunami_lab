@@ -113,11 +113,13 @@ Das Epizentrum liegt bei
 6.2. 2011 M 9.1 Tohoku Event
 ============================
 
-In dieser Aufgabe wird nur das Tohoku-Ereignis vom 11. Maerz 2011 betrachtet.
+In dieser Aufgabe wird nur das Tohoku-Ereignis vom 11. März 2011 betrachtet.
 Die Simulation nutzt die vorhandenen NetCDF-Eingabedaten fuer Bathymetrie und
 Displacement sowie das Setup ``tsunamievent2d``. Als Ausgabe verwenden wir
-zunaechst CSV-Dateien, damit die Resultate einfach in ParaView kontrolliert
-werden koennen.
+zunächst CSV-Dateien, damit die Resultate einfach in ParaView kontrolliert
+werden können.
+
+**Die Visualisierung der Tohoku Input-Daten:**
 
 Simulationskonfiguration
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -148,35 +150,23 @@ Damit ergibt sich eine Zellweite von
 ``dx = 2700000 m / 2700 = 1000 m``.
 
 Die Randbedingung ist ``reflective_boundary = false``. Damit werden offene
-Raender bzw. Outflow-Bedingungen genutzt, was fuer diese Aufgabe sinnvoll ist:
-die Welle soll die Computational Domain verlassen koennen und nicht kuenstlich
-zurueck reflektiert werden.
+Ränder bzw. Outflow-Bedingungen genutzt, was für diese Aufgabe sinnvoll ist:
+die Welle soll die Computational Domain verlassen können und nicht künstlich
+zurück reflektiert werden.
 
 Visualisierung
 ~~~~~~~~~~~~~~
 
 Die Simulation schreibt alle 25 Zeitschritte CSV-Ausgaben nach ``outputs``.
-Diese Dateien koennen in ParaView geladen werden. Fuer die Darstellung eignen
+Diese Dateien können in ParaView geladen werden. Für die Darstellung eignen
 sich insbesondere:
 
-* ``height`` fuer die freie Oberflaeche bzw. Wasserhoehe,
-* ``momentum_x`` und ``momentum_y`` fuer die Bewegungsrichtung,
-* ``bathymetry`` fuer das Meeresbodenprofil.
+* ``height`` für die freie Oberfläche bzw. Wasserhöhe,
+* ``momentum_x`` und ``momentum_y`` für die Bewegungsrichtung,
+* ``bathymetry`` für das Meeresbodenprofil.
 
-Fuer eine Animation werden die CSV-Dateien als zeitliche Serie geladen und mit
-einer Hoehen- oder Diverging-Color-Map visualisiert.
-
-**Tohoku Input-Daten**
-
-.. figure:: ../_static/tohoku_20_250m_bathymetry.0000.png
-    :width: 70%
-    :align: center
-    :alt: Die Bathymetrie Daten vom Tohoku Event
-
-.. figure:: ../_static/tohoku_20_250m_displacement.0000.png
-    :width: 70%
-    :align: center
-    :alt: Die Displacement Daten vom Tohoku Event
+Für eine Animation werden die CSV-Dateien als zeitliche Serie geladen und mit
+einer öhen- oder Diverging-Color-Map visualisiert.
 
 **Tohoku: 1000m Resolution**
 
@@ -203,8 +193,8 @@ Wann verlassen erste Wellen die Domain?
 
 Die Domain reicht in x-Richtung von ``-200 km`` bis ``2500 km`` und in
 y-Richtung von ``-750 km`` bis ``750 km``. Da die Projektion am Epizentrum
-zentriert ist, liegt der kuerzeste Rand in westlicher Richtung nur etwa
-``200 km`` entfernt. Die noerdlichen und suedlichen Raender liegen jeweils etwa
+zentriert ist, liegt der kürzeste Rand in westlicher Richtung nur etwa
+``200 km`` entfernt. Die nördlichen und südlichen Ränder liegen jeweils etwa
 ``750 km`` entfernt.
 
 Mit der Flachwassergeschaetzung
@@ -218,17 +208,17 @@ und einer typischen Tiefsee-Tiefe von ``h = 4000 m`` ergibt sich
 Damit ergeben sich grob:
 
 * westlicher Rand, ``200 km``: ca. ``200000 / 198 = 1010 s`` = **17 Minuten**
-* noerdlicher/suedlicher Rand, ``750 km``: ca. ``750000 / 198 = 3785 s`` = **63 Minuten**
-* weit entfernter oestlicher Rand, bis ca. ``2500 km``: ca. **3.5 Stunden**
+* nördlicher/südlicher Rand, ``750 km``: ca. ``750000 / 198 = 3785 s`` = **63 Minuten**
+* weit entfernter östlicher Rand, bis ca. ``2500 km``: ca. **3.5 Stunden**
 
-Die erste Welle kann die Domain also schon nach ungefaehr **17 Minuten**
-Simulationszeit an der kuerzesten Seite verlassen. Fuer die weit entfernten
-offenen Raender muss man eher im Bereich von **1 bis 3.5 Stunden** simulieren.
+Die erste Welle kann die Domain also schon nach ungefähr **17 Minuten**
+Simulationszeit an der kürzesten Seite verlassen. Für die weit entfernten
+offenen Ränder muss man eher im Bereich von **1 bis 3.5 Stunden** simulieren.
 
 Rechenaufwand
 ~~~~~~~~~~~~~
 
-Fuer verschiedene Aufloesungen ergibt sich folgender Zellaufwand:
+Für verschiedene Auflösungen ergibt sich folgender Zellaufwand:
 
 .. list-table::
    :header-rows: 1
@@ -237,7 +227,7 @@ Fuer verschiedene Aufloesungen ergibt sich folgender Zellaufwand:
      - ``nx``
      - ``ny``
      - Zellen
-     - Zellupdates fuer 1 Stunde bei ca. 4500 Schritten
+     - Zellupdates für 1 Stunde bei ca. 4500 Schritten
    * - 1000 m
      - 2700
      - 1500
@@ -254,19 +244,19 @@ Fuer verschiedene Aufloesungen ergibt sich folgender Zellaufwand:
      - 64,800,000
      - ca. 291.6 Milliarden
 
-Die 1000-m-Variante ist deshalb fuer Tests und erste Visualisierungen deutlich
-praktischer. Die 250-m-Variante ist naeher an den Eingangsdaten, aber
+Die 1000-m-Variante ist deshalb für Tests und erste Visualisierungen deutlich
+praktischer. Die 250-m-Variante ist näher an den Eingangsdaten, aber
 entsprechend teuer.
 
 6.2.2. Zeit zwischen Erdbebenbruch und Ankunft der ersten Tsunamiwellen in Soma
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Gemessene Daten fuer Soma
+Gemessene Daten für Soma
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Fuer die gemessenen Daten von Soma waehrend des Tohoku-Tsunamis vom
-11. Maerz 2011 haben wir die Daten des National Centers for Environmental
-Information (NCEI) verwendet. Die relevanten Werte fuer Soma sind:
+Für die gemessenen Daten von Soma während des Tohoku-Tsunamis vom
+11. März 2011 haben wir die Daten des National Centers for Environmental
+Information (NCEI) verwendet. Die relevanten Werte für Soma sind:
 
 .. list-table::
    :header-rows: 1
@@ -289,15 +279,15 @@ Quelle:
 * NOAA/NCEI: ``Great Tohoku, Japan Earthquake and Tsunami, 11 March 2011``
   https://www.ngdc.noaa.gov/hazard/11mar2011.html
 
-Abschaetzung der Laufzeit nach Soma
+Abschätzung der Laufzeit nach Soma
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-In der Aufgabe soll die Wellengeschwindigkeit mit folgender Naeherung
-abgeschaetzt werden:
+In der Aufgabe soll die Wellengeschwindigkeit mit folgender äherung
+abgeschätzt werden:
 
 ``lambda = sqrt(g * h)``.
 
-Dafuer verwenden wir den Bathymetrie-Schnitt zwischen Soma und dem Epizentrum.
+Dafür verwenden wir den Bathymetrie-Schnitt zwischen Soma und dem Epizentrum.
 Die Datei enthaelt ``Points:0`` und ``Points:1`` als projizierte Koordinaten
 und ``z`` als Bathymetriewert. Wir haben die Daten auf den Wasserbereich
 zwischen Soma und dem Epizentrum zugeschnitten. Der erste verwendete Punkt ist
@@ -327,7 +317,7 @@ Mit dieser effektiven Wassertiefe ergibt sich die Wellengeschwindigkeit zu
 
 ``lambda = sqrt(9.81 * 255.6141787) = 50.08 m/s``.
 
-Soma liegt laut Aufgabenstellung etwa ``55 km`` suedlich und ``128 km``
+Soma liegt laut Aufgabenstellung etwa ``55 km`` südlich und ``128 km``
 westlich des Epizentrums. Die direkte Distanz ist daher
 
 ``distance = sqrt(55000^2 + 128000^2) = 139316 m``.
@@ -336,19 +326,19 @@ Die abgeschaetzte Laufzeit betraegt damit
 
 ``time = 139316 / 50.08 = 2782 s = 46.2 min``.
 
-Dies ist nur eine grobe Naeherung, weil die komplette Bathymetrie und die reale
+Dies ist nur eine grobe Näherung, weil die komplette Bathymetrie und die reale
 zweidimensionale Ausbreitung auf eine mittlere Wassertiefe reduziert werden.
 
 Station nahe Soma
 ^^^^^^^^^^^^^^^^^
 
-Fuer die Stationsmessung speichern wir alle ``20 s`` einen Messwert. Wir haben
+Für die Stationsmessung speichern wir alle ``20 s`` einen Messwert. Wir haben
 den Punkt
 
 ``P[-123860 / -53000]``
 
-ausgewaehlt, weil er der erste Punkt nahe Soma mit negativer Bathymetrie ist.
-Er liegt also nicht auf Land und kann fuer die Messung von ``h``, ``hu`` und
+ausgewählt, weil er der erste Punkt nahe Soma mit negativer Bathymetrie ist.
+Er liegt also nicht auf Land und kann für die Messung von ``h``, ``hu`` und
 ``hv`` verwendet werden. Die Stationskonfiguration lautet:
 
 .. code-block:: json
@@ -365,12 +355,12 @@ Er liegt also nicht auf Land und kann fuer die Messung von ``h``, ``hu`` und
     }
 
 Die Simulation wurde mit dem Tohoku-Setup und einer Zellweite von ``1000 m``
-durchgefuehrt. In der Stationsausgabe erreicht die erste klar erkennbare Welle
-die Station nach ungefaehr
+durchgeführt. In der Stationsausgabe erreicht die erste klar erkennbare Welle
+die Station nach ungefähr
 
 ``2540 s = 42.33 min``.
 
-Verglichen mit der Abschaetzung ergibt sich
+Verglichen mit der Abschätzung ergibt sich
 
 ``46.2 min - 42.33 min = 3.87 min``.
 
@@ -380,7 +370,7 @@ die Rechnung mehrere Vereinfachungen verwendet: gemittelte Bathymetrie,
 vereinfachte Distanz, grobe Gitterposition und eine eindimensionale
 Wellengeschwindigkeit.
 
-Vergleich der maximalen Wellenhoehe
+Vergleich der maximalen Wellenhöhe
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Um die simulierten Stationsdaten mit dem gemessenen NCEI-Wert zu vergleichen,
@@ -389,19 +379,19 @@ an der Station. In der Stationsausgabe betraegt die Anfangshoehe
 
 ``21.6348 m``,
 
-und die hoechste gemessene Hoehe in der Simulation ist
+und die höchste gemessene Höhe in der Simulation ist
 
 ``29.4237 m``.
 
-Damit ergibt sich fuer die simulierte ankommende Wellenhoehe
+Damit ergibt sich fuer die simulierte ankommende Wellenhöhe
 
 ``29.4237 m - 21.6348 m = 7.7889 m``.
 
-Die gemessene maximale Wasserhoehe betraegt ``9.3 m``. Die Differenz ist daher
+Die gemessene maximale Wasserhöhe betraegt ``9.3 m``. Die Differenz ist daher
 
 ``9.3 m - 7.7889 m = 1.5111 m``.
 
-Die simulierte maximale Wellenhoehe ist also etwa **1.51 m niedriger** als der
+Die simulierte maximale Wellenhöhe ist also etwa **1.51 m niedriger** als der
 gemessene NCEI-Wert. Mit Blick auf das grobe ``1000 m``-Gitter und die
 vereinfachte Stationsposition ist das fuer diese Simulation trotzdem ein
 plausibles Ergebnis.
