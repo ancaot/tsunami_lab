@@ -2,14 +2,53 @@
 Submission 6: Tsunami Simulations
 #################################
 
+6.1. 2010 M 8.8 Chile Event
+===========================
+
+In dieser Aufgabe beschäftigen wir uns mit dem Chile Erdbeben und dadurch ausgelösten Tsunami-Event.
+Dazu werden die vorgegebenen Daten eingelesen und für die Simulation verwendet.
+
+**Die Visualisierung der Input-Daten:**
+
+.. figure:: tsunami_lab/sphinx/source/_static/chile_250m_bathymetry.0000.png
+    :alt: Die Bathymetrie Daten vom Chile Event
+
+.. figure:: tsunami_lab/sphinx/source/_static/chile_250m_displacement.0000.png
+    :alt: Die Displacement Daten vom Chile Event
+
+
+
+Simulationskonfiguration
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+Die Simulation wird mithilfe von ``configs/config.json`` konfiguriert.
+
+.. code-block:: json
+
+    {
+      "numerical_solver": "fwave",
+      "scenario": "tsunamievent2d",
+      "wave_model": "2d",
+      "domain_size_x": 2700000,
+      "domain_size_y": 1500000,
+      "cells_x": 2700,
+      "cells_y": 1500,
+      "origin_x": -200000,
+      "origin_y": -750000,
+      "simulation_end_time": 36000,
+      "output_format": "csv",
+      "output_name": "tohoku_soma_1km_open_boundary.csv",
+      "reflective_boundary": false
+    }
+
+6.2. 2011 M 9.1 Tohoku Event
+============================
+
 In dieser Aufgabe wird nur das Tohoku-Ereignis vom 11. Maerz 2011 betrachtet.
 Die Simulation nutzt die vorhandenen NetCDF-Eingabedaten fuer Bathymetrie und
 Displacement sowie das Setup ``tsunamievent2d``. Als Ausgabe verwenden wir
 zunaechst CSV-Dateien, damit die Resultate einfach in ParaView kontrolliert
 werden koennen.
-
-6.2. 2011 M 9.1 Tohoku Event
-============================
 
 Simulationskonfiguration
 ~~~~~~~~~~~~~~~~~~~~~~~~
