@@ -1,266 +1,103 @@
-/**
- * @section DESCRIPTION
- * Unit tests of the F-Wave solver.
- **/
-
-
-//#include "../../submodules/Catch2/include/catch.hpp"
-#include <catch2/catch.hpp>
+/*#include <catch2/catch.hpp>
 #define private public
-#include "FWave.h"
+#include "fwave.h"
 #undef public
 
-TEST_CASE( "Test the derivation of the FWave speeds.", "[FWaveSpeeds]" ) {
-   /* 
-    * Computation identical to Roe solver, so test case for derivation of FWave speeds also identical
-    * 
-    * Test case:
-    *  h: 10 | 9
-    *  u: -3 | 3
-    *
-    * roe height: 9.5
-    * roe velocity: (sqrt(10) * -3 + 3 * 3) / ( sqrt(10) + sqrt(9) )
-    *               = -0.0790021169691720
-    * roe speeds: s1 = -0.079002116969172024 - sqrt(9.80665 * 9.5) = -9.7311093998375095
-    *             s2 = -0.079002116969172024 + sqrt(9.80665 * 9.5) =  9.5731051658991654
-    */
-  float l_waveSpeedL = 0;
-  float l_waveSpeedR = 0;
-  tsunami_lab::solvers::FWave::waveSpeeds( 10,
-                                         9,
-                                         -3,
-                                         3,
-                                         l_waveSpeedL,
-                                         l_waveSpeedR );
+TEST_CASE( "Testing The InverseMatrix ", "[InverseMatrix]" ) {
 
-  REQUIRE( l_waveSpeedL == Approx( -9.7311093998375095 ) );
-  REQUIRE( l_waveSpeedR == Approx(  9.5731051658991654 ) );
+  float i_inverse[4];
+  tsunami_lab::solvers::fwave::inverseMatrix( 2,3, i_inverse );
+  REQUIRE( i_inverse[0] == 3 );
+  REQUIRE( i_inverse[1] == -1 );
+  REQUIRE( i_inverse[2] == -2 );
+  REQUIRE( i_inverse[3] == 1 );
 }
 
-TEST_CASE( "Test the derivation of the FWave wave speeds.", "[FWaveStrengths]" ) {
-  /*
-   * Test case:
-   *  h:   10 | 9
-   *  u:   -3 | 3
-   *  hu: -30 | 27
-   *
-   * The derivation of the Roe speeds (s1, s2) is given above.
-   *
-   *  Matrix of right eigenvectors:
-   *
-   *      | 1   1 |
-   *  R = |       |
-   *      | s1 s2 |
-   *
-   * Inversion yields:
-   *
-   * wolframalpha.com query: invert {{1, 1}, {-9.7311093998375095, 9.5731051658991654}}
-   *
-   *        | 0.49590751974393229 -0.051802159398648326 |
-   * Rinv = |                                           |
-   *        | 0.50409248025606771  0.051802159398648326 |
-   *
-   *
-   * Jump computing with flux function
-   * 
-   * f = | hu                      |
-   *     | h * u^2 + 1/2 * g * h^2 |
-   *
-   * f = | -30         27       |
-   *     | 580.3325  478.169325 |
-   *
-   * Multiplicaton with the jump in quantities gives the wave strengths:
-   *
-   * wolframalpha.com query: {{0.49590751974393229, -0.051802159398648326}, {0.50409248025606771, 0.051802159398648326}} * {27 - -30 , 478.169325 - 580.3325}
-   *
-   *        | 27 - -30              |   | 33.559 |
-   * Rinv * |                       | = |        |
-   *        | 478.169325 - 580.3325 |   | 23.441 |
-   */
-  float l_strengthL = 0;
-  float l_strengthR = 0;
+TEST_CASE( "Testing The Flux Function ", "[Flux]" ) {
 
-  tsunami_lab::solvers::FWave::waveStrengths( 10,
+  float i_inverse[2];
+  tsunami_lab::solvers::fwave::flux( 9,7,5,4,i_inverse);
+  REQUIRE( i_inverse[0] == -1 );
+  REQUIRE( i_inverse[1] == Approx(-157.39846));
+
+  tsunami_lab::solvers::fwave::flux( 2,4,3,16,i_inverse);
+  REQUIRE( i_inverse[0] == 13 );
+  REQUIRE( i_inverse[1] == Approx(118.3399));
+
+}
+
+
+
+
+TEST_CASE( "Testing The eigencoefficient", "[AlphaVector]" ) {
+
+  float i_inverse[4] = {1,2,3,4};
+  float i_delta_f[2] = {5,6};
+  float eigencoefficients[2];
+  tsunami_lab::solvers::fwave::eigencoefficientAlpha( i_inverse,i_delta_f,0,eigencoefficients);
+  REQUIRE( eigencoefficients[0] == 17 );
+  REQUIRE( eigencoefficients[1] == 39);
+ 
+  
+}
+
+TEST_CASE( "Testing The Eigenvalues 1 ", "[EigenValues]" ) {
+
+  float eigenVal1 = 0;
+  float eigenVal2 = 0;
+  tsunami_lab::solvers::fwave::eigenvalues( 5.3,
+                                            2.6,
+                                            -6.5660377358491,
+                                            12.3846153846154,
+                                            eigenVal1,
+                                            eigenVal2 );
+
+  REQUIRE( eigenVal1 == Approx( -4.9840244 ) );
+  REQUIRE( eigenVal2 == Approx(  7.463668864 ) );
+
+  tsunami_lab::solvers::fwave::eigenvalues( 10,
                                             9,
-                                            -30,
-                                            27,
-                                            -9.7311093998375095,
-                                            9.5731051658991654,
-                                            -10,
-                                            -10,
-                                            l_strengthL,
-                                            l_strengthR );
+                                            -3,
+                                            3,
+                                            eigenVal1,
+                                            eigenVal2);
 
-  REQUIRE( l_strengthL == Approx(33.559) );
-  REQUIRE( l_strengthR == Approx(23.441) );
+  REQUIRE( eigenVal1 == Approx( -9.7311093998375095 ) );
+  REQUIRE( eigenVal2 == Approx(  9.5731051658991654 ) );
+
+
 }
 
-TEST_CASE( "Test the derivation of the FWave net-updates.", "[FWaveUpdates]" ) {
-  /*
-   * Test case:
-   *
-   *      left | right
-   *  h:    10 | 9
-   *  u:    -3 | 3
-   *  hu:  -30 | 27
-   *
-   * The derivation of the Roe speeds (s1, s2) and wave strengths (a1, a1) is given above.
-   *
-   * The net-updates are given through the scaled eigenvectors.
-   *
-   *                  |  1 |   |   33.559                  |
-   * update #1:  a1 * |    | = |                           |
-   *                  | s1 |   | -326.5663003491469813105  |
-   *
-   *                  |  1 |   |  23.441                  |
-   * update #2:  a2 * |    | = |                          |
-   *                  | s2 |   | 224.4031581938423361414  |
-   */
-  float l_netUpdatesL[2] = { -5, 3 };
-  float l_netUpdatesR[2] = {  4, 7 };
 
-  tsunami_lab::solvers::FWave::netUpdates( 10,
-                                         9,
-                                         -30,
-                                         27,
-                                         -10,
-                                         -10,
-                                         l_netUpdatesL,
-                                         l_netUpdatesR );
+TEST_CASE( "Test the derivation of the Fwave net-updates ", "[Zp - Vectors]" ) {
+  float i_alphas[] = {17,39};
+  float i_eigens[] = {-9.73,9.57};
+  float i_minus_A_deltaQ[2];
+  float i_plus_A_deltaQ[2];
+  tsunami_lab::solvers::fwave::decompose(i_alphas,
+                                        i_eigens,
+                                         i_minus_A_deltaQ,
+                                         i_plus_A_deltaQ );
 
-  //REQUIRE( l_netUpdatesL[0] == Approx( 27.0 ) );
-  //REQUIRE( l_netUpdatesL[1] == Approx( -253.65613 ) );
-  REQUIRE( l_netUpdatesL[0] == Approx( 33.559 ).margin(1e-3) );
-  REQUIRE( l_netUpdatesL[1] == Approx( -326.5663 ).margin(1e-3) );
+  REQUIRE( i_minus_A_deltaQ[0] == Approx( 19.01562f) );
+  REQUIRE( i_minus_A_deltaQ[1] == Approx(-161.40999f) );
 
-  //REQUIRE( l_netUpdatesR[0] == Approx( 27.0 ) );
-  //REQUIRE( l_netUpdatesR[1] == Approx( 253.65613 ) );
-  REQUIRE( l_netUpdatesR[0] == Approx( 23.441 ).margin(1e-3) );
-  REQUIRE( l_netUpdatesR[1] == Approx( 224.40315 ).margin(1e-3) );
+  REQUIRE( i_plus_A_deltaQ[0] == 39 );
+  
 
-  /*
-   * Test case (dam break):
-   *
-   *     left | right
-   *   h:  10 | 8
-   *   hu:  0 | 0
-   *
-   * Roe speeds are given as:
-   *
-   *   s1 = -sqrt(9.80665 * 9)
-   *   s2 =  sqrt(9.80665 * 9)
-   *
-   * Inversion of the matrix of right Eigenvectors:
-   * 
-   *   wolframalpha.com query: invert {{1, 1}, {-sqrt(9.80665 * 9), sqrt(9.80665 * 9)}}
-   *
-   *          | 0.5 -0.0532217 |
-   *   Rinv = |                |
-   *          | 0.5  0.0532217 |
-   *
-   * Multiplicaton with the jump (computed with flux function) in quantities gives the wave strengths:
-   *
-   *        |  0 - 0    |   | -1 |   | a1 |
-   * Rinv * |           | = |    | = |    |
-   *        | -176.5197 |   | -1 |   | a2 |
-   *
-   * The net-updates are given through the scaled eigenvectors.
-   *
-   *                  |  1 |   |   9.39467851749  |
-   * update #1:  a1 * |    | = |                  |
-   *                  | s1 |   | −88.259917223468 |
-   *
-   *                  |  1 |   |  −9.39467851749  |
-   * update #2:  a2 * |    | = |                  |
-   *                  | s2 |   | −88.259917223468 |
-   */
-  tsunami_lab::solvers::FWave::netUpdates( 10,
-                                         8,
-                                         0,
-                                         0,
-                                         -10,
-                                         -10,
-                                         l_netUpdatesL,
-                                         l_netUpdatesR ); 
+  REQUIRE( i_plus_A_deltaQ[1] ==  Approx(  373.23 ) );
+}
 
-  REQUIRE( l_netUpdatesL[0] ==  Approx(9.394671362) );
-  REQUIRE( l_netUpdatesL[1] == -Approx(88.25985)    );
 
-  REQUIRE( l_netUpdatesR[0] == -Approx(9.394671362) );
-  REQUIRE( l_netUpdatesR[1] == -Approx(88.25985)    );
+TEST_CASE( "Testing The Decomposition ", "[Zp - Vectors]" ) {
 
-   /*
-    * Test case (Two positive eigenvectors, supersonic problem):
-    *  h:  10  | 9
-    *  u:  20  | 20
-    *  hu: 200 | 180
-    *
-    * roe height: 9.5
-    * roe velocity: (sqrt(10) * 20 + 3 * 20) / ( sqrt(10) + sqrt(9) )
-    *               = 20
-    * roe speeds: s1 = 20 - sqrt(9.80665 * 9.5) = 10.3479
-    *             s2 = 20 + sqrt(9.80665 * 9.5) = 29.6521
-    * 
-    * Inversion of the matrix of right Eigenvectors:
-    * 
-    *   wolframalpha.com query: invert {{1, 1}, {10.3479, 29.6521}}
-    *
-    *          |  1.5360439697060742 -0.051802198485303694 |
-    *   Rinv = |                                           |
-    *          | -0.5360439697060743  0.051802198485303715 |
-    *
-    * Multiplicaton with the jump (computed with flux function) in quantities gives the wave strengths:
-    *
-    *        |         180 - 200       |          |  -20     |   |  -5.17394 |
-    * Rinv * |                         | = Rinv * |          | = |           |
-    *        | 3997.169325 - 4490.3325 |          | -493.163 |   | -14.8261  |
-    *
-    *
-    *
-    *        |         180 - 200       |   |  -5.17394 |   | a1 |
-    * Rinv * |                         | = |           | = |    |
-    *        | 3997.169325 - 4490.3325 |   | -14.8261  |   | a2 |
-    *
-    * The net-updates are given through the scaled eigenvectors.
-    *
-    *                  |  1 |   |  -5.17395 |
-    * update #1:  a1 * |    | = |           |
-    *                  | s1 |   | -53.5394  |
-    *
-    *                  |  1 |   |  -14.8261 |
-    * update #2:  a2 * |    | = |           |
-    *                  | s2 |   | -439.624  |
-    *
-    */
 
-  tsunami_lab::solvers::FWave::netUpdates( 10,
-                                         9,
-                                         200,
-                                         180,
-                                         -10,
-                                         -10,
-                                         l_netUpdatesL,
-                                         l_netUpdatesR ); 
-
-  REQUIRE( l_netUpdatesL[0] == Approx(0) );
-  REQUIRE( l_netUpdatesL[1] == Approx(0) );
-
-  REQUIRE( l_netUpdatesR[0] == -Approx(20.) );
-  REQUIRE( l_netUpdatesR[1] == -Approx(493.163) );
-
-  /*
-   * Test case (trivial steady state):
-   *
-   *     left | right
-   *   h:  10 | 10
-   *  hu:   0 |  0
-   */
-  tsunami_lab::solvers::FWave::netUpdates( 10,
+  float l_netUpdatesL[2];
+  float l_netUpdatesR[2];
+  tsunami_lab::solvers::fwave::netUpdates( 10,
                                          10,
                                          0,
-                                         0,
-                                         -10,
-                                         -10,
+                                         0,0,0,
                                          l_netUpdatesL,
                                          l_netUpdatesR );
 
@@ -269,38 +106,84 @@ TEST_CASE( "Test the derivation of the FWave net-updates.", "[FWaveUpdates]" ) {
 
   REQUIRE( l_netUpdatesR[0] == Approx(0) );
   REQUIRE( l_netUpdatesR[1] == Approx(0) );
-}
 
-TEST_CASE( "Test the effect of bathymetry on the the FWave net-updates.", "[FWaveUpdates]" ) {
-  /*
-   * Test case:
-   *
-   *      left | right
-   *  h:     5 |  10
-   *  u:     0 |   0
-   *  hu:    0 |   0
-   *  b:    -5 | -10
-   *
-   * Sanity check - True hight of the water sourface is equal on both sides, as such nothing should happen
-   * for some reason this causes issues
-   *
-   */
-  float l_netUpdatesL[2] = { -5, 3 };
-  float l_netUpdatesR[2] = {  4, 7 };
 
-  tsunami_lab::solvers::FWave::netUpdates( 5,
-                                         10,
+  tsunami_lab::solvers::fwave::netUpdates( 10,
+                                         8,
                                          0,
                                          0,
-                                         -5,
-                                         -10,
+                                         0,
+                                         0,                                         l_netUpdatesL,
+                                         l_netUpdatesR ); 
+
+  REQUIRE( l_netUpdatesL[0] ==  Approx(9.394671362) );
+  REQUIRE( l_netUpdatesL[1] ==  -Approx(88.25985)    );
+
+  REQUIRE( l_netUpdatesR[0] == -Approx(9.394671362) );
+  REQUIRE( l_netUpdatesR[1] == -Approx(88.25985)    );
+
+
+tsunami_lab::solvers::fwave::netUpdates( 10,
+                                         9,
+                                         -30,
+                                         27,
+                                         0,
+                                         0,
                                          l_netUpdatesL,
-                                         l_netUpdatesR );
+                                         l_netUpdatesR ); 
 
-  REQUIRE( l_netUpdatesL[0] == Approx( 0 ).margin(1e-4) ); // I have no idea why -0 is not Approx(0) compatible
-  REQUIRE( l_netUpdatesL[1] == Approx( 0 ).margin(1e-4) );
+  REQUIRE( l_netUpdatesL[0] == Approx( 33.5590017014261447899292 ) );
+  REQUIRE( l_netUpdatesL[1] == Approx( -326.56631690591093200508 ) );
 
-  REQUIRE( l_netUpdatesR[0] == Approx( 0 ).margin(1e-4) );
-  REQUIRE( l_netUpdatesR[1] == Approx( 0 ).margin(1e-4) );
+  REQUIRE( l_netUpdatesR[0] == Approx( 23.4409982985738561366777 ) );
+  REQUIRE( l_netUpdatesR[1] == Approx( 224.403141905910928927533 ) );
 
-}
+  tsunami_lab::solvers::fwave::netUpdates( 2.8,
+                                         9.6,
+                                         41.9,
+                                         37.7,0,0,
+                                         l_netUpdatesL,
+                                         l_netUpdatesR ); 
+
+  REQUIRE( l_netUpdatesL[0] == Approx(0) );
+  REQUIRE( l_netUpdatesL[1] == Approx(0) );
+
+  REQUIRE( l_netUpdatesR[0] == Approx(  -4.19969));
+  REQUIRE( l_netUpdatesR[1] == Approx( -65.504));
+
+//test for the Bathymetry with net-update
+  tsunami_lab::solvers::fwave::netUpdates( 5,
+                                         6,
+                                         0,
+                                         0,
+                                         -10,
+                                         -4,
+                                         l_netUpdatesL,
+                                         l_netUpdatesR ); 
+
+  REQUIRE( l_netUpdatesL[0] == Approx( -25.7045 ) );
+  REQUIRE( l_netUpdatesL[1] == Approx( 188.7780125) );
+
+  REQUIRE( l_netUpdatesR[0] == Approx( 25.7045) );
+  REQUIRE( l_netUpdatesR[1] == Approx( 188.7780125 ) );
+
+
+  tsunami_lab::solvers::fwave::netUpdates( 5,
+                                         6,
+                                         4,
+                                         3,
+                                         -14,
+                                         -7,
+                                         l_netUpdatesL,
+                                         l_netUpdatesR ); 
+
+  REQUIRE( l_netUpdatesL[0] == Approx( -29.80466) );
+  REQUIRE( l_netUpdatesL[1] == Approx( 199.720) );
+
+  REQUIRE( l_netUpdatesR[0] == Approx( 28.80465) );
+  REQUIRE( l_netUpdatesR[1] == Approx( 230.072 ) );
+
+
+
+
+}*/

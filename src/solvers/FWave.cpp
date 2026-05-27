@@ -1,155 +1,168 @@
-/**
- * @section DESCRIPTION
- * F-Wave solver for the shallow water equations.
- **/
-#include "FWave.h"
+#include "fwave.h"
 #include <cmath>
 
-void tsunami_lab::solvers::FWave::waveSpeeds( t_real   i_hL,
-                                              t_real   i_hR,
-                                              t_real   i_uL,
-                                              t_real   i_uR,
-                                              t_real & o_waveSpeedL,
-                                              t_real & o_waveSpeedR ) {
-  // pre-compute square-root ops
+void tsunami_lab::solvers::fwave::eigenvalues( t_real   i_hL,
+                                t_real   i_hR,
+                                t_real   i_uL,
+                                t_real   i_uR,
+                                t_real & o_waveSpeedL,
+                                t_real & o_waveSpeedR ){
+
+  
   t_real l_hSqrtL = std::sqrt( i_hL );
   t_real l_hSqrtR = std::sqrt( i_hR );
 
-  // compute Roe averages
-  t_real l_hRoe = 0.5f * ( i_hL + i_hR );
-  t_real l_uRoe = 0;
-  if( l_hSqrtL + l_hSqrtR > 0 ) {
-    l_uRoe = (l_hSqrtL * i_uL + l_hSqrtR * i_uR) / (l_hSqrtL + l_hSqrtR);
-  }
+  //determine the height : h_Roe 
+  t_real l_hRoe = t_real(0.5) * ( i_hL + i_hR );
 
-  // compute wave speeds
+  //determine the particle velocity : u_Roe
+  t_real l_uRoe = l_hSqrtL * i_uL + l_hSqrtR * i_uR;
+  l_uRoe /= l_hSqrtL + l_hSqrtR;
+
+  //compute the wave speeds
   t_real l_ghSqrtRoe = m_gSqrt * std::sqrt( l_hRoe );
+
   o_waveSpeedL = l_uRoe - l_ghSqrtRoe;
   o_waveSpeedR = l_uRoe + l_ghSqrtRoe;
 }
 
-void tsunami_lab::solvers::FWave::waveStrengths( t_real   i_hL,
-                                                 t_real   i_hR,
-                                                 t_real   i_huL,
-                                                 t_real   i_huR,
-                                                 t_real   i_waveSpeedL,
-                                                 t_real   i_waveSpeedR,
-                                                 t_real   i_bL,
-                                                 t_real   i_bR,
-                                                 t_real & o_strengthL,
-                                                 t_real & o_strengthR ) {
-  
-  // compute inverse of right eigenvector-matrix
-  // A^-1 = | d -b| * |A|^-1
-  //        |-c  a|
-  // |A| = ad - bc
-  // a = 1; b = 1; c = sL; d = sR
+void tsunami_lab::solvers::fwave::flux( t_real i_hL,
+                                        t_real i_hR,
+                                        t_real i_huL,
+                                        t_real i_huR,
+                                        t_real o_fdelta[2]){
+    /*
+     ___(1.3.3)___
+     compute f(q_left):
+     compute hu² = (hu)² / h
+    */
+    t_real pow2HuL= i_huL*i_huL/i_hL;
+    t_real gPowHL = m_g * i_hL*i_hL;
+    t_real totalL = pow2HuL + 0.5 * gPowHL;
+    t_real fql[2] = {i_huL, totalL};
 
-  t_real l_detInv = 1 / ( 1 * i_waveSpeedR - 1 * i_waveSpeedL);
+    //compute f(q_right)
+    t_real pow2HuR= i_huR*i_huR/i_hR;
+    t_real gPowHR = m_g * i_hR*i_hR;
+    t_real totalR = pow2HuR + 0.5 * gPowHR;
+    t_real fqr[2] = {i_huR, totalR};
+    //compute Δf
+    o_fdelta[0] = fqr[0] - fql[0];
+    o_fdelta[1] = fqr[1] - fql[1];
+}
+ 
 
-  t_real l_rInv[2][2] = {0};
-  l_rInv[0][0] = l_detInv *  i_waveSpeedR; l_rInv[0][1] = l_detInv * -1;
-  l_rInv[1][0] = l_detInv * -i_waveSpeedL; l_rInv[1][1] = l_detInv *  1;
+void tsunami_lab::solvers::fwave::decompose(t_real i_alphas[2],
+                                            t_real i_eigens[2],
+                                            t_real o_minus_A_deltaQ[2], 
+                                            t_real o_plus_A_deltaQ[2]){
+ 
+    //Negative speed of wave propagation                                    
+    if( i_eigens[0] < 0){
+        o_minus_A_deltaQ[0] +=  i_alphas[0];
+        o_minus_A_deltaQ[1] += (i_alphas[0] * i_eigens[0]);
+    }else
+    {
+        o_plus_A_deltaQ[0] +=   i_alphas[0];
+        o_plus_A_deltaQ[1] +=  (i_alphas[0] * i_eigens[0]);
+    }
+    //Positive speed of wave propagation
+    if(i_eigens[1] < 0){
+        o_minus_A_deltaQ[0] += o_minus_A_deltaQ[0] + (i_alphas[1]);
+        o_minus_A_deltaQ[1] += o_minus_A_deltaQ[1] + (i_alphas[1] * i_eigens[1]);
+        
+    }else{
+        o_plus_A_deltaQ[0] += o_plus_A_deltaQ[0] + (i_alphas[1]);
+        o_plus_A_deltaQ[1] += o_plus_A_deltaQ[1] + (i_alphas[1] * i_eigens[1]) ;
+    }
+ }
 
-  // compute jump in flux function
-  // f = | hu                      |
-  //     | h * u^2 + 1/2 * g * h^2 |
+    
+void tsunami_lab::solvers::fwave::inverseMatrix(t_real i_eigen1,
+                                                t_real i_eigen2,
+                                                t_real o_inverse[4]){
+    //Compute the determinant of a 2x2 matrix 
+    t_real det = 1 / (i_eigen2 - i_eigen1);
 
-  t_real l_fJump[2] = {0};
-  l_fJump[0]  = i_huR - i_huL;
-  l_fJump[1]  = (i_hR * i_hR) - (i_hL * i_hL);
-  l_fJump[1] *= 0.5f * m_g;
-  l_fJump[1] += (i_huR * i_huR / i_hR) - (i_huL * i_huL / i_hL);
-  l_fJump[1] -= -m_g * (i_hL + i_hR) * (i_bR - i_bL) * 0.5;
-
-  // compute wave strengths
-  o_strengthL  = l_rInv[0][0] * l_fJump[0];
-  o_strengthL += l_rInv[0][1] * l_fJump[1];
-
-  o_strengthR  = l_rInv[1][0] * l_fJump[0];
-  o_strengthR += l_rInv[1][1] * l_fJump[1];
+    //Compute the inverses of specific 2x2 matrices. (first row contains only ones)
+    o_inverse[0] = i_eigen2 * det;
+    o_inverse[1] = -1 * det;
+    o_inverse[2] = -i_eigen1 * det;
+    o_inverse[3] = 1 * det;
+    
 }
 
-void tsunami_lab::solvers::FWave::netUpdates( t_real i_hL,
-                                            t_real i_hR,
-                                            t_real i_huL,
-                                            t_real i_huR,
-                                            t_real i_bL,
-                                            t_real i_bR,
-                                            t_real o_netUpdateL[2],
-                                            t_real o_netUpdateR[2] ) {
-  
-  if(i_bL > 0) {
-    i_hL = i_hR;
-    i_huL = -i_huR;
-    i_bL = i_bR;
-  }
-  if(i_bR > 0) {
-    i_hR = i_hL;
-    i_huR = -i_huL;
-    i_bR = i_bL;
-  }
-  
-  // compute particle velocities
-  t_real l_uL = i_huL / i_hL;
-  t_real l_uR = i_huR / i_hR;
+void tsunami_lab::solvers::fwave::eigencoefficientAlpha(t_real i_inverse[4],
+                                                        t_real i_delta_f[2],
+                                                        t_real i_b,
+                                                        t_real o_eigencoefficients[2]){
 
-  // compute wave speeds
-  t_real l_sL = 0;
-  t_real l_sR = 0;
+    i_delta_f[1] = i_delta_f[1] - i_b;
+    //m x n ° n x p = 
+    o_eigencoefficients[0] = (i_inverse[0] * i_delta_f[0]) + (i_inverse[1] * i_delta_f[1]);
+    o_eigencoefficients[1] = (i_inverse[2] * i_delta_f[0]) + (i_inverse[3] * i_delta_f[1]);
 
-  waveSpeeds( i_hL,
-              i_hR,
-              l_uL,
-              l_uR,
-              l_sL,
-              l_sR );
+}
 
-  // compute wave strengths
-  t_real l_aL = 0;
-  t_real l_aR = 0;
+void tsunami_lab::solvers::fwave::netUpdates(t_real   i_hL,
+                                             t_real   i_hR,
+                                             t_real   i_huL,
+                                             t_real   i_huR,
+                                             t_real   i_bL,
+                                             t_real   i_bR,
+                                             t_real   o_minus_A_deltaQ[2],
+                                             t_real   o_plus_A_deltaQ[2]){
 
-  waveStrengths( i_hL,
-                 i_hR,
-                 i_huL,
-                 i_huR,
-                 l_sL,
-                 l_sR,
-                 i_bL,
-                 i_bR,
-                 l_aL,
-                 l_aR );
+    //two dry cells next to each other you cant divide by zero
+        o_minus_A_deltaQ[1] = 0;
+        o_minus_A_deltaQ[0] = 0;
+        o_plus_A_deltaQ[1] = 0;
+        o_plus_A_deltaQ[0] = 0;
+        t_real temp[2] = {};
+    if(i_hL <= 0){
 
-  // compute scaled waves
-  t_real l_waveL[2] = {0};
-  t_real l_waveR[2] = {0};
-
-  l_waveL[0] = l_aL * 1;
-  l_waveL[1] = l_aL * l_sL;
-
-  l_waveR[0] = l_aR * 1;
-  l_waveR[1] = l_aR * l_sR;
-
-  // set net-updates depending on wave speeds
-  for( unsigned short l_qt = 0; l_qt < 2; l_qt++ ) {
-    // init
-    o_netUpdateL[l_qt] = 0;
-    o_netUpdateR[l_qt] = 0;
-
-    // 1st wave
-    if( l_sL < 0 ) {
-      o_netUpdateL[l_qt] += l_waveL[l_qt];
+        if(i_hR <= 0){
+            return;
+        }
+        i_hL = i_hR;
+        i_huL = -i_huR;
+        i_bL = i_bR;
+        o_minus_A_deltaQ = temp;
     }
-    else {
-      o_netUpdateR[l_qt] += l_waveL[l_qt];
+    //left cell is a dry cell
+    else if(i_hR <= 0){
+        i_hR = i_hL;
+        i_huR = -i_huL;
+        i_bR = i_bL;
+        o_plus_A_deltaQ = temp;
     }
 
-    // 2nd wave
-    if( l_sR > 0 ) {
-      o_netUpdateR[l_qt] += l_waveR[l_qt];
-    }
-    else {
-      o_netUpdateL[l_qt] += l_waveR[l_qt];
-    }
-  }
+
+
+
+
+    t_real l_uL = i_huL / i_hL;
+    t_real l_uR = i_huR / i_hR;
+      
+    t_real l_sL = 0;
+    t_real l_sR = 0;
+
+    eigenvalues(i_hL,i_hR,l_uL,l_uR,l_sL,l_sR);
+
+    t_real l_inverse[4];
+
+    inverseMatrix(l_sL, l_sR, l_inverse);
+
+    t_real l_fdelta[2] = {0,0};
+    flux(i_hL,i_hR,i_huL,i_huR,l_fdelta);
+    
+    t_real l_bathymetry = (-m_g) * (i_bR-i_bL) *((i_hL+i_hR)/2);
+
+    t_real l_eigencoefficients[2];
+    eigencoefficientAlpha(l_inverse,l_fdelta,l_bathymetry,l_eigencoefficients);
+
+   
+    t_real l_eigens[2] = {l_sL,l_sR};
+    decompose(l_eigencoefficients,l_eigens,o_minus_A_deltaQ,o_plus_A_deltaQ);
+
 }

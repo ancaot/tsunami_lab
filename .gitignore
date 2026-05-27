@@ -4,6 +4,7 @@
 # SCons build system
 .sconsign.dblite
 config.log
+.sconf_temp/
 
 # Sphinx documentation
 /sphinx/build/
@@ -18,6 +19,11 @@ config.log
 solution_*.csv
 symmetry_*.csv
 !/data/csv/
+/data/nc/
+/data/output/
+/outputs/
+/station/
+/stations/
 
 # Python scripts (from tools)
 __pycache__/

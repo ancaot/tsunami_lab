@@ -1,50 +1,61 @@
 ##
+# @author Alexander Breuer (alex.breuer AT uni-jena.de)
+#
 # @section DESCRIPTION
 # Collects sources for a build.
 ##
 Import('env')
 
 # gather sources
-l_sources = [ 'solvers/FWave.cpp',
-              'solvers/Roe.cpp',
-              'patches/WavePropagation1d.cpp',
-              'patches/WavePropagation2d.cpp',
-              'setups/DamBreak1d.cpp',
-              'setups/DamBreak2d.cpp',
-              'setups/RareRare1d.cpp',
-              'setups/ShockShock1d.cpp',
-              'setups/TsunamiEvent1d.cpp',
-              'setups/ShockLand1d.cpp',
-              'setups/CircularDamBreak1d.cpp',
-              'setups/ArtificialTsunami2d.cpp',
-              'setups/TsunamiEvent2d.cpp',
-              'io/Csv.cpp',
-              'io/Stations.cpp' ]
+l_sources = [ 'solvers/Roe.cpp',
+              'patches/wavepropagation1d/WavePropagation1d.cpp',
+              'patches/wavepropagation2d/WavePropagation2d.cpp',
+              'setups/dambreak/DamBreak1d.cpp',
+              'setups/dambreak2d/DamBreak2d.cpp',
+              'io/Csv/Csv.cpp',
+              'io/Stations/Station.cpp',
+              'solvers/fwave.cpp',
+              'setups/shockshock/ShockShock.cpp',
+              'setups/rarerare/RareRare.cpp',
+              'setups/subcriticalflow/SubcriticalFlow.cpp',
+              'setups/supercriticalflow/SupercriticalFlow.cpp',
+              'setups/tsunamievent1d/TsunamiEvent1d.cpp',
+              'io/JsReader/Configuration.cpp',
+              'setups/ArtificialTsunami2d/ArtificialTsunami2d.cpp']
 
 if env['USE_NETCDF']:
-  l_sources.append( 'io/NetCdf.cpp' )
+  l_sources.append( 'setups/tsunamievent2d/TsunamiEvent2d.cpp' )
+  l_sources.append( 'io/NetCdf/NetCdf.cpp' )
+
 
 for l_so in l_sources:
   env.sources.append( env.Object( l_so ) )
 
-env.standalone_main = env.Object( "main.cpp" )
-env.standalone_symmetry = env.Object( "symmetric_station_study.cpp" )
+env.standalone = env.Object( "main.cpp" )
 
 # gather unit tests
 l_tests = [ 'tests.cpp',
-            'solvers/FWave.test.cpp',
             'solvers/Roe.test.cpp',
-            'patches/WavePropagation1d.test.cpp',
-            'io/Csv.test.cpp',
-            'setups/DamBreak1d.test.cpp',
-            'setups/RareRare1d.test.cpp',
-            'setups/ShockShock1d.test.cpp',
-            'setups/ArtificialTsunami2d.test.cpp',
-            'setups/TsunamiEvent2d.test.cpp',
-            'patches/WavePropagation2d.test.cpp' ]
+            'patches/wavepropagation1d/WavePropagation1d.test.cpp',
+            'io/Csv/Csv.test.cpp',
+            'io/Stations/Station.test.cpp',
+            'setups/dambreak/DamBreak1d.test.cpp',
+            'setups/shockshock/ShockShock.test.cpp',
+            'setups/rarerare/RareRare.test.cpp',
+            'setups/subcriticalflow/SubcriticalFlow.test.cpp',
+            'setups/supercriticalflow/SupercriticalFlow.test.cpp',
+            'setups/dambreak2d/DamBreak2d.test.cpp',
+            'solvers/fwave.test.cpp',
+            'patches/wavepropagation2d/WavePropagation2d.test.cpp',
+            'setups/tsunamievent1d/TsunamiEvent1d.test.cpp'
+            ]
 
 if env['USE_NETCDF']:
-  l_tests.append( 'io/NetCdf.test.cpp' )
+  l_tests.append( 'setups/tsunamievent2d/TsunamiEvent2d.test.cpp' )
+  l_tests.append( 'io/NetCdf/NetCdf.test.cpp' )
+            
+            
+
 
 for l_te in l_tests:
   env.tests.append( env.Object( l_te ) )

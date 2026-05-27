@@ -22,17 +22,20 @@ class tsunami_lab::patches::WavePropagation {
      **/
     virtual ~WavePropagation(){};
 
-    /**
+    /*
      * Performs a time step.
      *
      * @param i_scaling scaling of the time step.
      **/
-    virtual void timeStep( t_real i_scaling ) = 0;
+      virtual void timeStep(t_real i_scaling) = 0;
+    
+    
 
     /**
-     * Sets the values of the ghost cells according to outflow boundary conditions.
+     * @brief Sets the values of the ghost cells according to outflow boundary conditions
+     * true : reflecting boundary , false : outflow conditions.
      **/
-    virtual void setGhostOutflow() = 0;
+    virtual void setGhostCollumn() = 0;
 
     /**
      * Gets the stride in y-direction. x-direction is stride-1.
@@ -63,11 +66,17 @@ class tsunami_lab::patches::WavePropagation {
     virtual t_real const * getMomentumY() = 0;
 
     /**
-     * Gets the cells' bathymetry.
+     * Gets the cells' Bathymetry at a given position .
      *
-     * @return bathymetry.
+     * @return Bathymetry.
      **/
     virtual t_real const * getBathymetry() = 0;
+
+
+    virtual t_idx getGhostcellX() = 0;
+    
+    virtual t_idx getGhostcellY() = 0;
+
 
     /**
      * Sets the height of the cell to the given value.
@@ -79,6 +88,15 @@ class tsunami_lab::patches::WavePropagation {
     virtual void setHeight( t_idx  i_ix,
                             t_idx  i_iy,
                             t_real i_h ) = 0;
+
+    /**
+    * @brief Sets the bathymetry at a given position.
+    * @param i_ix x-coordinate.
+    * @param i_iy y-coordinate.
+    */
+    virtual void setBathymetry(t_idx  i_ix,
+                               t_idx  i_iy,
+                               t_real i_b)=0;
 
     /**
      * Sets the momentum in x-direction to the given value.
@@ -101,17 +119,5 @@ class tsunami_lab::patches::WavePropagation {
     virtual void setMomentumY( t_idx  i_ix,
                                t_idx  i_iy,
                                t_real i_hv ) = 0;
-
-    /**
-     * Sets the bathymetry to the given value.
-     *
-     * @param i_ix id of the cell in x-direction.
-     * @param i_iy id of the cell in y-direction.
-     * @param i_b bathymetry in y-direction.
-     **/
-    virtual void setBathymetry( t_idx  i_ix,
-                               t_idx  i_iy,
-                               t_real i_b ) = 0;
 };
-
 #endif

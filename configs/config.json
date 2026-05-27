@@ -1,0 +1,23 @@
+{
+    "solver" : "fwave",
+    "dimension_x" : 2700000,
+    "dimension_y" : 1500000,
+    "setup" :  "tsunamievent2d",
+    "nx" : 2700,
+    "ny" : 1500,
+    "hu" : 0,
+    "location" : 0,
+    "hv":0.0,
+    "hr": 55,
+    "hl": 25,
+    "domain_start_x" : -200000,
+    "domain_start_y" : -750000,
+    "wavepropagation" : "2d",
+    "endtime" : 36000,
+    "writer" : "csv",
+    "bathfile" : "data/nc/data_in/output/tohoku_gebco20_usgs_250m_bath.nc",
+    "disfile" : "data/nc/data_in/output/tohoku_gebco20_usgs_250m_displ.nc",
+    "outputfilename": "tohoku_soma_1km_open_boundary.csv",
+    "reflecting_boundary" : false
+    
+}
