@@ -1,31 +1,68 @@
 #include "Configuration.h"
+#include <utility>
+
+namespace {
+    std::string resolveConfigKey(const json& i_data, const std::string& i_key) {
+        if (i_data.contains(i_key)) return i_key;
+
+        const std::vector<std::pair<std::string, std::string>> l_aliases = {
+            {"solver", "numerical_solver"},
+            {"setup", "scenario"},
+            {"wavepropagation", "wave_model"},
+            {"dimension_x", "domain_size_x"},
+            {"dimension_y", "domain_size_y"},
+            {"nx", "cells_x"},
+            {"ny", "cells_y"},
+            {"domain_start_x", "origin_x"},
+            {"domain_start_y", "origin_y"},
+            {"endtime", "simulation_end_time"},
+            {"writer", "output_format"},
+            {"bathfile", "bathymetry_file"},
+            {"disfile", "displacement_file"},
+            {"outputfilename", "output_name"},
+            {"reflecting_boundary", "reflective_boundary"},
+            {"hu", "initial_momentum_x"},
+            {"hv", "initial_momentum_y"},
+            {"hl", "left_height"},
+            {"hr", "right_height"},
+            {"location", "dam_location"}
+        };
+
+        for (const auto& l_alias : l_aliases) {
+            if (i_key == l_alias.first && i_data.contains(l_alias.second)) return l_alias.second;
+            if (i_key == l_alias.second && i_data.contains(l_alias.first)) return l_alias.first;
+        }
+
+        return i_key;
+    }
+}
 
 std::string tsunami_lab::io::Configuration::readFromConfigString(std::string i_configVariable){
     
     std::ifstream f("configs/config.json");
     json data = json::parse(f); 
-    return data[i_configVariable];
+    return data[resolveConfigKey(data, i_configVariable)];
 }
 
 tsunami_lab::t_real tsunami_lab::io::Configuration::readFromConfigReal(std::string i_configVariable){
     
     std::ifstream f("configs/config.json");
     json data = json::parse(f); 
-    return data[i_configVariable];
+    return data[resolveConfigKey(data, i_configVariable)];
 }
 
 tsunami_lab::t_idx tsunami_lab::io::Configuration::readFromConfigIndex(std::string i_configVariable){
     
     std::ifstream f("configs/config.json");
     json data = json::parse(f); 
-    return data[i_configVariable];
+    return data[resolveConfigKey(data, i_configVariable)];
 }
 
 bool tsunami_lab::io::Configuration::readFromConfigBoolean(std::string  i_configVariable){
     try {
         std::ifstream f("configs/config.json");
         json data = json::parse(f); 
-        return data[i_configVariable];
+        return data[resolveConfigKey(data, i_configVariable)];
     } catch (const std::exception& e) {
         std::cerr << "Exception caught: " << e.what() << '\n';
         return false;
@@ -55,7 +92,7 @@ std::vector<std::string> tsunami_lab::io::Configuration::checkMissingKeys(std::v
 
     // Check for missing keys
     for (const auto& key : i_keys) {
-        if (!jsonData.contains(key)) {
+        if (!jsonData.contains(resolveConfigKey(jsonData, key))) {
             missingKeys.push_back(key);
         }
     }

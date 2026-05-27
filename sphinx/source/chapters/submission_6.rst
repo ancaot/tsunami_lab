@@ -20,26 +20,26 @@ Werte sind:
 .. code-block:: json
 
     {
-      "solver": "fwave",
-      "setup": "tsunamievent2d",
-      "wavepropagation": "2d",
-      "dimension_x": 2700000,
-      "dimension_y": 1500000,
-      "nx": 2700,
-      "ny": 1500,
-      "domain_start_x": -200000,
-      "domain_start_y": -750000,
-      "endtime": 36000,
-      "writer": "csv",
-      "outputfilename": "tohoku_soma_1km_open_boundary.csv",
-      "reflecting_boundary": false
+      "numerical_solver": "fwave",
+      "scenario": "tsunamievent2d",
+      "wave_model": "2d",
+      "domain_size_x": 2700000,
+      "domain_size_y": 1500000,
+      "cells_x": 2700,
+      "cells_y": 1500,
+      "origin_x": -200000,
+      "origin_y": -750000,
+      "simulation_end_time": 36000,
+      "output_format": "csv",
+      "output_name": "tohoku_soma_1km_open_boundary.csv",
+      "reflective_boundary": false
     }
 
 Damit ergibt sich eine Zellweite von
 
 ``dx = 2700000 m / 2700 = 1000 m``.
 
-Die Randbedingung ist ``reflecting_boundary = false``. Damit werden offene
+Die Randbedingung ist ``reflective_boundary = false``. Damit werden offene
 Raender bzw. Outflow-Bedingungen genutzt, was fuer diese Aufgabe sinnvoll ist:
 die Welle soll die Computational Domain verlassen koennen und nicht kuenstlich
 zurueck reflektiert werden.

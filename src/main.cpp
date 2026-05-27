@@ -14,11 +14,15 @@
 #include "io/Stations/Station.h"
 #include "io/JsReader/Configuration.h"
 #include <filesystem>
+#include <algorithm>
+#include <cctype>
 #include <cstdlib>
 #include <iostream>
 #include <cmath>
 #include <fstream>
+#include <sstream>
 #include <limits>
+#include <stdexcept>
 #include <string>
 #include <vector>
 #include <thread>
@@ -63,56 +67,232 @@ std::string generateNewName( std::string name,  std::string filePath) {
     return newName;
 }
 
+namespace cli {
+  const char* const reset = "\033[0m";
+  const char* const soft = "\033[38;5;245m";
+  const char* const pink = "\033[38;5;213m";
+  const char* const cyan = "\033[38;5;45m";
+  const char* const violet = "\033[38;5;141m";
+  const char* const red = "\033[38;5;203m";
+  const char* const green = "\033[38;5;120m";
+
+  std::string trim(std::string i_text) {
+    const auto l_begin = i_text.find_first_not_of(" \t\r\n");
+    if (l_begin == std::string::npos) return "";
+    const auto l_end = i_text.find_last_not_of(" \t\r\n");
+    return i_text.substr(l_begin, l_end - l_begin + 1);
+  }
+
+  std::string lower(std::string i_text) {
+    std::transform(i_text.begin(), i_text.end(), i_text.begin(), [](unsigned char c) {
+      return static_cast<char>(std::tolower(c));
+    });
+    return i_text;
+  }
+
+  void printLogo() {
+    std::cout << pink
+              << "  _______ _____ _    _ _   _          __  __ _____ \n"
+              << " |__   __/ ____| |  | | \\ | |   /\\   |  \\/  |_   _|\n"
+              << "    | | | (___ | |  | |  \\| |  /  \\  | \\  / | | |  \n"
+              << "    | |  \\___ \\| |  | | . ` | / /\\ \\ | |\\/| | | |  \n"
+              << "    | |  ____) | |__| | |\\  |/ ____ \\| |  | |_| |_ \n"
+              << "    |_| |_____/ \\____/|_| \\_/_/    \\_\\_|  |_|_____|\n"
+              << reset;
+    std::cout << cyan << "        wave simulation console" << soft
+              << "  |  config-aware interactive launch\n\n" << reset;
+  }
+
+  void section(const std::string& i_title) {
+    std::cout << "\n" << violet << "== " << i_title << " ==" << reset << std::endl;
+  }
+
+  json loadConfig(const std::string& i_path) {
+    std::ifstream l_file(i_path);
+    if (!l_file.is_open()) {
+      throw std::runtime_error("Unable to open " + i_path);
+    }
+    json l_data;
+    l_file >> l_data;
+    return l_data;
+  }
+
+  bool hasAny(const json& i_data, const std::vector<std::string>& i_names) {
+    for (const std::string& l_name : i_names) {
+      if (i_data.contains(l_name)) return true;
+    }
+    return false;
+  }
+
+  template< typename T >
+  T getOr(const json& i_data, const std::vector<std::string>& i_names, T i_default) {
+    for (const std::string& l_name : i_names) {
+      if (i_data.contains(l_name)) {
+        return i_data.at(l_name).get<T>();
+      }
+    }
+    return i_default;
+  }
+
+  std::string promptString(const std::string& i_label, const std::string& i_default) {
+    std::cout << cyan << "? " << reset << i_label << " "
+              << soft << "[" << i_default << "]" << reset << ": ";
+    std::string l_input;
+    std::getline(std::cin, l_input);
+    l_input = trim(l_input);
+    return l_input.empty() ? i_default : l_input;
+  }
+
+  tsunami_lab::t_real promptReal(const std::string& i_label, tsunami_lab::t_real i_default) {
+    while (true) {
+      const std::string l_answer = promptString(i_label, std::to_string(i_default));
+      std::istringstream l_stream(l_answer);
+      tsunami_lab::t_real l_value = 0;
+      if (l_stream >> l_value) return l_value;
+      std::cout << red << "  Please enter a number." << reset << std::endl;
+    }
+  }
+
+  tsunami_lab::t_idx promptIndex(const std::string& i_label, tsunami_lab::t_idx i_default) {
+    while (true) {
+      const std::string l_answer = promptString(i_label, std::to_string(i_default));
+      std::istringstream l_stream(l_answer);
+      tsunami_lab::t_idx l_value = 0;
+      if (l_stream >> l_value && l_value > 0) return l_value;
+      std::cout << red << "  Please enter a positive integer." << reset << std::endl;
+    }
+  }
+
+  bool promptBool(const std::string& i_label, bool i_default) {
+    const std::string l_default = i_default ? "yes" : "no";
+    while (true) {
+      std::string l_answer = lower(promptString(i_label + " (yes/no)", l_default));
+      if (l_answer == "yes" || l_answer == "y" || l_answer == "true" || l_answer == "1") return true;
+      if (l_answer == "no" || l_answer == "n" || l_answer == "false" || l_answer == "0") return false;
+      std::cout << red << "  Please answer yes or no." << reset << std::endl;
+    }
+  }
+
+  std::string promptChoice(const std::string& i_label,
+                           const std::vector<std::string>& i_options,
+                           const std::string& i_default) {
+    std::cout << cyan << "? " << reset << i_label << " "
+              << soft << "[" << i_default << "]" << reset << std::endl;
+    for (std::size_t l_i = 0; l_i < i_options.size(); ++l_i) {
+      std::cout << soft << "  " << (l_i + 1) << ") " << reset << i_options[l_i] << std::endl;
+    }
+    while (true) {
+      std::cout << cyan << "> " << reset;
+      std::string l_input;
+      std::getline(std::cin, l_input);
+      l_input = trim(l_input);
+      if (l_input.empty()) return i_default;
+      std::istringstream l_stream(l_input);
+      std::size_t l_choice = 0;
+      if (l_stream >> l_choice && l_stream.eof() && l_choice >= 1 && l_choice <= i_options.size()) {
+        return i_options[l_choice - 1];
+      }
+      l_input = lower(l_input);
+      for (const std::string& l_option : i_options) {
+        if (lower(l_option) == l_input) return l_option;
+      }
+      std::cout << red << "  Choose a number from the list or type the value." << reset << std::endl;
+    }
+  }
+
+  std::vector<std::string> findNetCdfFiles(const std::string& i_root) {
+    std::vector<std::string> l_files;
+    if (!std::filesystem::exists(i_root)) return l_files;
+    for (const auto& l_entry : std::filesystem::recursive_directory_iterator(i_root)) {
+      if (!l_entry.is_regular_file()) continue;
+      if (lower(l_entry.path().extension().string()) == ".nc") {
+        l_files.push_back(l_entry.path().generic_string());
+      }
+    }
+    std::sort(l_files.begin(), l_files.end());
+    return l_files;
+  }
+
+  std::string promptNetCdfFile(const std::string& i_label,
+                               const std::string& i_default,
+                               const std::vector<std::string>& i_files) {
+    if (i_files.empty()) {
+      std::cout << soft << "No NetCDF files found. Keeping configured path." << reset << std::endl;
+      return i_default;
+    }
+    std::cout << cyan << "? " << reset << i_label << " "
+              << soft << "[" << i_default << "]" << reset << std::endl;
+    for (std::size_t l_i = 0; l_i < i_files.size(); ++l_i) {
+      std::cout << soft << "  " << (l_i + 1) << ") " << reset << i_files[l_i] << std::endl;
+    }
+    while (true) {
+      std::cout << cyan << "> " << reset;
+      std::string l_input;
+      std::getline(std::cin, l_input);
+      l_input = trim(l_input);
+      if (l_input.empty()) return i_default;
+      std::istringstream l_stream(l_input);
+      std::size_t l_choice = 0;
+      if (l_stream >> l_choice && l_choice >= 1 && l_choice <= i_files.size()) {
+        return i_files[l_choice - 1];
+      }
+      std::cout << red << "  Choose one of the listed file numbers." << reset << std::endl;
+    }
+  }
+}
+
 
 int main() {
   tsunami_lab::t_idx l_nx = 1;
   tsunami_lab::t_idx l_ny = 1;
   tsunami_lab::t_real l_dxy = 0;
-  //data_end = 440500.0
 
-  
-  std::cout << "\033[1;95m"<< "####################################" << std::endl;
-  std::cout << "### Tsunami Lab                  ###" << std::endl;
-  std::cout << "###                              ###" << std::endl;
-  std::cout << "### https://scalable.uni-jena.de ###" << std::endl;
-  std::cout << "####################################" << "\033[0m" << std::endl;
-  
-  //NEW::
-  //Errors checking-----------------------------------------------------------------------START
-  //1. Does the Json File exists???
+  cli::printLogo();
+
   const std::string filename = "configs/config.json";
-  std::ifstream fileStream(filename.c_str());
-  if (fileStream.good()) {
-    std::cout << "\n\033[1;95m\u2713 The file 'config.json' does indeed exist."  << std::endl;
-  } else {
-    std::cout << "\n\033[1;91m\u2717 The File 'config.json' does not exist under 'configs/config.json'  "<< std::endl;
+  json l_config;
+  try {
+    l_config = cli::loadConfig(filename);
+  } catch (const std::exception& l_error) {
+    std::cout << cli::red << "Cannot start: " << l_error.what() << cli::reset << std::endl;
     return EXIT_FAILURE;
   }
-  //2. Are all the needed Keys there??
-  std::vector<std::string> keysToCheck = {"reflecting_boundary","solver","dimension_x","dimension_y", "setup",
-                                          "nx","hu","location","hl","ny","domain_start_x",
-                                          "domain_start_y","wavepropagation","endtime","writer","bathfile","disfile","outputfilename"};
-  std::vector<std::string> missingKeys = tsunami_lab::io::Configuration::checkMissingKeys(keysToCheck);
-  if(missingKeys.size() > 0){
-    std::cout << "\033[1;91m\u2717 Some Keys are missing. "  << std::endl;
-    for (const auto& key : missingKeys) {
-      std::cout << "-> "<< key << std::endl;
+
+  std::vector<std::pair<std::string, std::vector<std::string>>> l_requiredKeys = {
+    {"numerical solver", {"numerical_solver", "solver"}},
+    {"scenario", {"scenario", "setup"}},
+    {"wave model", {"wave_model", "wavepropagation"}},
+    {"domain size x", {"domain_size_x", "dimension_x"}},
+    {"domain size y", {"domain_size_y", "dimension_y"}},
+    {"cells x", {"cells_x", "nx"}},
+    {"cells y", {"cells_y", "ny"}},
+    {"origin x", {"origin_x", "domain_start_x"}},
+    {"origin y", {"origin_y", "domain_start_y"}},
+    {"end time", {"simulation_end_time", "endtime"}},
+    {"output format", {"output_format", "writer"}},
+    {"bathymetry file", {"bathymetry_file", "bathfile"}},
+    {"displacement file", {"displacement_file", "disfile"}},
+    {"output name", {"output_name", "outputfilename"}},
+    {"boundary mode", {"reflective_boundary", "reflecting_boundary"}}
+  };
+
+  std::vector<std::string> l_missingKeys;
+  for (const auto& l_group : l_requiredKeys) {
+    if (!cli::hasAny(l_config, l_group.second)) {
+      l_missingKeys.push_back(l_group.first);
     }
+  }
+  if (!l_missingKeys.empty()) {
+    std::cout << cli::red << "Config is missing these values:" << cli::reset << std::endl;
+    for (const auto& l_key : l_missingKeys) std::cout << "  - " << l_key << std::endl;
     return EXIT_FAILURE;
   }
-  std::cout << "\033[0m"; 
+
   ensureOutputDirectories();
 
-
-  //if (std::filesystem::exists("stations")) std::filesystem::remove_all("stations");
-  //std::filesystem::create_directory("stations");
-  //Errors checking-----------------------------------------------------------------------END
   //Declaration---------------------------------------------------------------------------START
 
 
-  std::string l_temp_outputfilename = tsunami_lab::io::Configuration::readFromConfigString("outputfilename");
-  l_temp_outputfilename = generateNewName(l_temp_outputfilename,"outputs/");
-  std::string l_temp_outputfile =  "outputs/" + l_temp_outputfilename;
   tsunami_lab::setups::Setup *l_setup = nullptr;
   std::string l_temp_setup,l_temp_solver,l_temp_waveprop,l_temp_bathFile,l_temp_disFile,l_temp_writer;
   tsunami_lab::t_real l_domain_start_x = -1,l_domain_start_y = -1,l_temp_dimension_x = -1,l_temp_dimension_y = -1,l_frequency = -1,l_temp_endtime = -1;
@@ -123,29 +303,66 @@ int main() {
   
   std::vector<tsunami_lab::Station> l_stations;
 
-  {
-    //Reading Data from the Json File
-    l_nx =  tsunami_lab::io::Configuration::readFromConfigIndex("nx");
-    l_ny =  tsunami_lab::io::Configuration::readFromConfigIndex("ny");
-    l_temp_setup = tsunami_lab::io::Configuration::readFromConfigString("setup");
-    l_temp_solver = tsunami_lab::io::Configuration::readFromConfigString("solver");
-    l_temp_waveprop = tsunami_lab::io::Configuration::readFromConfigString("wavepropagation");
-    l_domain_start_x = tsunami_lab::io::Configuration::readFromConfigReal("domain_start_x");
-    l_domain_start_y = tsunami_lab::io::Configuration::readFromConfigReal("domain_start_y");
-    l_temp_dimension_x =  tsunami_lab::io::Configuration::readFromConfigReal("dimension_x");
-    l_temp_dimension_y =  tsunami_lab::io::Configuration::readFromConfigReal("dimension_y");
-    l_frequency = tsunami_lab::io::Configuration::getFrequencyFromJson();
-    l_temp_endtime = tsunami_lab::io::Configuration::readFromConfigReal("endtime");
-    l_temp_writer = tsunami_lab::io::Configuration::readFromConfigString("writer");
-    l_temp_bathFile = tsunami_lab::io::Configuration::readFromConfigString("bathfile");
-    l_temp_disFile = tsunami_lab::io::Configuration::readFromConfigString("disfile");
-    reflecting_boundary = tsunami_lab::io::Configuration::readFromConfigBoolean("reflecting_boundary");
-  }
+  l_nx = cli::getOr<tsunami_lab::t_idx>(l_config, {"cells_x", "nx"}, 2700);
+  l_ny = cli::getOr<tsunami_lab::t_idx>(l_config, {"cells_y", "ny"}, 1500);
+  l_temp_setup = cli::getOr<std::string>(l_config, {"scenario", "setup"}, "tsunamievent2d");
+  l_temp_solver = cli::getOr<std::string>(l_config, {"numerical_solver", "solver"}, "fwave");
+  l_temp_waveprop = cli::getOr<std::string>(l_config, {"wave_model", "wavepropagation"}, "2d");
+  l_domain_start_x = cli::getOr<tsunami_lab::t_real>(l_config, {"origin_x", "domain_start_x"}, -200000);
+  l_domain_start_y = cli::getOr<tsunami_lab::t_real>(l_config, {"origin_y", "domain_start_y"}, -750000);
+  l_temp_dimension_x = cli::getOr<tsunami_lab::t_real>(l_config, {"domain_size_x", "dimension_x"}, 2700000);
+  l_temp_dimension_y = cli::getOr<tsunami_lab::t_real>(l_config, {"domain_size_y", "dimension_y"}, 1500000);
+  l_temp_endtime = cli::getOr<tsunami_lab::t_real>(l_config, {"simulation_end_time", "endtime"}, 36000);
+  l_temp_writer = cli::getOr<std::string>(l_config, {"output_format", "writer"}, "csv");
+  l_temp_bathFile = cli::getOr<std::string>(l_config, {"bathymetry_file", "bathfile"}, "");
+  l_temp_disFile = cli::getOr<std::string>(l_config, {"displacement_file", "disfile"}, "");
+  std::string l_temp_outputfilename = cli::getOr<std::string>(l_config, {"output_name", "outputfilename"}, "tsunami_output.csv");
+  reflecting_boundary = cli::getOr<bool>(l_config, {"reflective_boundary", "reflecting_boundary"}, false);
 
-  tsunami_lab::t_real l_temp_hr=  tsunami_lab::io::Configuration::readFromConfigReal("hr");
-  tsunami_lab::t_real l_temp_hl = tsunami_lab::io::Configuration::readFromConfigReal("hl");
-  tsunami_lab::t_real l_temp_hu = tsunami_lab::io::Configuration::readFromConfigReal("hu");
-  tsunami_lab::t_real l_temp_location = tsunami_lab::io::Configuration::readFromConfigReal("location");
+  tsunami_lab::t_real l_temp_hr = cli::getOr<tsunami_lab::t_real>(l_config, {"right_height", "hr"}, 55);
+  tsunami_lab::t_real l_temp_hl = cli::getOr<tsunami_lab::t_real>(l_config, {"left_height", "hl"}, 25);
+  tsunami_lab::t_real l_temp_hu = cli::getOr<tsunami_lab::t_real>(l_config, {"initial_momentum_x", "hu"}, 0);
+  tsunami_lab::t_real l_temp_location = cli::getOr<tsunami_lab::t_real>(l_config, {"dam_location", "location"}, 0);
+
+  l_frequency = tsunami_lab::io::Configuration::getFrequencyFromJson();
+
+  cli::section("Launch settings");
+  l_temp_solver = cli::promptChoice("Numerical solver", {"fwave", "roe"}, cli::lower(l_temp_solver));
+  l_temp_waveprop = cli::promptChoice("Wave model", {"2d", "1d"}, cli::lower(l_temp_waveprop));
+  if (l_temp_waveprop == "2d") {
+    const std::vector<std::string> l_2dSetups = {"tsunamievent2d", "dambreak2d", "artificialtsunami2D"};
+    if (std::find(l_2dSetups.begin(), l_2dSetups.end(), l_temp_setup) == l_2dSetups.end()) {
+      l_temp_setup = "tsunamievent2d";
+    }
+    l_temp_setup = cli::promptChoice("Scenario", {"tsunamievent2d", "dambreak2d", "artificialtsunami2D"}, l_temp_setup);
+  } else {
+    const std::vector<std::string> l_1dSetups = {"dambreak1d", "tsunamievent1d", "shockshock", "rarerare", "subcriticalflow", "supercriticalflow"};
+    if (std::find(l_1dSetups.begin(), l_1dSetups.end(), l_temp_setup) == l_1dSetups.end()) {
+      l_temp_setup = "dambreak1d";
+    }
+    l_temp_setup = cli::promptChoice("Scenario", l_1dSetups, l_temp_setup);
+  }
+  l_temp_writer = cli::promptChoice("Output format", {"csv", "netcdf"}, cli::lower(l_temp_writer));
+
+  cli::section("Domain");
+  l_temp_dimension_x = cli::promptReal("Domain size x [m]", l_temp_dimension_x);
+  l_temp_dimension_y = cli::promptReal("Domain size y [m]", l_temp_dimension_y);
+  l_nx = cli::promptIndex("Cells x", l_nx);
+  l_ny = cli::promptIndex("Cells y", l_ny);
+  l_domain_start_x = cli::promptReal("Origin x [m]", l_domain_start_x);
+  l_domain_start_y = cli::promptReal("Origin y [m]", l_domain_start_y);
+  l_temp_endtime = cli::promptReal("Simulation end time [s]", l_temp_endtime);
+  reflecting_boundary = cli::promptBool("Reflective boundary", reflecting_boundary);
+
+  cli::section("Input data");
+  const std::vector<std::string> l_ncFiles = cli::findNetCdfFiles("data/nc/data_in");
+  if (l_temp_setup == "tsunamievent2d") {
+    l_temp_bathFile = cli::promptNetCdfFile("Bathymetry NetCDF", l_temp_bathFile, l_ncFiles);
+    l_temp_disFile = cli::promptNetCdfFile("Displacement NetCDF", l_temp_disFile, l_ncFiles);
+  }
+  l_temp_outputfilename = cli::promptString("Output base name", l_temp_outputfilename);
+  l_temp_outputfilename = generateNewName(l_temp_outputfilename,"outputs/");
+  std::string l_temp_outputfile =  "outputs/" + l_temp_outputfilename;
 
   const char * l_bathFile = l_temp_bathFile.c_str();
   const char * l_disFile = l_temp_disFile.c_str();
@@ -161,10 +378,8 @@ int main() {
    
   bool l_solver;
   if(l_temp_solver == "roe") {
-    std::cout << "\033[1;95m\u2713 Solver :  Roe\033[0m" << std::endl;
     l_solver = true;
   }else{
-    std::cout << "\033[1;95m\u2713 Solver : Fwave\033[0m" << std::endl;
     l_solver = false;
   }
   //Reading the Solver from the Json file-------------------------------------------------END
@@ -172,66 +387,56 @@ int main() {
   tsunami_lab::patches::WavePropagation *l_waveProp = nullptr;
   if(l_temp_waveprop == "2d"){
     l_waveProp = new tsunami_lab::patches::WavePropagation2d( l_nx, l_ny, l_solver, reflecting_boundary);
-    std::cout << "\033[1;95m\u2713 WavePropagation : 2d will be chosen \033[0m" << std::endl;
     if(l_temp_setup == "artificialtsunami2D")
     {
-      std::cout << "\033[1;95m\u2713 Setup : ArtificialTsunami2D \033[0m" << std::endl;
       l_setup = new tsunami_lab::setups::ArtificialTsunami2d();
     }
     else if(l_temp_setup == "tsunamievent2d")
     {
-      std::cout << "\033[1;95m\u2713 Setup : TsunamiEvent2d \033[0m" << std::endl;
       l_setup = new tsunami_lab::setups::TsunamiEvent2d(l_bathFile ,l_disFile);
     }
     else
     {
-      std::cout << "\033[1;95m\u2713 Setup : dambreak2d \033[0m" << std::endl;
       l_setup = new tsunami_lab::setups::DamBreak2d();
     }
    
   }else if(l_temp_waveprop == "1d")
   {
-      std::cout << "\033[1;95m\u2713 WavePropagation : 1d will be chosen \033[0m" << std::endl;
       l_waveProp = new tsunami_lab::patches::WavePropagation1d( l_nx , l_solver, reflecting_boundary);
       if(l_temp_setup == "tsunamievent1d"){
-        std::cout << "\033[1;95m\u2713 Setup : TsunamiEvent1d \033[0m" << std::endl;
         l_setup = new tsunami_lab::setups::TsunamiEvent1d();
       }else if(l_temp_setup == "dambreak1d"){
-        std::cout << "\033[1;95m\u2713 Setup : dambreak1d \033[0m" << std::endl;
         l_setup = new tsunami_lab::setups::DamBreak1d(l_temp_hl ,l_temp_hr,l_temp_location); 
       }else if(l_temp_setup == "supercriticalflow"){
-        std::cout << "\033[1;95m\u2713 Setup : SupercriticalFlow \033[0m" << std::endl;
         l_setup = new tsunami_lab::setups::SupercriticalFlow();
       }
       else if(l_temp_setup == "subcriticalflow"){
-        std::cout << "\033[1;95m\u2713 Setup : SubcriticalFlow \033[0m" << std::endl;
         l_setup = new tsunami_lab::setups::SubcriticalFlow();
       }
       else if(l_temp_setup == "shockshock" || l_temp_setup =="rarerare" ){
         if(l_temp_setup == "shockshock" ){
-          std::cout << "\033[1;95m\u2713 Setup : ShockShock \033[0m" << std::endl;
           l_setup = new tsunami_lab::setups::ShockShock(l_temp_hl ,l_temp_hu,l_temp_location);  
         }else{
-          std::cout << "\033[1;95m\u2713 Setup : RareRare \033[0m" << std::endl;
           l_setup = new tsunami_lab::setups::RareRare(l_temp_hl ,l_temp_hu,l_temp_location);  
         }
       }else if(l_temp_setup == "dambreak1d"){
         
-        std::cout << "\033[1;95m\u2713 Setup : dambreak1d \033[0m" << std::endl;
         l_setup = new tsunami_lab::setups::DamBreak1d(l_temp_hl ,l_temp_hr,l_temp_location); 
 
       }else if(l_temp_setup == "dambreak2d"){
 
-        std::cout << "\033[1;95m\u2713 Setup : dambreak2d \033[0m" << std::endl;
         l_setup = new tsunami_lab::setups::DamBreak2d();
       }
     l_ny = 1;
   }
     //Determine which setup and which wavepropagation to use--------------------------------END
-  std::cout << "\n\033[1;35m" << "runtime configuration" << std::endl;
-  std::cout << "  number of cells in x-direction: " << l_nx << std::endl;
-  std::cout << "  number of cells in y-direction: " << l_ny << std::endl;
-  std::cout << "  cell width:                     " << l_dxy << "\033[0m"<< std::endl;
+  cli::section("Runtime matrix");
+  std::cout << cli::soft << "  solver       " << cli::reset << l_temp_solver << std::endl;
+  std::cout << cli::soft << "  scenario     " << cli::reset << l_temp_setup << std::endl;
+  std::cout << cli::soft << "  model        " << cli::reset << l_temp_waveprop << std::endl;
+  std::cout << cli::soft << "  output       " << cli::reset << l_temp_outputfile << std::endl;
+  std::cout << cli::soft << "  cells        " << cli::reset << l_nx << " x " << l_ny << std::endl;
+  std::cout << cli::soft << "  cell width   " << cli::reset << l_dxy << " m" << std::endl;
 
   // maximum observed height in the setup
   tsunami_lab::t_real l_hMax = std::numeric_limits< tsunami_lab::t_real >::lowest();
@@ -277,13 +482,13 @@ int main() {
   // derive scaling for a time step
   tsunami_lab::t_real l_scaling = l_dt/l_dxy;
   
-  std::cout << "\033[1;35mTime step: " << l_dt << " seconds\033[0m" << std::endl;
+  std::cout << cli::soft << "  time step    " << cli::reset << l_dt << " seconds" << std::endl;
 
   tsunami_lab::t_real amount_time_steps = ceil(l_temp_endtime/l_dt);
-  std::cout << "\033[1;35mAmount of Time steps: " << amount_time_steps << "\033[0m" << std::endl;
+  std::cout << cli::soft << "  steps        " << cli::reset << amount_time_steps << std::endl;
 
   // set up time and print control
-  std::cout << "\033[1;35mGenerate time loop" << "\033[0m\n" << std::endl;
+  std::cout << "\n" << cli::green << "Starting simulation loop" << cli::reset << "\n" << std::endl;
   
 
   // Checking if the "y" of each Station is set 0, else delete it from the vector.
@@ -291,7 +496,7 @@ int main() {
     l_stations.erase(
     std::remove_if(l_stations.begin(), l_stations.end(), [&](const auto& station) {
         if (station.i_y != 0) {
-            std::cout << "\033[1;91m\u2717 " << station.i_name << " has to have the Y set to 0 \033[0m " << std::endl;
+            std::cout << cli::red << "[skip] " << station.i_name << " needs y = 0 for 1d." << cli::reset << std::endl;
             return true;
         }
         return false; 
@@ -306,12 +511,12 @@ int main() {
     std::remove_if(l_stations.begin(), l_stations.end(), [&](const auto& station) {
     if (station.i_x < l_domain_start_x || station.i_x >= l_temp_dimension_x + l_domain_start_x ||
         station.i_y < l_domain_start_y || station.i_y >= l_temp_dimension_y + l_domain_start_y) {
-        std::cout << "\033[1;91m\u2717 " << station.i_name << " is out of boundary \033[0m " << std::endl;
+        std::cout << cli::red << "[skip] " << station.i_name << " is out of boundary." << cli::reset << std::endl;
         std::string l_foldername = "stations/"+station.i_name;
         l_stations_string= l_stations_string + l_foldername +"/"+ station.i_name+".csv"+"$$"; 
         return true; // Remove the station
     }
-    std::cout << "\033[1;95m\u2713 " << station.i_name << " is in boundary \033[0m " << std::endl;
+    std::cout << cli::green << "[ok] " << station.i_name << " is in boundary." << cli::reset << std::endl;
     return false; // Keep the station
     }),
     l_stations.end());
@@ -320,10 +525,10 @@ int main() {
     l_stations.erase(
     std::remove_if(l_stations.begin(), l_stations.end(), [&](const auto& station) {
     if (station.i_x < l_domain_start_x || station.i_x >= l_temp_dimension_x + l_domain_start_x) {
-        std::cout << "\033[1;91m\u2717 " << station.i_name << " is out of boundary \033[0m " << std::endl;
+        std::cout << cli::red << "[skip] " << station.i_name << " is out of boundary." << cli::reset << std::endl;
         return true; // Remove the station
     }
-    std::cout << "\033[1;95m\u2713 " << station.i_name << " is in boundary \033[0m " << std::endl;
+    std::cout << cli::green << "[ok] " << station.i_name << " is in boundary." << cli::reset << std::endl;
     return false; // Keep the station
     }),
     l_stations.end());
@@ -431,12 +636,12 @@ int main() {
     updateProgressBar(l_simTime, l_temp_endtime,50);
   }
 
-  std::cout << "\n\n\033[1;95m\u2713 All solutions have been written to the Folder : 'outputs' " << std::endl;
+  std::cout << "\n\n" << cli::green << "Simulation complete. Outputs are in 'outputs'." << cli::reset << std::endl;
   // free memory
-  std::cout << "\033[1;95m\u2713 freeing memory" << std::endl;
+  std::cout << cli::soft << "Releasing memory..." << cli::reset << std::endl;
   delete l_setup;
   delete l_waveProp;
   delete l_netCdf;
-  std::cout << "\033[1;95m\u2713 finished, exiting \033[0m" << std::endl;
+  std::cout << cli::pink << "Goodbye from TSUNAMI." << cli::reset << std::endl;
   return EXIT_SUCCESS;
 }
