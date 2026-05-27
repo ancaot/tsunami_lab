@@ -329,7 +329,7 @@ abgeschätzt werden:
 ``lambda = sqrt(g * h)``.
 
 Dafür verwenden wir den Bathymetrie-Schnitt zwischen Soma und dem Epizentrum.
-Die Datei enthaelt ``Points:0`` und ``Points:1`` als projizierte Koordinaten
+Die Datei enthält ``Points:0`` und ``Points:1`` als projizierte Koordinaten
 und ``z`` als Bathymetriewert. Wir haben die Daten auf den Wasserbereich
 zwischen Soma und dem Epizentrum zugeschnitten. Der erste verwendete Punkt ist
 
@@ -385,15 +385,17 @@ Er liegt also nicht auf Land und kann für die Messung von ``h``, ``hu`` und
 .. code-block:: json
 
     {
-      "frequency": 20,
-      "stations": [
+    "frequency": 20,
+    "stations": 
+    [
         {
-          "i_name": "SomaNearshore",
-          "i_x": -123860,
-          "i_y": -53000
+            "i_name": "SomaStation",
+            "i_x": -12000,
+            "i_y": -50000
         }
-      ]
-    }
+    ]
+
+}
 
 Die Simulation wurde mit dem Tohoku-Setup und einer Zellweite von ``1000 m``
 durchgeführt. In der Stationsausgabe erreicht die erste klar erkennbare Welle

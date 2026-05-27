@@ -1,8 +1,12 @@
 {
     "frequency": 20,
-    "stations":
+    "stations": 
     [
-
+        {
+            "i_name": "SomaStation",
+            "i_x": -123860,
+            "i_y": -53000
+        }
     ]
 
 }
