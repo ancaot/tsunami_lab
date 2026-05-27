@@ -10,10 +10,14 @@ Dazu werden die vorgegebenen Daten eingelesen und für die Simulation verwendet.
 
 **Die Visualisierung der Input-Daten:**
 
-.. figure:: tsunami_lab/sphinx/source/_static/chile_250m_bathymetry.0000.png
+.. figure:: ../_static/chile_250m_bathymetry.0000.png
+    :width: 70%
+    :align: center
     :alt: Die Bathymetrie Daten vom Chile Event
 
-.. figure:: tsunami_lab/sphinx/source/_static/chile_250m_displacement.0000.png
+.. figure:: ../_static/chile_250m_displacement.0000.png
+    :width: 70%
+    :align: center
     :alt: Die Displacement Daten vom Chile Event
 
 Für unser Setup verwenden wir ``setups::tsunamievent2d`` und haben drei verschiedene Grid Resolutionen simuliert.
@@ -89,11 +93,14 @@ Zuerst zeigen wir die Simulation mit der Resolution von 1000m.
 Die zweite Simulation hat eine Resolution von 2500m.
 
 .. raw:: html
-  <video src="../_static/chile_2500.mp4" controls="True"></video>
+
+   <video src="../_static/chile_2500.mp4" controls style="width: 72%; max-width: 760px; display: block; margin: 1rem auto;"></video>
 
 Die dritte Simulation geht in 5000m Schritten voran.
 
-.. video:: ../_static/chile_5000.mp4
+.. raw:: html
+
+   <video src="../_static/chile_5000.mp4" controls style="width: 72%; max-width: 760px; display: block; margin: 1rem auto;"></video>
 
 
 Wann verlassen erste Wellen die Domain?
@@ -159,20 +166,35 @@ sich insbesondere:
 Fuer eine Animation werden die CSV-Dateien als zeitliche Serie geladen und mit
 einer Hoehen- oder Diverging-Color-Map visualisiert.
 
+**Tohoku Input-Daten**
+
+.. figure:: ../_static/tohoku_20_250m_bathymetry.0000.png
+    :width: 70%
+    :align: center
+    :alt: Die Bathymetrie Daten vom Tohoku Event
+
+.. figure:: ../_static/tohoku_20_250m_displacement.0000.png
+    :width: 70%
+    :align: center
+    :alt: Die Displacement Daten vom Tohoku Event
+
 **Tohoku: 1000m Resolution**
 
 .. raw:: html
-  <video src="../_static/tohoku_1000.mp4" controls="True"></video>
 
-**Tohoku: 2500m Resolution*+
+   <video src="../_static/tohoku_1000.mp4" controls style="width: 72%; max-width: 760px; display: block; margin: 1rem auto;"></video>
+
+**Tohoku: 2500m Resolution**
 
 .. raw:: html
-  <video src="../_static/tohoku_2500.mp4" controls="True"></video>
+
+   <video src="../_static/tohoku_2500.mp4" controls style="width: 72%; max-width: 760px; display: block; margin: 1rem auto;"></video>
 
 **Tohoku: 3500m Resolution**
 
 .. raw:: html
-  <video src="../_static/tohoku_3500.mp4" controls="True"></video>
+
+   <video src="../_static/tohoku_3500.mp4" controls style="width: 72%; max-width: 760px; display: block; margin: 1rem auto;"></video>
 
 
 
@@ -236,60 +258,98 @@ Die 1000-m-Variante ist deshalb fuer Tests und erste Visualisierungen deutlich
 praktischer. Die 250-m-Variante ist naeher an den Eingangsdaten, aber
 entsprechend teuer.
 
-Soma: gemessene Daten
-~~~~~~~~~~~~~~~~~~~~~
+6.2.2. Zeit zwischen Erdbebenbruch und Ankunft der ersten Tsunamiwellen in Soma
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Als reale Vergleichsdaten nutzen wir die publizierten Pegelwerte fuer Soma in
-Fukushima. In der Uebersicht zum Tohoku-Erdbeben wird fuer Soma eine maximale
-Tsunamihoehe von **9.3 m oder mehr** angegeben; der Pegel wurde um **15:51
-JST** gestoert bzw. unterbrochen. Das Erdbeben begann um etwa **14:46 JST**,
-damit liegt dieser schwere beobachtete Zeitpunkt etwa **65 Minuten** nach dem
-Bruch. Eine NOAA/NCEI-Zusammenfassung verweist ausserdem auf die global
-archivierten Tohoku-Daten und die Tsunami-Travel-Time-Karte fuer das Ereignis.
+Gemessene Daten fuer Soma
+^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Quellen:
+Fuer die gemessenen Daten von Soma waehrend des Tohoku-Tsunamis vom
+11. Maerz 2011 haben wir die Daten des National Centers for Environmental
+Information (NCEI) verwendet. Die relevanten Werte fuer Soma sind:
+
+.. list-table::
+   :header-rows: 1
+
+   * - Groesse
+     - Wert
+   * - Breitengrad
+     - ``37.83300``
+   * - Laengengrad
+     - ``140.96700``
+   * - Entfernung von der Quelle
+     - ``134 km``
+   * - Laufzeit
+     - ``9 min``
+   * - Maximale Wasserhoehe
+     - ``9.3 m``
+
+Quelle:
 
 * NOAA/NCEI: ``Great Tohoku, Japan Earthquake and Tsunami, 11 March 2011``
   https://www.ngdc.noaa.gov/hazard/11mar2011.html
-* ``Outline of the 2011 off the Pacific coast of Tohoku Earthquake (Mw 9.0)``,
-  Tabelle 2, Soma: ``9.3 m or more (disrupted)``, ``15:51``
-  https://earth-planets-space.springeropen.com/articles/10.5047/eps.2011.06.029/tables/2
 
-Daumenregel fuer die Laufzeit nach Soma
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Abschaetzung der Laufzeit nach Soma
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Soma liegt laut Aufgabenstellung etwa ``128 km`` westlich und ``55 km``
-suedlich des Epizentrums. Die direkte Distanz ist daher
+In der Aufgabe soll die Wellengeschwindigkeit mit folgender Naeherung
+abgeschaetzt werden:
 
-``sqrt(128^2 + 55^2) km = 139 km``.
+``lambda = sqrt(g * h)``.
 
-Die lokale Cut-Datei
-``data/csv/soma_epicenter_tohoku_2011_bathymetry.csv`` enthaelt den Schnitt
-zwischen Epizentrum und Soma. Die gesamte Wasserstrecke im Schnitt ist sehr
-tief; ueber alle negativen ``z``-Werte ergibt sich eine mittlere Tiefe von
-ungefaehr ``5185 m``. Das beschreibt aber vor allem den Tiefseeanteil. Fuer die
-Ankunft an der Kueste ist der flache Kuestenbereich entscheidend. Eine
-vorsichtige mittlere Effektivtiefe von ca. ``255.6 m`` ist deshalb fuer die
-Daumenregel plausibler.
+Dafuer verwenden wir den Bathymetrie-Schnitt zwischen Soma und dem Epizentrum.
+Die Datei enthaelt ``Points:0`` und ``Points:1`` als projizierte Koordinaten
+und ``z`` als Bathymetriewert. Wir haben die Daten auf den Wasserbereich
+zwischen Soma und dem Epizentrum zugeschnitten. Der erste verwendete Punkt ist
 
-Damit:
+``-3.9362, -1.2386e+05, -53000, 0``
 
-``lambda = sqrt(9.81 * 255.6) = 50.1 m/s``
+weil dies der erste Punkt nahe Soma mit negativer Bathymetrie ist. Damit liegt
+dieser Punkt im Wasser. Den vorherigen Punkt
 
-und
+``5.7205, -1.25e+05, -53487, 0``
 
-``t = 139316 m / 50.1 m/s = 2782 s = 46.4 min``.
+haben wir nicht verwendet, weil der positive Bathymetriewert auf Land
+hindeutet. Das Zuschneiden endet bei
 
-Die grobe theoretische Ankunftszeit liegt also bei etwa **46 Minuten**. Das ist
-in derselben Groessenordnung wie die beobachteten schweren Pegelwerte in Soma
-nach rund **65 Minuten**. Die Abweichung ist erwartbar, weil die Daumenregel
-keine echte 2D-Ausbreitung, keine variable Bathymetrie, keine Kuestengeometrie
-und keine Reibung beruecksichtigt.
+``-968.75, -1000, -427.9, 0``
+
+damit der folgende Punkt
+
+``-994.25, 1000, 427.9, 0``,
+
+nicht mehr eingeschlossen wird. Dieser liegt bereits hinter dem Epizentrum.
+Der Mittelwert der zugeschnittenen negativen Bathymetriewerte ergibt
+
+``h = 255.6141787 m``.
+
+Mit dieser effektiven Wassertiefe ergibt sich die Wellengeschwindigkeit zu
+
+``lambda = sqrt(9.81 * 255.6141787) = 50.08 m/s``.
+
+Soma liegt laut Aufgabenstellung etwa ``55 km`` suedlich und ``128 km``
+westlich des Epizentrums. Die direkte Distanz ist daher
+
+``distance = sqrt(55000^2 + 128000^2) = 139316 m``.
+
+Die abgeschaetzte Laufzeit betraegt damit
+
+``time = 139316 / 50.08 = 2782 s = 46.2 min``.
+
+Dies ist nur eine grobe Naeherung, weil die komplette Bathymetrie und die reale
+zweidimensionale Ausbreitung auf eine mittlere Wassertiefe reduziert werden.
 
 Station nahe Soma
-~~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^^
 
-Die Station ist in ``configs/stations.json`` gesetzt:
+Fuer die Stationsmessung speichern wir alle ``20 s`` einen Messwert. Wir haben
+den Punkt
+
+``P[-123860 / -53000]``
+
+ausgewaehlt, weil er der erste Punkt nahe Soma mit negativer Bathymetrie ist.
+Er liegt also nicht auf Land und kann fuer die Messung von ``h``, ``hu`` und
+``hv`` verwendet werden. Die Stationskonfiguration lautet:
 
 .. code-block:: json
 
@@ -304,15 +364,44 @@ Die Station ist in ``configs/stations.json`` gesetzt:
       ]
     }
 
-Die Koordinate liegt nahe Soma, aber noch im Wasserbereich, damit ``h``,
-``hu`` und ``hv`` sinnvoll gemessen werden koennen. Die Messwerte werden nach
-``stations/SomaNearshore/SomaNearshore.csv`` geschrieben.
+Die Simulation wurde mit dem Tohoku-Setup und einer Zellweite von ``1000 m``
+durchgefuehrt. In der Stationsausgabe erreicht die erste klar erkennbare Welle
+die Station nach ungefaehr
 
-Fuer den Vergleich wird der erste deutliche Ausschlag in ``h`` gegenueber dem
-Anfangswert gesucht. In einem frueheren Testlauf lag dieser erste starke
-Ausschlag bei etwa ``2540 s`` bzw. **42.3 Minuten**. Das passt gut zur
-Daumenregel von **46.4 Minuten**. Gegenueber dem beobachteten schweren
-Pegelereignis in Soma um **15:51 JST** ist die Simulation frueher; das ist
-plausibel, da die Simulation den ersten messbaren Wellenkontakt an einer
-kuestennahen Wasserzelle erkennt, waehrend der reale Pegelwert den spaeteren,
-sehr hohen bzw. gestoerten Kuestenpegel beschreibt.
+``2540 s = 42.33 min``.
+
+Verglichen mit der Abschaetzung ergibt sich
+
+``46.2 min - 42.33 min = 3.87 min``.
+
+Die simulierte erste Ankunft liegt also etwa **3.87 Minuten frueher** als die
+einfache bathymetriebasierte Abschaetzung. Diese Abweichung ist plausibel, da
+die Rechnung mehrere Vereinfachungen verwendet: gemittelte Bathymetrie,
+vereinfachte Distanz, grobe Gitterposition und eine eindimensionale
+Wellengeschwindigkeit.
+
+Vergleich der maximalen Wellenhoehe
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Um die simulierten Stationsdaten mit dem gemessenen NCEI-Wert zu vergleichen,
+vergleichen wir den maximalen ankommenden Wasserstand mit dem Anfangswasserstand
+an der Station. In der Stationsausgabe betraegt die Anfangshoehe
+
+``21.6348 m``,
+
+und die hoechste gemessene Hoehe in der Simulation ist
+
+``29.4237 m``.
+
+Damit ergibt sich fuer die simulierte ankommende Wellenhoehe
+
+``29.4237 m - 21.6348 m = 7.7889 m``.
+
+Die gemessene maximale Wasserhoehe betraegt ``9.3 m``. Die Differenz ist daher
+
+``9.3 m - 7.7889 m = 1.5111 m``.
+
+Die simulierte maximale Wellenhoehe ist also etwa **1.51 m niedriger** als der
+gemessene NCEI-Wert. Mit Blick auf das grobe ``1000 m``-Gitter und die
+vereinfachte Stationsposition ist das fuer diese Simulation trotzdem ein
+plausibles Ergebnis.
