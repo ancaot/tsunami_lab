@@ -27,6 +27,10 @@
 #include <vector>
 #include <thread>
 
+#ifdef _WIN32
+#include <conio.h>
+#endif
+
 
 
 
@@ -107,6 +111,35 @@ namespace cli {
     std::cout << "\n" << violet << "== " << i_title << " ==" << reset << std::endl;
   }
 
+  enum class Key {
+    up,
+    down,
+    enter,
+    other
+  };
+
+  Key readKey() {
+#ifdef _WIN32
+    const int l_key = _getch();
+    if (l_key == 13) return Key::enter;
+    if (l_key == 224 || l_key == 0) {
+      const int l_arrow = _getch();
+      if (l_arrow == 72) return Key::up;
+      if (l_arrow == 80) return Key::down;
+    }
+    return Key::other;
+#else
+    const int l_key = std::cin.get();
+    if (l_key == '\n') return Key::enter;
+    if (l_key == 27 && std::cin.get() == '[') {
+      const int l_arrow = std::cin.get();
+      if (l_arrow == 'A') return Key::up;
+      if (l_arrow == 'B') return Key::down;
+    }
+    return Key::other;
+#endif
+  }
+
   json loadConfig(const std::string& i_path) {
     std::ifstream l_file(i_path);
     if (!l_file.is_open()) {
@@ -176,27 +209,55 @@ namespace cli {
   std::string promptChoice(const std::string& i_label,
                            const std::vector<std::string>& i_options,
                            const std::string& i_default) {
-    std::cout << cyan << "? " << reset << i_label << " "
-              << soft << "[" << i_default << "]" << reset << std::endl;
+    if (i_options.empty()) return i_default;
+
+    std::size_t l_selected = 0;
     for (std::size_t l_i = 0; l_i < i_options.size(); ++l_i) {
-      std::cout << soft << "  " << (l_i + 1) << ") " << reset << i_options[l_i] << std::endl;
+      if (lower(i_options[l_i]) == lower(i_default)) {
+        l_selected = l_i;
+        break;
+      }
     }
+
+    std::cout << cyan << "? " << reset << i_label << " "
+              << soft << "[" << i_default << "]" << reset
+              << soft << "  use up/down, enter to confirm" << reset << std::endl;
+
+    auto l_render = [&]() {
+      for (std::size_t l_i = 0; l_i < i_options.size(); ++l_i) {
+        std::cout << "\033[2K";
+        if (l_i == l_selected) {
+          std::cout << pink << "  > " << i_options[l_i] << reset << std::endl;
+        } else {
+          std::cout << soft << "    " << i_options[l_i] << reset << std::endl;
+        }
+      }
+    };
+
+    l_render();
     while (true) {
-      std::cout << cyan << "> " << reset;
-      std::string l_input;
-      std::getline(std::cin, l_input);
-      l_input = trim(l_input);
-      if (l_input.empty()) return i_default;
-      std::istringstream l_stream(l_input);
-      std::size_t l_choice = 0;
-      if (l_stream >> l_choice && l_stream.eof() && l_choice >= 1 && l_choice <= i_options.size()) {
-        return i_options[l_choice - 1];
+      const Key l_key = readKey();
+      if (l_key == Key::enter) {
+        std::cout << "\033[" << i_options.size() << "A";
+        for (std::size_t l_i = 0; l_i < i_options.size(); ++l_i) {
+          std::cout << "\033[2K";
+          if (l_i == l_selected) {
+            std::cout << green << "  > " << i_options[l_i] << reset << std::endl;
+          } else {
+            std::cout << soft << "    " << i_options[l_i] << reset << std::endl;
+          }
+        }
+        return i_options[l_selected];
       }
-      l_input = lower(l_input);
-      for (const std::string& l_option : i_options) {
-        if (lower(l_option) == l_input) return l_option;
+      if (l_key == Key::up) {
+        l_selected = (l_selected == 0) ? i_options.size() - 1 : l_selected - 1;
+      } else if (l_key == Key::down) {
+        l_selected = (l_selected + 1) % i_options.size();
+      } else {
+        continue;
       }
-      std::cout << red << "  Choose a number from the list or type the value." << reset << std::endl;
+      std::cout << "\033[" << i_options.size() << "A";
+      l_render();
     }
   }
 
@@ -220,23 +281,53 @@ namespace cli {
       std::cout << soft << "No NetCDF files found. Keeping configured path." << reset << std::endl;
       return i_default;
     }
-    std::cout << cyan << "? " << reset << i_label << " "
-              << soft << "[" << i_default << "]" << reset << std::endl;
+    std::size_t l_selected = 0;
     for (std::size_t l_i = 0; l_i < i_files.size(); ++l_i) {
-      std::cout << soft << "  " << (l_i + 1) << ") " << reset << i_files[l_i] << std::endl;
-    }
-    while (true) {
-      std::cout << cyan << "> " << reset;
-      std::string l_input;
-      std::getline(std::cin, l_input);
-      l_input = trim(l_input);
-      if (l_input.empty()) return i_default;
-      std::istringstream l_stream(l_input);
-      std::size_t l_choice = 0;
-      if (l_stream >> l_choice && l_choice >= 1 && l_choice <= i_files.size()) {
-        return i_files[l_choice - 1];
+      if (i_files[l_i] == i_default) {
+        l_selected = l_i;
+        break;
       }
-      std::cout << red << "  Choose one of the listed file numbers." << reset << std::endl;
+    }
+
+    std::cout << cyan << "? " << reset << i_label << " "
+              << soft << "[" << i_default << "]" << reset
+              << soft << "  use up/down, enter to confirm" << reset << std::endl;
+
+    auto l_render = [&]() {
+      for (std::size_t l_i = 0; l_i < i_files.size(); ++l_i) {
+        std::cout << "\033[2K";
+        if (l_i == l_selected) {
+          std::cout << pink << "  > " << i_files[l_i] << reset << std::endl;
+        } else {
+          std::cout << soft << "    " << i_files[l_i] << reset << std::endl;
+        }
+      }
+    };
+
+    l_render();
+    while (true) {
+      const Key l_key = readKey();
+      if (l_key == Key::enter) {
+        std::cout << "\033[" << i_files.size() << "A";
+        for (std::size_t l_i = 0; l_i < i_files.size(); ++l_i) {
+          std::cout << "\033[2K";
+          if (l_i == l_selected) {
+            std::cout << green << "  > " << i_files[l_i] << reset << std::endl;
+          } else {
+            std::cout << soft << "    " << i_files[l_i] << reset << std::endl;
+          }
+        }
+        return i_files[l_selected];
+      }
+      if (l_key == Key::up) {
+        l_selected = (l_selected == 0) ? i_files.size() - 1 : l_selected - 1;
+      } else if (l_key == Key::down) {
+        l_selected = (l_selected + 1) % i_files.size();
+      } else {
+        continue;
+      }
+      std::cout << "\033[" << i_files.size() << "A";
+      l_render();
     }
   }
 }
