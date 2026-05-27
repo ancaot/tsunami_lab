@@ -17,6 +17,7 @@ config.log
 *.nc
 !data/artificialtsunami_bathymetry_1000.nc
 !data/artificialtsunami_displ_1000.nc
+!testsFiles/*.nc
 # Ignore general solution CSVs unless they're in the data folder
 solution_*.csv
 symmetry_*.csv
