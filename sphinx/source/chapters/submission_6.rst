@@ -10,15 +10,18 @@ Dazu werden die vorgegebenen Daten eingelesen und für die Simulation verwendet.
 
 **Die Visualisierung der Input-Daten:**
 
-.. figure:: ../_static/chile_250m_bathymetry.0000.png
-    :width: 70%
-    :align: center
-    :alt: Die Bathymetrie Daten vom Chile Event
+.. figure:: ../_static/chile_250m_bathymetry.png
+  :width: 70%
+  :align: center
+  
+  Die Bathymetrie Daten vom Chile Event
 
-.. figure:: ../_static/chile_250m_displacement.0000.png
-    :width: 70%
-    :align: center
-    :alt: Die Displacement Daten vom Chile Event
+
+.. figure:: ../_static/chile_250m_displacement.png
+  :width: 70%
+  :align: center
+  
+  Die Displacement Daten vom Chile Event
 
 Für unser Setup verwenden wir ``setups::tsunamievent2d`` und haben drei verschiedene Grid Resolutionen simuliert.
 Alle drei verwenden eine ähnliche Simulationskonfiguration.
@@ -28,6 +31,7 @@ Simulationskonfiguration
 
 Die Simulation wird mithilfe von ``configs/config.json`` konfiguriert. 
 Wir untersuchen im Chile-Event die Resolutionen von 1000m, 2500m und 5000m. 
+Beim ausführen ist es wichtig die Input-Daten in ``data/nc/data_in/output`` gespeichert zu haben.
 
 .. code-block:: json
 
@@ -102,12 +106,27 @@ Die dritte Simulation geht in 5000m Schritten voran.
 
    <video src="../_static/chile_5000.mp4" controls style="width: 72%; max-width: 760px; display: block; margin: 1rem auto;"></video>
 
+Der Unterschied bei der Wellengeschwindigkeit kommt durch den Export der Animationen und unterschiedlichen Einstellungen diesbezüglich hervor. 
 
-Wann verlassen erste Wellen die Domain?
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Wann verlassen die ersten Wellen die Domain?
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Das Domain geht von ``-3000 km`` bis ``500 km`` in x-Richtung und von ``-1500km`` bis ``1500km`` in y-Richtung. 
-Das Epizentrum liegt bei 
+Das Epizentrum liegt in der Mitte unseres Domain, was bedeutet die Welle braucht etwa ``500 km`` bis zum ersten Domain-Rand. 
+Dieser Rand ist der ostliche Rand. Der westliche Rand ist hingegen ``3000 km`` vom Epizentrum entfernt. 
+Die Welle hat in Nord- und Südrichtung jeweils ``1500km`` bis zum Domain-Rand.
+
+Mithilfe der Flachwassser-Gleichungen berechnen wir eine Approximation wann die ersten Wellen die Domain-Ränder verlassen. 
+
+Dafür rechnen wir zu erst :math:`lambda = sqrt(g * h)` mit einer durchschnittlichen Tiefsee-Tiefe von :math:`h = 3500m`. 
+Damit ergibt sich :math:`lambda = sqrt(9.81 * 3500) = 185 m/s`.
+
+So können wir grob approximieren:
+
+* ostlicher Rand, ``500 km``: ca. :math:`500000 / 185 = 2703 s` = **45 Minuten**
+* westlicher Rand, ``3000 km``: ca. :math:`3000000 / 185 = 16216 s` = **4 Stunden 30 Minuten**
+* Nord- und Süd-Rand (jeweils gleich), ``1500 km``: ca. :math:`1500000 / 185 = 8108 s` = **2 Stunden 15 Minuten**
+
 
 
 6.2. 2011 M 9.1 Tohoku Event
@@ -165,8 +184,22 @@ sich insbesondere:
 * ``momentum_x`` und ``momentum_y`` für die Bewegungsrichtung,
 * ``bathymetry`` für das Meeresbodenprofil.
 
-Für eine Animation werden die CSV-Dateien als zeitliche Serie geladen und mit
-einer öhen- oder Diverging-Color-Map visualisiert.
+Fuer eine Animation werden die CSV-Dateien als zeitliche Serie geladen und mit
+einer Hoehen- oder Diverging-Color-Map visualisiert.
+
+**Tohoku Input-Daten**
+
+.. figure:: ../_static/tohoku_20_250m_bathymetry.0000.png
+    :width: 70%
+    :align: center
+    
+    Die Bathymetrie Daten vom Tohoku Event
+
+.. figure:: ../_static/tohoku_20_250m_displacement.0000.png
+    :width: 70%
+    :align: center
+    
+    Die Displacement Daten vom Tohoku Event
 
 **Tohoku: 1000m Resolution**
 
