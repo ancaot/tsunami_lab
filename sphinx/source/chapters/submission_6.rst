@@ -91,7 +91,10 @@ Visualisierung
 ~~~~~~~~~~~~~~
 
 Zuerst zeigen wir die Simulation mit der Resolution von 1000m.
-//simulation 1000-m-Variante
+
+.. raw:: html
+
+   <video src="../_static/chile_1000.mp4" controls style="width: 72%; max-width: 760px; display: block; margin: 1rem auto;"></video>
 
 
 Die zweite Simulation hat eine Resolution von 2500m.
@@ -205,11 +208,15 @@ einer Hoehen- oder Diverging-Color-Map visualisiert.
 
    <video src="../_static/tohoku_1000.mp4" controls style="width: 72%; max-width: 760px; display: block; margin: 1rem auto;"></video>
 
+Ungefähre Ausführungszeit (1000m): 6 Stunden 40 Minuten 
+
 **Tohoku: 2500m Resolution**
 
 .. raw:: html
 
    <video src="../_static/tohoku_2500.mp4" controls style="width: 72%; max-width: 760px; display: block; margin: 1rem auto;"></video>
+
+Ungefähre Ausführungszeit (2500m): 2 Stunden 40 Minuten
 
 **Tohoku: 3500m Resolution**
 
@@ -217,6 +224,7 @@ einer Hoehen- oder Diverging-Color-Map visualisiert.
 
    <video src="../_static/tohoku_3500.mp4" controls style="width: 72%; max-width: 760px; display: block; margin: 1rem auto;"></video>
 
+Ungefähre Ausführungszeit (3500m): 1 Stunde 55 Minuten
 
 
 Wann verlassen erste Wellen die Domain?
