@@ -1,8 +1,7 @@
 /**
- * @author Ward Tammaa 
  *
  * @section DESCRIPTION
-
+ * To simulate two dimensional tsunami events
  **/
 #ifndef TSUNAMI_LAB_SETUPS_TSUNAMIEVENT2D_H
 #define TSUNAMI_LAB_SETUPS_TSUNAMIEVENT2D_H

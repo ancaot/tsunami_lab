@@ -1,5 +1,4 @@
 /**
- * @author Mohamad Khaled Minawe
  *
  * @section DESCRIPTION
  * Tests the circular dam break setup.

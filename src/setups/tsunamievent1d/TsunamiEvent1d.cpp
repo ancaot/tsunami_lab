@@ -1,8 +1,6 @@
 /**
- * @author Ward Tammaa 
  *
  * @section DESCRIPTION
- * The Shock Shock problem.
  **/
 #include "TsunamiEvent1d.h"
 #include "../../io/Csv/Csv.h"

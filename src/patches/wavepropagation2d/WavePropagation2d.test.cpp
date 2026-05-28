@@ -1,7 +1,6 @@
 /**
- * @author Ward Tammaa, Mohamad khaled Minawe
  * @section DESCRIPTION
- * tow-dimensional wave propagation patch.
+ * two-dimensional wave propagation patch.
  **/
 #include <catch2/catch.hpp>
 #include "WavePropagation2d.h"

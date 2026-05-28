@@ -1,5 +1,4 @@
 /**
- * @author Ward Tammaa
  *
  * @section DESCRIPTION
  * test unit for the SupercriticalFlow.

@@ -1,5 +1,4 @@
 /**
- * @author Ward Tammaa 
  *
  * @section DESCRIPTION
  * Tests SubcriticalFlow.

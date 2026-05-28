@@ -1,5 +1,4 @@
 /**
- * @author Danie Schicer, Ward Tammaa, Mohamad khaled Minawe
  * @section DESCRIPTION
  * Two-dimensional wave propagation patch.
  **/

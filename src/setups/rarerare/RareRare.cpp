@@ -1,6 +1,4 @@
 /**
- * @author Ward Tammaa 
- *
  * @section DESCRIPTION
  * The Rare Rare problem.
  **/
