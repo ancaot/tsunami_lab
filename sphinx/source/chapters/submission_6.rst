@@ -90,24 +90,29 @@ Demnach beobachten wir eher wann die erste Welle an den Grenzen reflektiert wird
 Visualisierung
 ~~~~~~~~~~~~~~
 
-Zuerst zeigen wir die Simulation mit der Resolution von 1000m.
+Zuerst zeigen wir die Simulation mit der Resolution von **1000m**.
 
 .. raw:: html
 
-   <video src="../_static/chile_1000.mp4" controls style="width: 72%; max-width: 760px; display: block; margin: 1rem auto;"></video>
+   <video src="../_static/chile_1000_3d.mp4" controls style="width: 72%; max-width: 760px; display: block; margin: 1rem auto;"></video>
 
+Ungefähre Ausführungszeit (1000m): 6 Stunden 40 Minuten 
 
-Die zweite Simulation hat eine Resolution von 2500m.
+Die zweite Simulation hat eine Resolution von **2500m**.
 
 .. raw:: html
 
    <video src="../_static/chile_2500.mp4" controls style="width: 72%; max-width: 760px; display: block; margin: 1rem auto;"></video>
 
-Die dritte Simulation geht in 5000m Schritten voran.
+Ungefähre Ausführungszeit (2500m): 2 Stunden 40 Minuten
+
+Die dritte Simulation geht in **5000m** Schritten voran.
 
 .. raw:: html
 
    <video src="../_static/chile_5000.mp4" controls style="width: 72%; max-width: 760px; display: block; margin: 1rem auto;"></video>
+
+Ungefähre Ausführungszeit (3500m): 1 Stunde 55 Minuten
 
 Der Unterschied bei der Wellengeschwindigkeit kommt durch den Export der Animationen und unterschiedlichen Einstellungen diesbezüglich hervor. 
 
@@ -202,13 +207,12 @@ einer Hoehen- oder Diverging-Color-Map visualisiert.
     
     Die Displacement Daten vom Tohoku Event
 
-**Tohoku: 1000m Resolution** Animation wird noch ergänzt (Paraview war abgestürtzt)
+**Tohoku: 1000m Resolution**
 
 .. raw:: html
 
    <video src="../_static/tohoku_1000.mp4" controls style="width: 72%; max-width: 760px; display: block; margin: 1rem auto;"></video>
 
-Ungefähre Ausführungszeit (1000m): 6 Stunden 40 Minuten 
 
 **Tohoku: 2500m Resolution**
 
@@ -216,7 +220,6 @@ Ungefähre Ausführungszeit (1000m): 6 Stunden 40 Minuten
 
    <video src="../_static/tohoku_2500.mp4" controls style="width: 72%; max-width: 760px; display: block; margin: 1rem auto;"></video>
 
-Ungefähre Ausführungszeit (2500m): 2 Stunden 40 Minuten
 
 **Tohoku: 3500m Resolution**
 
@@ -224,7 +227,6 @@ Ungefähre Ausführungszeit (2500m): 2 Stunden 40 Minuten
 
    <video src="../_static/tohoku_3500.mp4" controls style="width: 72%; max-width: 760px; display: block; margin: 1rem auto;"></video>
 
-Ungefähre Ausführungszeit (3500m): 1 Stunde 55 Minuten
 
 
 Wann verlassen erste Wellen die Domain?
