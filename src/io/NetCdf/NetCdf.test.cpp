@@ -184,3 +184,134 @@ TEST_CASE("Test the NetCdf-reader ", "[NetCdfreader]")
     delete[] l_data;
 }
 
+TEST_CASE("Test the NetCdf-checkpoint-writer", "[NetCdfCheckpoint]"){
+
+    tsunami_lab::t_real l_h[16] = {0, 0, 0, 0, 
+                                   0, 1, 2, 0, 
+                                   0, 6, 7, 0, 
+                                   0, 0, 0, 0, };
+
+    tsunami_lab::t_real l_hu[16] = {0, 0, 0, 0, 
+                                    0, 17, 18, 0, 
+                                    0, 22, 23, 0, 
+                                    0, 0, 0, 0, };
+
+    tsunami_lab::t_real l_hv[16] = {0, 0, 0, 0, 
+                                    0, 37, 38, 0, 
+                                    0, 42, 43, 0, 
+                                    0, 0, 0, 0, };
+
+    tsunami_lab::t_real l_b[16] = {0, 0, 0, 0, 
+                                   0, 57, 58, 0, 
+                                   0, 62, 63, 0, 
+                                   0, 0, 0, 0, };
+
+    tsunami_lab::t_real l_h_read_result[4] = {1, 2, 6, 7};
+    tsunami_lab::t_real l_hu_read_result[4] = {17, 18, 22, 23};
+    tsunami_lab::t_real l_hv_read_result[4] = {37, 38, 42, 43};
+    tsunami_lab::t_real l_b_read_result[4] = {57, 58, 62, 63};
+
+    tsunami_lab::io::NetCdf *l_netCdf = new tsunami_lab::io::NetCdf(2, 2, "testsFiles/testCheckPoint.nc");
+    REQUIRE(std::filesystem::exists("testsFiles/testCheckPoint.nc"));
+
+    std::string l_path = "outputs";
+    std::string l_cpPath = l_path + "/checkpoints";
+
+    if(!std::filesystem::exists(l_path)){
+        std::filesystem::create_directory(l_path);
+    }
+    if(!std::filesystem::exists(l_cpPath)){
+        std::filesystem::create_directory(l_cpPath);
+    }
+
+    l_netCdf->createCheckPoint("fwave", "tsunamievent2d", "2d", 50, 50, 2, 2, -25, -25, 360, 
+                                "csv", "bathfile.nc", "dispfile.nc", "output.csv", false, 60, 
+                                l_hu, l_hv, l_h,  0, l_b, 3, 250, "testCheckPoint.nc");
+    REQUIRE(std::filesystem::exists("outputs/checkpoints/testCheckPoint.nc"));
+
+
+    // reading file
+    std::string o_solver;
+    std::string o_scenario;
+    std::string o_waveModel;
+    tsunami_lab::t_real o_domainSizeX;
+    tsunami_lab::t_real o_domainSizeY;
+    tsunami_lab::t_idx o_nx;
+    tsunami_lab::t_idx o_ny;
+    tsunami_lab::t_real o_domainStartX;
+    tsunami_lab::t_real o_domainStartY;
+    tsunami_lab::t_real o_simEndTime;
+    std::string o_outputFormat;
+    std::string o_bathFile;
+    std::string o_dispFile;
+    std::string o_outputName;
+    bool o_reflectiveBoundary;
+    tsunami_lab::t_real o_simTimeLastCP;
+    tsunami_lab::t_real *l_hua;
+    tsunami_lab::t_real *l_hva;
+    tsunami_lab::t_real *l_ha;
+    tsunami_lab::t_real o_damLocation;
+    tsunami_lab::t_real *l_ba;
+
+    tsunami_lab::io::NetCdf::readCheckPoint("outputs/checkpoints/testCheckPoint.nc",
+                                            &o_solver,
+                                            &o_scenario,
+                                            &o_waveModel,
+                                            &o_domainSizeX,
+                                            &o_domainSizeY,
+                                            &o_nx,
+                                            &o_ny,
+                                            &o_domainStartX,
+                                            &o_domainStartY,
+                                            &o_simEndTime,
+                                            &o_outputFormat,
+                                            &o_bathFile,
+                                            &o_dispFile,
+                                            &o_outputName,
+                                            &o_reflectiveBoundary,
+                                            &o_simTimeLastCP,
+                                            &l_hua,
+                                            &l_hva,
+                                            &l_ha,
+                                            &o_damLocation,
+                                            &l_ba);
+
+    //checking
+    REQUIRE(o_solver == "fwave");
+    REQUIRE(o_scenario == "tsunamievent2d");
+    REQUIRE(o_waveModel == "2d");
+    REQUIRE(o_domainSizeX == 50);
+    REQUIRE(o_domainSizeY == 50);
+    REQUIRE(o_nx == 2);
+    REQUIRE(o_ny == 2);
+    REQUIRE(o_domainStartX == -25);
+    REQUIRE(o_domainStartY == -25);
+    REQUIRE(o_simEndTime == 360);
+
+    REQUIRE(o_outputFormat == "csv");
+    REQUIRE(o_bathFile ==  "bathfile.nc");
+    REQUIRE(o_dispFile ==  "dispfile.nc");
+    REQUIRE(o_outputName == "output.csv");
+    REQUIRE(o_reflectiveBoundary == false);
+    REQUIRE(o_simTimeLastCP == 60);
+
+    REQUIRE(o_damLocation == 0);
+
+    for (tsunami_lab::t_idx l_i = 0; l_i < 4; l_i++){
+        REQUIRE(l_hua[l_i] == l_hu_read_result[l_i]);
+        REQUIRE(l_hva[l_i] == l_hv_read_result[l_i]);
+        REQUIRE(l_ha[l_i] == l_h_read_result[l_i]);
+        REQUIRE(l_b[l_i] == l_b_read_result[l_i]);
+    }
+
+    delete[] l_hua;
+    delete[] l_hva;
+    delete[] l_ha;
+    delete[] l_ba;
+
+    std::string path = "outputs/checkpoints/testCheckPoint.nc";
+    remove(path.c_str());
+    path = "testFiles/testCheckPoint.nc";
+    remove(path.c_str());
+
+}
