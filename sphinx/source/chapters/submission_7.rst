@@ -4,11 +4,11 @@ Submission 7: Checkpointing and Coarse Output
 
 In dieser Woche wurden zwei Erweiterungen umgesetzt: Checkpointing für das
 Fortsetzen einer abgebrochenen Simulation und Coarse Output zur Reduktion der
-NetCDF-Ausgabegroesse.
+NetCDF-Ausgabegröße.
 
 Die offizielle Aufgabenstellung beschreibt, dass ein Checkpoint alle
 Informationen enthalten muss, die fuer einen Restart notwendig sind:
-Gittergroesse, Domain, Solver, Setup, Randbedingung, Bathymetrie, Wasserhoehe
+Gittergröße, Domain, Solver, Setup, Randbedingung, Bathymetrie, Wasserhöhe
 und Impulse. Fuer den Coarse Output sollen jeweils ``k x k`` benachbarte Zellen
 zu einer Ausgabezelle gemittelt werden.
 
@@ -78,7 +78,7 @@ Dadurch kann man eine Simulation mit denselben Parametern fortsetzen:
     $env:PATH = "C:\Program Files\netCDF 4.10.0\bin;" + $env:PATH
     .\build\tsunami_lab.exe
 
-Falls die Simulation abgebrochen wird, kann derselbe Befehl erneut ausgefuehrt
+Falls die Simulation abgebrochen wird, kann derselbe Befehl erneut ausgeführt
 werden. Das Programm erkennt den Checkpoint und setzt die Simulation an der
 gespeicherten Zeit fort.
 
@@ -161,7 +161,7 @@ Diese Simulation ist lokal sehr gross. Allein ein einzelnes Feld mit
 
 Da der 2D-Solver mehrere Felder und Ghost Cells verwaltet, ist der echte
 Speicherbedarf deutlich hoeher. Deshalb wurde die komplette 50m-Simulation
-nicht lokal bis zum Ende ausgefuehrt. Fuer die Aufgabe reicht es, die ersten
+nicht lokal bis zum Ende ausgeführt. Fuer die Aufgabe reicht es, die ersten
 Zeitschritte zu starten oder einen kleineren Datensatz zu verwenden.
 
 Beispiel-Konfiguration fuer die 50m-Variante:
@@ -190,7 +190,7 @@ Mit ``k = 20`` wird aus der internen 50m-Simulation eine Ausgabe mit
 
 ``ceil(54000 / 20) x ceil(30000 / 20) = 2700 x 1500``.
 
-Das ist immer noch gross, aber wesentlich kleiner als die volle 50m-Ausgabe.
+Das ist immer noch groß, aber wesentlich kleiner als die volle 50m-Ausgabe.
 
 Visualisierung
 --------------
@@ -198,7 +198,7 @@ Visualisierung
 Die grobe NetCDF-Datei kann in ParaView direkt geöffnet werden. Für die
 Visualisierung wurden die Variablen
 
-* ``h`` für Wasserhoehe,
+* ``h`` für Wasserhöhe,
 * ``hu`` und ``hv`` für Impulse,
 * ``b`` für Bathymetrie
 

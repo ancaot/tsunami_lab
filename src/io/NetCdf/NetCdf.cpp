@@ -6,6 +6,7 @@
 #include <iostream>
 #include <stdexcept>
 #include <vector>
+#include <cmath>
 
 #ifdef _WIN32
 #include <windows.h>
