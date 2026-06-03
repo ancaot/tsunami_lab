@@ -7,6 +7,25 @@
 #include <stdexcept>
 #include <vector>
 
+#ifdef _WIN32
+#include <windows.h>
+#endif
+
+namespace {
+  void replaceFileAtomically(const std::string & i_source,
+                             const std::string & i_target) {
+#ifdef _WIN32
+    if (!MoveFileExA(i_source.c_str(),
+                     i_target.c_str(),
+                     MOVEFILE_REPLACE_EXISTING | MOVEFILE_WRITE_THROUGH)) {
+      throw std::runtime_error("Unable to replace checkpoint file.");
+    }
+#else
+    std::filesystem::rename(i_source, i_target);
+#endif
+  }
+}
+
 tsunami_lab::io::NetCdf::NetCdf(t_idx i_nx,
                                 t_idx i_ny,
                                 t_idx i_k,
@@ -315,6 +334,7 @@ void tsunami_lab::io::NetCdf::createCheckPoint(std::string   i_solver,
   std::string l_basePath = "outputs";
   std::string l_path = l_basePath + "/checkpoints";
   std::string l_cpPath = l_path + "/" + i_checkpointfile;
+  std::string l_tmpPath = l_cpPath + ".tmp";
 
   if (!std::filesystem::exists(l_basePath)) {
     std::filesystem::create_directory(l_basePath);
@@ -322,8 +342,10 @@ void tsunami_lab::io::NetCdf::createCheckPoint(std::string   i_solver,
   if (!std::filesystem::exists(l_path)) {
     std::filesystem::create_directory(l_path);
   }
+
+  std::filesystem::remove(l_tmpPath);
   
-  l_err = nc_create(l_cpPath.data(), NC_CLOBBER | NC_NETCDF4, &l_ncId);
+  l_err = nc_create(l_tmpPath.data(), NC_CLOBBER | NC_NETCDF4, &l_ncId);
   checkNcErr(l_err, __FILE__, __LINE__);
 
   //defining dimensions
@@ -528,6 +550,7 @@ void tsunami_lab::io::NetCdf::createCheckPoint(std::string   i_solver,
   l_err = nc_close(l_ncId);
   checkNcErr(l_err, __FILE__, __LINE__);
 
+  replaceFileAtomically(l_tmpPath, l_cpPath);
 }
 
 void tsunami_lab::io::NetCdf::readCheckPoint(const char * i_filename,
