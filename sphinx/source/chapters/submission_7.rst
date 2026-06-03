@@ -7,9 +7,9 @@ Fortsetzen einer abgebrochenen Simulation und Coarse Output zur Reduktion der
 NetCDF-Ausgabegröße.
 
 Die offizielle Aufgabenstellung beschreibt, dass ein Checkpoint alle
-Informationen enthalten muss, die fuer einen Restart notwendig sind:
+Informationen enthalten muss, die für einen Restart notwendig sind:
 Gittergröße, Domain, Solver, Setup, Randbedingung, Bathymetrie, Wasserhöhe
-und Impulse. Fuer den Coarse Output sollen jeweils ``k x k`` benachbarte Zellen
+und Impulse. Für den Coarse Output sollen jeweils ``k x k`` benachbarte Zellen
 zu einer Ausgabezelle gemittelt werden.
 
 7.1. Checkpointing
@@ -89,7 +89,7 @@ Das Checkpointing wird mit zwei Tests abgedeckt:
 
 * ``NetCdfCheckpoint`` schreibt einen Checkpoint, liest ihn wieder ein und
   vergleicht alle gespeicherten Felder und Meta-Daten.
-* ``CheckPointSetup`` prueft, ob ``setups::CheckPoint`` aus den geladenen
+* ``CheckPointSetup`` prüft, ob ``setups::CheckPoint`` aus den geladenen
   Arrays wieder korrekte Werte fuer ``h``, ``hu``, ``hv`` und ``b`` liefert.
 
 Der Testlauf war erfolgreich:
@@ -139,7 +139,7 @@ kleiner.
 Tohoku mit 50m Zellweite
 ------------------------
 
-Fuer die Aufgabe soll das Tohoku-Ereignis mit derselben Domain wie in Kapitel
+Für die Aufgabe soll das Tohoku-Ereignis mit derselben Domain wie in Kapitel
 6.2 simuliert werden. Die Domain ist
 
 ``2700000 m x 1500000 m``.
@@ -154,17 +154,17 @@ Das sind
 
 ``54000 * 30000 = 1,620,000,000`` Zellen.
 
-Diese Simulation ist lokal sehr gross. Allein ein einzelnes Feld mit
-``float``-Werten benoetigt ungefaehr
+Diese Simulation ist lokal sehr groß. Allein ein einzelnes Feld mit
+``float``-Werten benötigt ungefähr
 
 ``1.62e9 * 4 Byte = 6.48 GB``.
 
 Da der 2D-Solver mehrere Felder und Ghost Cells verwaltet, ist der echte
-Speicherbedarf deutlich hoeher. Deshalb wurde die komplette 50m-Simulation
-nicht lokal bis zum Ende ausgeführt. Fuer die Aufgabe reicht es, die ersten
+Speicherbedarf deutlich höher. Deshalb wurde die komplette 50m-Simulation
+nicht lokal bis zum Ende ausgeführt. Für die Aufgabe reicht es, die ersten
 Zeitschritte zu starten oder einen kleineren Datensatz zu verwenden.
 
-Beispiel-Konfiguration fuer die 50m-Variante:
+Beispiel-Konfiguration für die 50m-Variante:
 
 .. code-block:: json
 
@@ -206,12 +206,44 @@ verwendet. Der Vorteil des Coarse Outputs ist, dass ParaView nicht die komplette
 50m-Auflösung laden muss. Dadurch lässt sich die Ausbreitung der Welle trotz
 feiner Simulation deutlich einfacher betrachten.
 
+
+Für die tatsächliche Simulation und Visualisierung haben wir am Ende eine 100m-Auflösung simuliert. 
+Mit folgender ``config.json`` Datei:
+
+.. code-block:: json
+
+    {
+      "numerical_solver": "fwave",
+      "scenario": "tsunamievent2d",
+      "wave_model": "2d",
+      "domain_size_x": 2700000,
+      "domain_size_y": 1500000,
+      "cells_x": 27000,
+      "cells_y": 15000,
+      "coarse_factor": 10,
+      "origin_x": -200000,
+      "origin_y": -750000,
+      "simulation_end_time": 36000,
+      "output_format": "netcdf",
+      "output_name": "tohoku_100m_coarse_k10.nc",
+      "reflective_boundary": false
+    }
+
+Natürlich nutzen wir als Input-Daten für Bathymetrie und Verschiebung, die entsprechenenden gegeben Input-Dateien.
+Am Ende konnten wir nur etwa 1724 Zeitschritte von 221804 simulieren und haben daher folgende Visualisierung aus ParaView.
+
+.. raw:: html
+
+   <video src="../_static/tohoku_100_3d.mp4" controls style="width: 72%; max-width: 760px; display: block; margin: 1rem auto;"></video>
+
+Nur circa 4 min von einer Stunde werden in diesem Abschnitt simuliert. Die Zeitschritte dauerten jeweils 0,162 Sekunden.
+
 Zusammenfassung
 ===============
 
 Checkpointing und Coarse Output sind nun miteinander kombinierbar:
 
-* Der Solver schreibt regelmaessig einen Restart-Zustand nach
+* Der Solver schreibt regelmäßig einen Restart-Zustand nach
   ``outputs/checkpoints/checkpoint.nc``.
 * Bei einem erneuten Start wird automatisch aus diesem Checkpoint fortgesetzt.
 * Die NetCDF-Ausgabe kann durch ``coarse_factor`` verkleinert werden.
@@ -219,4 +251,4 @@ Checkpointing und Coarse Output sind nun miteinander kombinierbar:
   einen unvollständigen Checkpoint hinterlässt.
 
 Damit ist die Simulation robuster gegen Unterbrechungen und erzeugt gleichzeitig
-handlichere Ausgabedateien für grosse Szenarien wie Tohoku.
+handlichere Ausgabedateien für große Szenarien wie Tohoku.
