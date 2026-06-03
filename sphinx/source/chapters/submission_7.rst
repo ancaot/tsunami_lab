@@ -2,7 +2,7 @@
 Submission 7: Checkpointing and Coarse Output
 #############################################
 
-In dieser Woche wurden zwei Erweiterungen umgesetzt: Checkpointing fuer das
+In dieser Woche wurden zwei Erweiterungen umgesetzt: Checkpointing für das
 Fortsetzen einer abgebrochenen Simulation und Coarse Output zur Reduktion der
 NetCDF-Ausgabegroesse.
 
@@ -25,7 +25,7 @@ Der NetCDF-Writer wurde in ``src/io/NetCdf/NetCdf.cpp`` erweitert. Die Methode
 * numerischer Solver, z.B. ``fwave`` oder ``roe``,
 * verwendetes Szenario, z.B. ``tsunamievent2d``,
 * Wave-Model, also ``1d`` oder ``2d``,
-* Domain-Groesse und Domain-Start,
+* Domain-Grösse und Domain-Start,
 * Anzahl der Zellen in x- und y-Richtung,
 * Endzeit der Simulation,
 * Ausgabeformat und Dateinamen der Eingabedaten,
@@ -34,11 +34,11 @@ Der NetCDF-Writer wurde in ``src/io/NetCdf/NetCdf.cpp`` erweitert. Die Methode
 * ``h``, ``hu``, ``hv`` und ``b`` ohne Ghost Cells.
 
 Beim Schreiben wird ``nc_sync`` verwendet, bevor die Datei geschlossen wird.
-Dadurch werden NetCDF-Puffer auf die Festplatte geschrieben. Das ist fuer den
+Dadurch werden NetCDF-Puffer auf die Festplatte geschrieben. Das ist für den
 Crash-Test wichtig, weil ein Abbruch mit ``CTRL-C`` sonst noch Daten im
-Speicher verlieren koennte.
+Speicher verlieren könnte.
 
-Zusaetzlich gibt es die Methode ``readCheckPoint``. Sie liest die gespeicherten
+Zusätzlich gibt es die Methode ``readCheckPoint``. Sie liest die gespeicherten
 Meta-Daten und Felder wieder ein. Das Ergebnis wird an das neue Setup
 ``setups::CheckPoint`` weitergegeben.
 
@@ -46,7 +46,7 @@ CheckPoint-Setup
 ----------------
 
 Das Setup liegt in ``src/setups/CheckPoint``. Es bekommt die aus dem
-Checkpoint gelesenen Arrays und gibt sie wie ein normales Setup ueber die
+Checkpoint gelesenen Arrays und gibt sie wie ein normales Setup über die
 Methoden
 
 * ``getHeight``,
@@ -54,14 +54,14 @@ Methoden
 * ``getMomentumY``,
 * ``getBathymetry``
 
-zurueck. Damit kann der bestehende Initialisierungscode wiederverwendet werden:
+zurück. Damit kann der bestehende Initialisierungscode wiederverwendet werden:
 Der Solver merkt nicht, ob die Werte aus ``TsunamiEvent2d`` oder aus einem
 Checkpoint kommen.
 
 Automatischer Restart
 ---------------------
 
-Im ``main.cpp`` wird beim Start geprueft, ob
+Im ``main.cpp`` wird beim Start geprüft, ob
 ``outputs/checkpoints/checkpoint.nc`` existiert. Wenn die Datei vorhanden ist,
 werden die Simulationswerte aus dieser Datei gelesen und das Programm startet
 automatisch mit ``setups::CheckPoint``. Wenn keine Checkpoint-Datei existiert,
@@ -195,15 +195,15 @@ Das ist immer noch gross, aber wesentlich kleiner als die volle 50m-Ausgabe.
 Visualisierung
 --------------
 
-Die grobe NetCDF-Datei kann in ParaView direkt geoeffnet werden. Fuer die
+Die grobe NetCDF-Datei kann in ParaView direkt geöffnet werden. Für die
 Visualisierung wurden die Variablen
 
-* ``h`` fuer Wasserhoehe,
-* ``hu`` und ``hv`` fuer Impulse,
-* ``b`` fuer Bathymetrie
+* ``h`` für Wasserhoehe,
+* ``hu`` und ``hv`` für Impulse,
+* ``b`` für Bathymetrie
 
 verwendet. Der Vorteil des Coarse Outputs ist, dass ParaView nicht die komplette
-50m-Aufloesung laden muss. Dadurch laesst sich die Ausbreitung der Welle trotz
+50m-Auflösung laden muss. Dadurch lässt sich die Ausbreitung der Welle trotz
 feiner Simulation deutlich einfacher betrachten.
 
 Zusammenfassung
@@ -216,7 +216,7 @@ Checkpointing und Coarse Output sind nun miteinander kombinierbar:
 * Bei einem erneuten Start wird automatisch aus diesem Checkpoint fortgesetzt.
 * Die NetCDF-Ausgabe kann durch ``coarse_factor`` verkleinert werden.
 * ``nc_sync`` reduziert das Risiko, dass ein Abbruch kurz nach dem Schreiben
-  einen unvollstaendigen Checkpoint hinterlaesst.
+  einen unvollständigen Checkpoint hinterlässt.
 
 Damit ist die Simulation robuster gegen Unterbrechungen und erzeugt gleichzeitig
-handlichere Ausgabedateien fuer grosse Szenarien wie Tohoku.
+handlichere Ausgabedateien für grosse Szenarien wie Tohoku.
