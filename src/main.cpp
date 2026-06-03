@@ -13,7 +13,9 @@
 #include "io/NetCdf/NetCdf.h"
 #include "io/Stations/Station.h"
 #include "io/JsReader/Configuration.h"
+#include "setups/CheckPoint/CheckPoint.h"
 #include <filesystem>
+
 #include <algorithm>
 #include <cctype>
 #include <cstdlib>
@@ -405,6 +407,7 @@ int main() {
   l_temp_dimension_y = cli::getOr<tsunami_lab::t_real>(l_config, {"domain_size_y", "dimension_y"}, 1500000);
   l_temp_endtime = cli::getOr<tsunami_lab::t_real>(l_config, {"simulation_end_time", "endtime"}, 36000);
   l_temp_writer = cli::getOr<std::string>(l_config, {"output_format", "writer"}, "csv");
+  tsunami_lab::t_idx l_k = cli::getOr<tsunami_lab::t_idx>(l_config, {"coarse_factor", "k"}, 1);
   l_temp_bathFile = cli::getOr<std::string>(l_config, {"bathymetry_file", "bathfile"}, "");
   l_temp_disFile = cli::getOr<std::string>(l_config, {"displacement_file", "disfile"}, "");
   std::string l_temp_outputfilename = cli::getOr<std::string>(l_config, {"output_name", "outputfilename"}, "tsunami_output.csv");
@@ -417,42 +420,93 @@ int main() {
 
   l_frequency = tsunami_lab::io::Configuration::getFrequencyFromJson();
 
-  cli::section("Launch settings");
-  l_temp_solver = cli::promptChoice("Numerical solver", {"fwave", "roe"}, cli::lower(l_temp_solver));
-  l_temp_waveprop = cli::promptChoice("Wave model", {"2d", "1d"}, cli::lower(l_temp_waveprop));
-  if (l_temp_waveprop == "2d") {
-    const std::vector<std::string> l_2dSetups = {"tsunamievent2d", "dambreak2d", "artificialtsunami2D"};
-    if (std::find(l_2dSetups.begin(), l_2dSetups.end(), l_temp_setup) == l_2dSetups.end()) {
-      l_temp_setup = "tsunamievent2d";
-    }
-    l_temp_setup = cli::promptChoice("Scenario", {"tsunamievent2d", "dambreak2d", "artificialtsunami2D"}, l_temp_setup);
-  } else {
-    const std::vector<std::string> l_1dSetups = {"dambreak1d", "tsunamievent1d", "shockshock", "rarerare", "subcriticalflow", "supercriticalflow"};
-    if (std::find(l_1dSetups.begin(), l_1dSetups.end(), l_temp_setup) == l_1dSetups.end()) {
-      l_temp_setup = "dambreak1d";
-    }
-    l_temp_setup = cli::promptChoice("Scenario", l_1dSetups, l_temp_setup);
-  }
-  l_temp_writer = cli::promptChoice("Output format", {"csv", "netcdf"}, cli::lower(l_temp_writer));
+  tsunami_lab::t_real * l_cp_h = nullptr;
+  tsunami_lab::t_real * l_cp_hu = nullptr;
+  tsunami_lab::t_real * l_cp_hv = nullptr;
+  tsunami_lab::t_real * l_cp_b = nullptr;
+  bool l_useCheckpoint = false;
+  tsunami_lab::t_real l_simTimeLastCP = 0;
 
-  cli::section("Domain");
-  l_temp_dimension_x = cli::promptReal("Domain size x [m]", l_temp_dimension_x);
-  l_temp_dimension_y = cli::promptReal("Domain size y [m]", l_temp_dimension_y);
-  l_nx = cli::promptIndex("Cells x", l_nx);
-  l_ny = cli::promptIndex("Cells y", l_ny);
-  l_domain_start_x = cli::promptReal("Origin x [m]", l_domain_start_x);
-  l_domain_start_y = cli::promptReal("Origin y [m]", l_domain_start_y);
-  l_temp_endtime = cli::promptReal("Simulation end time [s]", l_temp_endtime);
-  reflecting_boundary = cli::promptBool("Reflective boundary", reflecting_boundary);
-
-  cli::section("Input data");
-  const std::vector<std::string> l_ncFiles = cli::findNetCdfFiles("data/nc/data_in");
-  if (l_temp_setup == "tsunamievent2d") {
-    l_temp_bathFile = cli::promptNetCdfFile("Bathymetry NetCDF", l_temp_bathFile, l_ncFiles);
-    l_temp_disFile = cli::promptNetCdfFile("Displacement NetCDF", l_temp_disFile, l_ncFiles);
+  if (std::filesystem::exists("outputs/checkpoints/checkpoint.nc")) {
+    try {
+      l_useCheckpoint = true;
+      tsunami_lab::io::NetCdf::readCheckPoint("outputs/checkpoints/checkpoint.nc",
+                                              &l_temp_solver,
+                                              &l_temp_setup,
+                                              &l_temp_waveprop,
+                                              &l_temp_dimension_x,
+                                              &l_temp_dimension_y,
+                                              &l_nx,
+                                              &l_ny,
+                                              &l_domain_start_x,
+                                              &l_domain_start_y,
+                                              &l_temp_endtime,
+                                              &l_temp_writer,
+                                              &l_temp_bathFile,
+                                              &l_temp_disFile,
+                                              &l_temp_outputfilename,
+                                              &reflecting_boundary,
+                                              &l_simTimeLastCP,
+                                              &l_cp_hu,
+                                              &l_cp_hv,
+                                              &l_cp_h,
+                                              &l_temp_location,
+                                              &l_cp_b);
+      l_simTime = l_simTimeLastCP;
+      std::cout << cli::green << "Resuming from checkpoint 'outputs/checkpoints/checkpoint.nc' at time: " << l_simTime << cli::reset << std::endl;
+    }
+    catch (const std::exception& l_error) {
+      std::cout << cli::red << "Ignoring broken checkpoint: " << l_error.what() << cli::reset << std::endl;
+      std::filesystem::remove("outputs/checkpoints/checkpoint.nc");
+      l_useCheckpoint = false;
+    }
   }
-  l_temp_outputfilename = cli::promptString("Output base name", l_temp_outputfilename);
-  l_temp_outputfilename = generateNewName(l_temp_outputfilename,"outputs/");
+
+  if (!l_useCheckpoint) {
+    cli::section("Launch settings");
+    l_temp_solver = cli::promptChoice("Numerical solver", {"fwave", "roe"}, cli::lower(l_temp_solver));
+    l_temp_waveprop = cli::promptChoice("Wave model", {"2d", "1d"}, cli::lower(l_temp_waveprop));
+    if (l_temp_waveprop == "2d") {
+      const std::vector<std::string> l_2dSetups = {"tsunamievent2d", "dambreak2d", "artificialtsunami2D"};
+      if (std::find(l_2dSetups.begin(), l_2dSetups.end(), l_temp_setup) == l_2dSetups.end()) {
+        l_temp_setup = "tsunamievent2d";
+      }
+      l_temp_setup = cli::promptChoice("Scenario", l_2dSetups, l_temp_setup);
+    }
+    else {
+      const std::vector<std::string> l_1dSetups = {"dambreak1d", "tsunamievent1d", "shockshock", "rarerare", "subcriticalflow", "supercriticalflow"};
+      if (std::find(l_1dSetups.begin(), l_1dSetups.end(), l_temp_setup) == l_1dSetups.end()) {
+        l_temp_setup = "dambreak1d";
+      }
+      l_temp_setup = cli::promptChoice("Scenario", l_1dSetups, l_temp_setup);
+    }
+    l_temp_writer = cli::promptChoice("Output format", {"csv", "netcdf"}, cli::lower(l_temp_writer));
+
+    cli::section("Domain");
+    l_temp_dimension_x = cli::promptReal("Domain size x [m]", l_temp_dimension_x);
+    l_temp_dimension_y = cli::promptReal("Domain size y [m]", l_temp_dimension_y);
+    l_nx = cli::promptIndex("Cells x", l_nx);
+    l_ny = cli::promptIndex("Cells y", l_ny);
+    l_k = cli::promptIndex("Coarsening factor k", l_k);
+    l_domain_start_x = cli::promptReal("Origin x [m]", l_domain_start_x);
+    l_domain_start_y = cli::promptReal("Origin y [m]", l_domain_start_y);
+    l_temp_endtime = cli::promptReal("Simulation end time [s]", l_temp_endtime);
+    reflecting_boundary = cli::promptBool("Reflective boundary", reflecting_boundary);
+
+    cli::section("Input data");
+    const std::vector<std::string> l_ncFiles = cli::findNetCdfFiles("data/nc/data_in");
+    if (l_temp_setup == "tsunamievent2d") {
+      l_temp_bathFile = cli::promptNetCdfFile("Bathymetry NetCDF", l_temp_bathFile, l_ncFiles);
+      l_temp_disFile = cli::promptNetCdfFile("Displacement NetCDF", l_temp_disFile, l_ncFiles);
+    }
+    l_temp_outputfilename = cli::promptString("Output base name", l_temp_outputfilename);
+  }
+  if (!l_useCheckpoint) {
+    l_temp_outputfilename = generateNewName(l_temp_outputfilename,"outputs/");
+  }
+  if (l_temp_writer == "netcdf" && std::filesystem::path(l_temp_outputfilename).extension().empty()) {
+    l_temp_outputfilename += ".nc";
+  }
   std::string l_temp_outputfile =  "outputs/" + l_temp_outputfilename;
 
   const char * l_bathFile = l_temp_bathFile.c_str();
@@ -476,7 +530,22 @@ int main() {
   //Reading the Solver from the Json file-------------------------------------------------END
   //Determine which setup and which wavepropagation to use--------------------------------START
   tsunami_lab::patches::WavePropagation *l_waveProp = nullptr;
-  if(l_temp_waveprop == "2d"){
+  if (l_useCheckpoint) {
+    l_setup = new tsunami_lab::setups::CheckPoint(l_temp_dimension_x,
+                                                  l_temp_dimension_y,
+                                                  l_nx,
+                                                  l_ny,
+                                                  l_domain_start_x,
+                                                  l_domain_start_y,
+                                                  l_cp_h,
+                                                  l_cp_hu,
+                                                  l_cp_hv,
+                                                  l_cp_b);
+    l_waveProp = (l_temp_waveprop == "2d")
+        ? static_cast<tsunami_lab::patches::WavePropagation*>(new tsunami_lab::patches::WavePropagation2d(l_nx, l_ny, l_solver, reflecting_boundary))
+        : static_cast<tsunami_lab::patches::WavePropagation*>(new tsunami_lab::patches::WavePropagation1d(l_nx, l_solver, reflecting_boundary));
+  }
+  else if(l_temp_waveprop == "2d"){
     l_waveProp = new tsunami_lab::patches::WavePropagation2d( l_nx, l_ny, l_solver, reflecting_boundary);
     if(l_temp_setup == "artificialtsunami2D")
     {
@@ -569,6 +638,10 @@ int main() {
   // derive maximum wave speed in setup; the momentum is ignored
   tsunami_lab::t_real l_speedMax = std::sqrt( 9.81 * l_hMax );
   l_dt = 0.50 * l_dxy / l_speedMax;
+  if (l_useCheckpoint && l_dt > 0) {
+    l_timeStep = static_cast<tsunami_lab::t_idx>(std::ceil(l_simTime / l_dt));
+    l_time_step_index = static_cast<tsunami_lab::t_idx>(std::ceil(l_timeStep / 25.0));
+  }
   
   // derive scaling for a time step
   tsunami_lab::t_real l_scaling = l_dt/l_dxy;
@@ -632,7 +705,7 @@ int main() {
   tsunami_lab::io::NetCdf* l_netCdf = nullptr ;
 
   if(l_temp_writer == "netcdf"){
-    l_netCdf = new tsunami_lab::io::NetCdf(l_nx,l_ny,l_outputFile);
+    l_netCdf = new tsunami_lab::io::NetCdf(l_nx,l_ny,l_k,l_outputFile);
     l_netCdf->fillConstants(l_nx,
                             l_ny,
                             l_waveProp->getStride(),
@@ -675,6 +748,14 @@ int main() {
                               l_waveProp->getMomentumY(),
                               l_outputFile);
       }
+
+      tsunami_lab::io::NetCdf* cp_netCdf = (l_netCdf != nullptr) ? l_netCdf : new tsunami_lab::io::NetCdf(l_nx, l_ny, l_k, "outputs/temp.nc");
+      cp_netCdf->createCheckPoint(l_temp_solver, l_temp_setup, l_temp_waveprop, l_temp_dimension_x, l_temp_dimension_y, l_nx, l_ny, l_domain_start_x, l_domain_start_y, l_temp_endtime, l_temp_writer, l_temp_bathFile, l_temp_disFile, l_temp_outputfilename, reflecting_boundary, l_simTime, l_waveProp->getMomentumX(), l_waveProp->getMomentumY(), l_waveProp->getHeight(), l_temp_location, l_waveProp->getBathymetry(), l_waveProp->getStride(), l_dxy, "checkpoint.nc");
+      if (l_netCdf == nullptr) {
+        delete cp_netCdf;
+        std::filesystem::remove("outputs/temp.nc");
+      }
+
       l_time_step_index++;
     }
     

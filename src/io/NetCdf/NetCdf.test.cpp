@@ -34,7 +34,7 @@ TEST_CASE("Test the NetCdf-writer", "[NetCdfWrite]")
                                    62, 62, 63, 64, 65, 66, 66,
                                    67, 67, 68, 69, 70, 71, 71};
 
-    tsunami_lab::io::NetCdf *l_netCdf = new tsunami_lab::io::NetCdf(5, 2, "testsFiles/test.nc");
+    tsunami_lab::io::NetCdf *l_netCdf = new tsunami_lab::io::NetCdf(5, 2, 1, "testsFiles/test.nc");
     l_netCdf->fillConstants(5, 2, 7, 0.5, -50, -50, l_b, "testsFiles/test.nc");
     l_netCdf->updateFile(5, 2, 7, 0, 1, l_h, l_hu, l_hv, "testsFiles/test.nc");
     int l_err;
@@ -211,7 +211,7 @@ TEST_CASE("Test the NetCdf-checkpoint-writer", "[NetCdfCheckpoint]"){
     tsunami_lab::t_real l_hv_read_result[4] = {37, 38, 42, 43};
     tsunami_lab::t_real l_b_read_result[4] = {57, 58, 62, 63};
 
-    tsunami_lab::io::NetCdf *l_netCdf = new tsunami_lab::io::NetCdf(2, 2, "testsFiles/testCheckPoint.nc");
+    tsunami_lab::io::NetCdf *l_netCdf = new tsunami_lab::io::NetCdf(2, 2, 1, "testsFiles/testCheckPoint.nc");
     REQUIRE(std::filesystem::exists("testsFiles/testCheckPoint.nc"));
 
     std::string l_path = "outputs";
@@ -226,7 +226,7 @@ TEST_CASE("Test the NetCdf-checkpoint-writer", "[NetCdfCheckpoint]"){
 
     l_netCdf->createCheckPoint("fwave", "tsunamievent2d", "2d", 50, 50, 2, 2, -25, -25, 360, 
                                 "csv", "bathfile.nc", "dispfile.nc", "output.csv", false, 60, 
-                                l_hu, l_hv, l_h,  0, l_b, 3, 250, "testCheckPoint.nc");
+                                l_hu, l_hv, l_h,  0, l_b, 4, 250, "testCheckPoint.nc");
     REQUIRE(std::filesystem::exists("outputs/checkpoints/testCheckPoint.nc"));
 
 
@@ -301,7 +301,7 @@ TEST_CASE("Test the NetCdf-checkpoint-writer", "[NetCdfCheckpoint]"){
         REQUIRE(l_hua[l_i] == l_hu_read_result[l_i]);
         REQUIRE(l_hva[l_i] == l_hv_read_result[l_i]);
         REQUIRE(l_ha[l_i] == l_h_read_result[l_i]);
-        REQUIRE(l_b[l_i] == l_b_read_result[l_i]);
+        REQUIRE(l_ba[l_i] == l_b_read_result[l_i]);
     }
 
     delete[] l_hua;

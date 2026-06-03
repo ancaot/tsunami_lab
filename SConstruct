@@ -95,14 +95,31 @@ env.Append( CPPPATH = [ '#/submodules/Catch2/single_include',
 
 env['USE_NETCDF'] = False
 if env['netcdf'] != 'off':
-  l_conf = Configure( env )
-  l_hasNetcdf = l_conf.CheckLibWithHeader( 'netcdf',
-                                           'netcdf.h',
-                                           'c' )
-  l_hasZlib = l_conf.CheckLib( 'zlib' if l_isMsvc else 'z' )
-  l_hasHdf5 = l_conf.CheckLib( 'hdf5' )
-  l_hasHdf5Serial = l_conf.CheckLib( 'hdf5_serial' )
-  env = l_conf.Finish()
+  l_hasNetcdf = False
+  l_hasZlib = False
+  l_hasHdf5 = False
+  l_hasHdf5Serial = False
+
+  if l_isMsvc and env['netcdf_include'] and env['netcdf_libdir']:
+    l_header = os.path.join( env['netcdf_include'], 'netcdf.h' )
+    l_netcdfLib = os.path.join( env['netcdf_libdir'], 'netcdf.lib' )
+    l_zlibLib = os.path.join( env['netcdf_libdir'], 'zlib.lib' )
+    l_hdf5Lib = os.path.join( env['netcdf_libdir'], 'hdf5.lib' )
+    l_hdf5SerialLib = os.path.join( env['netcdf_libdir'], 'hdf5_serial.lib' )
+
+    l_hasNetcdf = os.path.exists( l_header ) and os.path.exists( l_netcdfLib )
+    l_hasZlib = os.path.exists( l_zlibLib )
+    l_hasHdf5 = os.path.exists( l_hdf5Lib )
+    l_hasHdf5Serial = os.path.exists( l_hdf5SerialLib )
+  else:
+    l_conf = Configure( env )
+    l_hasNetcdf = l_conf.CheckLibWithHeader( 'netcdf',
+                                             'netcdf.h',
+                                             'c' )
+    l_hasZlib = l_conf.CheckLib( 'zlib' if l_isMsvc else 'z' )
+    l_hasHdf5 = l_conf.CheckLib( 'hdf5' )
+    l_hasHdf5Serial = l_conf.CheckLib( 'hdf5_serial' )
+    env = l_conf.Finish()
 
   if l_hasNetcdf:
     env['USE_NETCDF'] = True

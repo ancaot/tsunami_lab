@@ -13,6 +13,7 @@ namespace {
             {"dimension_y", "domain_size_y"},
             {"nx", "cells_x"},
             {"ny", "cells_y"},
+            {"k", "coarse_factor"},
             {"domain_start_x", "origin_x"},
             {"domain_start_y", "origin_y"},
             {"endtime", "simulation_end_time"},
