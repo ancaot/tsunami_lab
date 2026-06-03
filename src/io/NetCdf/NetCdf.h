@@ -18,8 +18,9 @@ namespace tsunami_lab {
 class tsunami_lab::io::NetCdf {
   private:
     int m_varIdX, m_varIdY, m_varIdHeight, m_varIdTime, m_varIdBathymetry, m_varIdImpulseX, m_varIdImpulseY;
+    t_idx m_k = 1;
 
-    static void writeInteriorGrid(t_real const * i_grid,
+    void writeInteriorGrid(t_real const * i_grid,
                                   t_idx          i_nx,
                                   t_idx          i_ny,
                                   t_idx          i_stride,
@@ -33,6 +34,7 @@ class tsunami_lab::io::NetCdf {
 
     NetCdf(t_idx i_nx,
            t_idx i_ny,
+           t_idx i_k,
            const char * i_filename);
 
     void fillConstants(t_idx          i_nx,

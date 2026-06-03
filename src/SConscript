@@ -25,6 +25,7 @@ l_sources = [ 'solvers/Roe.cpp',
 
 if env['USE_NETCDF']:
   l_sources.append( 'setups/tsunamievent2d/TsunamiEvent2d.cpp' )
+  l_sources.append( 'setups/CheckPoint/CheckPoint.cpp' )
   l_sources.append( 'io/NetCdf/NetCdf.cpp' )
 
 
@@ -52,6 +53,7 @@ l_tests = [ 'tests.cpp',
 
 if env['USE_NETCDF']:
   l_tests.append( 'setups/tsunamievent2d/TsunamiEvent2d.test.cpp' )
+  l_tests.append( 'setups/CheckPoint/CheckPoint.test.cpp' )
   l_tests.append( 'io/NetCdf/NetCdf.test.cpp' )
             
             

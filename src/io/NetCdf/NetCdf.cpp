@@ -9,18 +9,45 @@
 
 tsunami_lab::io::NetCdf::NetCdf(t_idx i_nx,
                                 t_idx i_ny,
+                                t_idx i_k,
                                 const char * i_filename) {
+  m_k = i_k > 0 ? i_k : 1;
+  t_idx out_nx = std::ceil(i_nx / (t_real)m_k);
+  t_idx out_ny = std::ceil(i_ny / (t_real)m_k);
+
   int l_ncId, l_err;
   int l_dimXId, l_dimYId, l_dimTimeId;
   int l_dim2Ids[2];
 
+  if (std::filesystem::exists(i_filename)) {
+    l_err = nc_open(i_filename, NC_WRITE, &l_ncId);
+    checkNcErr(l_err, __FILE__, __LINE__);
+    l_err = nc_inq_varid(l_ncId, "x", &m_varIdX);
+    checkNcErr(l_err, __FILE__, __LINE__);
+    l_err = nc_inq_varid(l_ncId, "y", &m_varIdY);
+    checkNcErr(l_err, __FILE__, __LINE__);
+    l_err = nc_inq_varid(l_ncId, "time", &m_varIdTime);
+    checkNcErr(l_err, __FILE__, __LINE__);
+    l_err = nc_inq_varid(l_ncId, "b", &m_varIdBathymetry);
+    checkNcErr(l_err, __FILE__, __LINE__);
+    l_err = nc_inq_varid(l_ncId, "h", &m_varIdHeight);
+    checkNcErr(l_err, __FILE__, __LINE__);
+    l_err = nc_inq_varid(l_ncId, "hu", &m_varIdImpulseX);
+    checkNcErr(l_err, __FILE__, __LINE__);
+    l_err = nc_inq_varid(l_ncId, "hv", &m_varIdImpulseY);
+    checkNcErr(l_err, __FILE__, __LINE__);
+    l_err = nc_close(l_ncId);
+    checkNcErr(l_err, __FILE__, __LINE__);
+    return;
+  }
+
   l_err = nc_create(i_filename, NC_CLOBBER, &l_ncId);
   checkNcErr(l_err, __FILE__, __LINE__);
 
-  l_err = nc_def_dim(l_ncId, "x", i_nx, &l_dimXId);
+  l_err = nc_def_dim(l_ncId, "x", out_nx, &l_dimXId);
   checkNcErr(l_err, __FILE__, __LINE__);
 
-  l_err = nc_def_dim(l_ncId, "y", i_ny, &l_dimYId);
+  l_err = nc_def_dim(l_ncId, "y", out_ny, &l_dimYId);
   checkNcErr(l_err, __FILE__, __LINE__);
 
   l_err = nc_def_dim(l_ncId, "time", NC_UNLIMITED, &l_dimTimeId);
@@ -88,18 +115,21 @@ void tsunami_lab::io::NetCdf::fillConstants(t_idx          i_nx,
   l_err = nc_open(i_filename, NC_WRITE, &l_ncId);
   checkNcErr(l_err, __FILE__, __LINE__);
 
-  std::vector<t_real> l_coordinateX(i_nx);
-  std::vector<t_real> l_coordinateY(i_ny);
+  t_idx out_nx = std::ceil(i_nx / (t_real)m_k);
+  t_idx out_ny = std::ceil(i_ny / (t_real)m_k);
 
-  for (t_idx l_iy = 0; l_iy < i_ny; l_iy++) {
-    l_coordinateY[l_iy] = ((l_iy + 0.5f) * i_dxy) + i_domainStartY;
+  std::vector<t_real> l_coordinateX(out_nx);
+  std::vector<t_real> l_coordinateY(out_ny);
+
+  for (t_idx l_iy = 0; l_iy < out_ny; l_iy++) {
+    l_coordinateY[l_iy] = ((l_iy * m_k + (m_k - 1) / 2.0f + 0.5f) * i_dxy) + i_domainStartY;
   }
 
   l_err = nc_put_var_float(l_ncId, m_varIdY, l_coordinateY.data());
   checkNcErr(l_err, __FILE__, __LINE__);
 
-  for (t_idx l_ix = 0; l_ix < i_nx; l_ix++) {
-    l_coordinateX[l_ix] = ((l_ix + 0.5f) * i_dxy) + i_domainStartX;
+  for (t_idx l_ix = 0; l_ix < out_nx; l_ix++) {
+    l_coordinateX[l_ix] = ((l_ix * m_k + (m_k - 1) / 2.0f + 0.5f) * i_dxy) + i_domainStartX;
   }
 
   l_err = nc_put_var_float(l_ncId, m_varIdX, l_coordinateX.data());
@@ -131,6 +161,9 @@ void tsunami_lab::io::NetCdf::updateFile(t_idx          i_nx,
   l_err = nc_put_var1_float(l_ncId, m_varIdTime, &i_timeStep, &i_time);
   checkNcErr(l_err, __FILE__, __LINE__);
 
+  l_err = nc_sync(l_ncId);
+  checkNcErr(l_err, __FILE__, __LINE__);
+
   l_err = nc_close(l_ncId);
   checkNcErr(l_err, __FILE__, __LINE__);
 }
@@ -143,30 +176,44 @@ void tsunami_lab::io::NetCdf::writeInteriorGrid(t_real const * i_grid,
                                                 bool           i_twoDimensionsOnly,
                                                 int            i_varId,
                                                 int            i_ncId) {
-  std::vector<t_real> l_grid(i_nx * i_ny);
+  t_idx out_nx = std::ceil(i_nx / (t_real)m_k);
+  t_idx out_ny = std::ceil(i_ny / (t_real)m_k);
+  std::vector<t_real> l_grid(out_nx * out_ny, 0.0);
 
-  for (t_idx l_iy = 0; l_iy < i_ny; l_iy++) {
-    for (t_idx l_ix = 0; l_ix < i_nx; l_ix++) {
-      l_grid[l_iy * i_nx + l_ix] = i_grid[(l_iy + 1) * i_stride + (l_ix + 1)];
+  for (t_idx l_iy = 0; l_iy < out_ny; l_iy++) {
+    for (t_idx l_ix = 0; l_ix < out_nx; l_ix++) {
+      t_real l_sum = 0;
+      t_idx l_avg_count = 0;
+      for (t_idx l_ky = 0; l_ky < m_k; l_ky++) {
+        for (t_idx l_kx = 0; l_kx < m_k; l_kx++) {
+          t_idx l_iy_actual = l_iy * m_k + l_ky;
+          t_idx l_ix_actual = l_ix * m_k + l_kx;
+          if (l_iy_actual < i_ny && l_ix_actual < i_nx) {
+            l_sum += i_grid[(l_iy_actual + 1) * i_stride + (l_ix_actual + 1)];
+            l_avg_count++;
+          }
+        }
+      }
+      l_grid[l_iy * out_nx + l_ix] = l_sum / l_avg_count;
     }
   }
 
   std::vector<size_t> l_start;
   std::vector<size_t> l_count;
-  std::vector<ptrdiff_t> l_stride;
+  std::vector<ptrdiff_t> l_stride_nc;
 
   if (i_twoDimensionsOnly) {
     l_start = {0, 0};
-    l_count = {i_ny, i_nx};
-    l_stride = {1, 1};
+    l_count = {out_ny, out_nx};
+    l_stride_nc = {1, 1};
   }
   else {
     l_start = {i_timeStep, 0, 0};
-    l_count = {1, i_ny, i_nx};
-    l_stride = {1, 1, 1};
+    l_count = {1, out_ny, out_nx};
+    l_stride_nc = {1, 1, 1};
   }
 
-  int l_err = nc_put_vars_float(i_ncId, i_varId, l_start.data(), l_count.data(), l_stride.data(), l_grid.data());
+  int l_err = nc_put_vars_float(i_ncId, i_varId, l_start.data(), l_count.data(), l_stride_nc.data(), l_grid.data());
   checkNcErr(l_err, __FILE__, __LINE__);
 }
 
@@ -276,7 +323,7 @@ void tsunami_lab::io::NetCdf::createCheckPoint(std::string   i_solver,
     std::filesystem::create_directory(l_path);
   }
   
-  l_err = nc_create(l_cpPath.data(), NC_CLOBBER, &l_ncId);
+  l_err = nc_create(l_cpPath.data(), NC_CLOBBER | NC_NETCDF4, &l_ncId);
   checkNcErr(l_err, __FILE__, __LINE__);
 
   //defining dimensions
@@ -475,6 +522,9 @@ void tsunami_lab::io::NetCdf::createCheckPoint(std::string   i_solver,
     checkNcErr(l_err, __FILE__, __LINE__);
   }
 
+  l_err = nc_sync(l_ncId);
+  checkNcErr(l_err, __FILE__, __LINE__);
+
   l_err = nc_close(l_ncId);
   checkNcErr(l_err, __FILE__, __LINE__);
 
@@ -516,7 +566,9 @@ void tsunami_lab::io::NetCdf::readCheckPoint(const char * i_filename,
   int l_ncId, l_err = 0;
 
   l_err = nc_open(i_filename, NC_NOWRITE, &l_ncId);
-  checkNcErr(l_err, __FILE__, __LINE__);
+  if (l_err != NC_NOERR) {
+    throw std::runtime_error(std::string("Unable to read checkpoint '") + i_filename + "': " + nc_strerror(l_err));
+  }
 
   //pointers for getting variable id to get var info
   
