@@ -371,7 +371,7 @@ int main() {
 
   cli::printLogo();
 
-  const std::string filename = "configs/config.json";
+  const std::string filename = "tsunami_lab/configs/config.json";
   json l_config;
   try {
     l_config = cli::loadConfig(filename);
