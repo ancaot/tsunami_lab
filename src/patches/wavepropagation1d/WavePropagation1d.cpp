@@ -6,7 +6,7 @@
  **/
 #include "WavePropagation1d.h"
 #include "../../solvers/Roe.h"
-#include "../../solvers/fwave.h"
+#include "../../solvers/FWave.h"
 
 
 
