@@ -1,4 +1,4 @@
-#include "fwave.h"
+#include "FWave.h"
 #include <cmath>
 
 void tsunami_lab::solvers::fwave::eigenvalues( t_real   i_hL,
