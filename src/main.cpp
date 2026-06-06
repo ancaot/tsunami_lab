@@ -28,6 +28,7 @@
 #include <string>
 #include <vector>
 #include <thread>
+#include <ctime>
 
 #ifdef _WIN32
 #include <conio.h>
@@ -334,6 +335,34 @@ namespace cli {
   }
 }
 
+//getting duration time in min, secs...
+void printDuration(std::chrono::nanoseconds duration){
+  auto hours = std::chrono::duration_cast<std::chrono::hours>(duration);
+  duration -= hours;
+
+  auto minutes = std::chrono::duration_cast<std::chrono::minutes>(duration);
+  duration -= minutes;
+
+  auto seconds = std::chrono::duration_cast<std::chrono::seconds>(duration);
+  duration -= seconds;
+
+  auto milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(duration);
+  duration -= milliseconds;
+
+  auto microseconds = std::chrono::duration_cast<std::chrono::microseconds>(duration);
+  duration -= microseconds;
+
+  auto nanoseconds = duration;
+
+  std::cout << cli::soft << "  Duration: " << cli::reset 
+        << hours.count() << " hours, " 
+        << minutes.count() << " minutes, "
+        << seconds.count() << " seconds, "
+        << milliseconds.count() << " milliseconds, "
+        << microseconds.count() << " microseconds, "
+        << nanoseconds.count() << " nanoseconds"
+        << std::endl; 
+}
 
 int main() {
   tsunami_lab::t_idx l_nx = 1;
@@ -598,6 +627,10 @@ int main() {
   std::cout << cli::soft << "  cells        " << cli::reset << l_nx << " x " << l_ny << std::endl;
   std::cout << cli::soft << "  cell width   " << cli::reset << l_dxy << " m" << std::endl;
 
+  //timer for whole computation including initialising the setup
+  std::cout << cli::soft << "  starting the timer  " << cli::reset << std::endl;
+  auto start = std::chrono::high_resolution_clock::now();
+
   // maximum observed height in the setup
   tsunami_lab::t_real l_hMax = std::numeric_limits< tsunami_lab::t_real >::lowest();
   // set up solver
@@ -716,6 +749,8 @@ int main() {
                             l_outputFile);
   }
 
+  // timer for timestep loop
+  auto cell_loop_start = std::chrono::high_resolution_clock::now();
   while( l_simTime < l_temp_endtime ){
     if( l_timeStep % 25 == 0 ) {
 
@@ -808,7 +843,20 @@ int main() {
     updateProgressBar(l_simTime, l_temp_endtime,50);
   }
 
+  //get duration of both timers
+  auto cell_loop_end = std::chrono::high_resolution_clock::now();
+  auto end = std::chrono::high_resolution_clock::now();
+
+  auto cell_loop_duration = std::chrono::duration_cast<std::chrono::nanoseconds>(cell_loop_end - cell_loop_start);
+  std::cout << "\n\n" << cli::green << "Duration of time step loop: " << cli::reset << std::endl;
+  printDuration(cell_loop_duration);
+
+  auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
+  std::cout << "\n\n" << cli::green << "Duration of programm: " << cli::reset << std::endl;
+  printDuration(duration);
+  
   std::cout << "\n\n" << cli::green << "Simulation complete. Outputs are in 'outputs'." << cli::reset << std::endl;
+
   // free memory
   std::cout << cli::soft << "Releasing memory..." << cli::reset << std::endl;
   delete l_setup;
