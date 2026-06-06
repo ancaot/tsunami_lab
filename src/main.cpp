@@ -456,10 +456,10 @@ int main() {
   bool l_useCheckpoint = false;
   tsunami_lab::t_real l_simTimeLastCP = 0;
 
-  if (std::filesystem::exists("outputs/checkpoints/checkpoint.nc")) {
+  if (std::filesystem::exists("tsunami_lab/outputs/checkpoints/checkpoint.nc")) {
     try {
       l_useCheckpoint = true;
-      tsunami_lab::io::NetCdf::readCheckPoint("outputs/checkpoints/checkpoint.nc",
+      tsunami_lab::io::NetCdf::readCheckPoint("tsunami_lab/outputs/checkpoints/checkpoint.nc",
                                               &l_temp_solver,
                                               &l_temp_setup,
                                               &l_temp_waveprop,
@@ -486,7 +486,7 @@ int main() {
     }
     catch (const std::exception& l_error) {
       std::cout << cli::red << "Ignoring broken checkpoint: " << l_error.what() << cli::reset << std::endl;
-      std::filesystem::remove("outputs/checkpoints/checkpoint.nc");
+      std::filesystem::remove("tsunami_lab/outputs/checkpoints/checkpoint.nc");
       l_useCheckpoint = false;
     }
   }
@@ -531,12 +531,12 @@ int main() {
     l_temp_outputfilename = cli::promptString("Output base name", l_temp_outputfilename);
   }
   if (!l_useCheckpoint) {
-    l_temp_outputfilename = generateNewName(l_temp_outputfilename,"outputs/");
+    l_temp_outputfilename = generateNewName(l_temp_outputfilename,"tsunami_lab/outputs/");
   }
   if (l_temp_writer == "netcdf" && std::filesystem::path(l_temp_outputfilename).extension().empty()) {
     l_temp_outputfilename += ".nc";
   }
-  std::string l_temp_outputfile =  "outputs/" + l_temp_outputfilename;
+  std::string l_temp_outputfile =  "tsunami_lab/outputs/" + l_temp_outputfilename;
 
   const char * l_bathFile = l_temp_bathFile.c_str();
   const char * l_disFile = l_temp_disFile.c_str();
@@ -709,7 +709,7 @@ int main() {
     if (station.i_x < l_domain_start_x || station.i_x >= l_temp_dimension_x + l_domain_start_x ||
         station.i_y < l_domain_start_y || station.i_y >= l_temp_dimension_y + l_domain_start_y) {
         std::cout << cli::red << "[skip] " << station.i_name << " is out of boundary." << cli::reset << std::endl;
-        std::string l_foldername = "stations/"+station.i_name;
+        std::string l_foldername = "tsunami_lab/stations/"+station.i_name;
         l_stations_string= l_stations_string + l_foldername +"/"+ station.i_name+".csv"+"$$"; 
         return true; // Remove the station
     }
@@ -755,7 +755,7 @@ int main() {
     if( l_timeStep % 25 == 0 ) {
 
       if(l_temp_writer == "csv"){
-        std::string l_path = "outputs/solution_" + std::to_string(l_time_step_index) + ".csv";
+        std::string l_path = "tsunami_lab/outputs/solution_" + std::to_string(l_time_step_index) + ".csv";
         std::ofstream l_file;
         l_file.open( l_path );
         tsunami_lab::io::Csv::write(l_dxy,
@@ -784,11 +784,11 @@ int main() {
                               l_outputFile);
       }
 
-      tsunami_lab::io::NetCdf* cp_netCdf = (l_netCdf != nullptr) ? l_netCdf : new tsunami_lab::io::NetCdf(l_nx, l_ny, l_k, "outputs/temp.nc");
+      tsunami_lab::io::NetCdf* cp_netCdf = (l_netCdf != nullptr) ? l_netCdf : new tsunami_lab::io::NetCdf(l_nx, l_ny, l_k, "tsunami_lab/outputs/temp.nc");
       cp_netCdf->createCheckPoint(l_temp_solver, l_temp_setup, l_temp_waveprop, l_temp_dimension_x, l_temp_dimension_y, l_nx, l_ny, l_domain_start_x, l_domain_start_y, l_temp_endtime, l_temp_writer, l_temp_bathFile, l_temp_disFile, l_temp_outputfilename, reflecting_boundary, l_simTime, l_waveProp->getMomentumX(), l_waveProp->getMomentumY(), l_waveProp->getHeight(), l_temp_location, l_waveProp->getBathymetry(), l_waveProp->getStride(), l_dxy, "checkpoint.nc");
       if (l_netCdf == nullptr) {
         delete cp_netCdf;
-        std::filesystem::remove("outputs/temp.nc");
+        std::filesystem::remove("tsunami_lab/outputs/temp.nc");
       }
 
       l_time_step_index++;
@@ -797,7 +797,7 @@ int main() {
     //STATIONS_---------------------------------------------START 
     if(l_current_frequency_time <= l_simTime){
       for (const auto& station : l_stations) {
-        std::string l_foldername = "stations/"+station.i_name;
+        std::string l_foldername = "tsunami_lab/stations/"+station.i_name;
         if (!std::filesystem::exists(l_foldername)){
           std::filesystem::create_directory(l_foldername);
         }
