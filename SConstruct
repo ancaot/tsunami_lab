@@ -138,6 +138,8 @@ if env['netcdf'] != 'off':
       Exit( 1 )
     print( 'netCDF support: disabled (libraries not found)' )
 
+env.Append(LIBS=['stdc++fs'])
+
 VariantDir( variant_dir = 'build/src',
             src_dir     = 'src' )
 
