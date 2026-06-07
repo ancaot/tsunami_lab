@@ -491,8 +491,12 @@ int main() {
     }
   }
 
+  bool l_batch_job = false;
   if (!l_useCheckpoint) {
-    cli::section("Launch settings");
+    //making it easier to run batch jobs
+    l_batch_job = cli::promptBool("Batch Job?", l_batch_job);
+    if (!l_batch_job){
+      cli::section("Launch settings");
     l_temp_solver = cli::promptChoice("Numerical solver", {"fwave", "roe"}, cli::lower(l_temp_solver));
     l_temp_waveprop = cli::promptChoice("Wave model", {"2d", "1d"}, cli::lower(l_temp_waveprop));
     if (l_temp_waveprop == "2d") {
@@ -529,7 +533,9 @@ int main() {
       l_temp_disFile = cli::promptNetCdfFile("Displacement NetCDF", l_temp_disFile, l_ncFiles);
     }
     l_temp_outputfilename = cli::promptString("Output base name", l_temp_outputfilename);
+    }
   }
+
   if (!l_useCheckpoint) {
     l_temp_outputfilename = generateNewName(l_temp_outputfilename,"outputs/");
   }
