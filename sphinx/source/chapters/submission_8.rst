@@ -206,14 +206,181 @@ als der persönliche Computer.
 1. Generische Compiler
 ----------------------
 
+In diesem Teil vergleichen wir zwei verschiedene C++ Compiler: den GNU Compiler ``g++`` aus der GNU Compiler Collection und den LLVM/Clang Compiler ``clang++``.
+Beide Compiler können C++ Code optimieren, aber sie treffen dabei teilweise unterschiedliche Entscheidungen. Deshalb kann derselbe Quellcode je nach Compiler unterschiedlich schnelle Programme erzeugen.
+Die offiziellen Projektseiten sind:
+
+* GNU Compiler Collection: https://gcc.gnu.org/
+* Clang / LLVM: https://clang.llvm.org/
+
+Damit wir unseren Code flexibel mit beiden Compilern übersetzen können, haben wir unser ``SConstruct`` erweitert.
+Der Compiler kann nun über die Umgebungsvariable ``CXX`` ausgewählt werden. Dafür wird die Umgebung mit ``os.environ.copy()`` an die SCons-Umgebung weitergegeben.
+Wenn ``CXX`` in der Umgebung gesetzt ist, wird der lokale SCons-Wert ``CXX`` entsprechend ersetzt:
+
+.. code-block:: python
+
+    env = Environment( variables = vars,
+                       ENV = os.environ.copy() )
+
+    if 'CXX' in os.environ:
+      env.Replace( CXX = os.environ['CXX'] )
+
+Damit kann ein Build mit GNU zum Beispiel so gestartet werden:
+
+.. code-block:: bash
+
+    CXX=g++ scons
+
+Ein Build mit Clang funktioniert entsprechend mit:
+
+.. code-block:: bash
+
+    CXX=clang++ scons
+
+Zusätzlich gibt das Build-Script den ausgewählten Compiler aus. Dadurch sieht man direkt beim Kompilieren, ob wirklich der gewünschte Compiler verwendet wurde.
+
 2. GNU vs Clang
 ---------------
+
+Für den Vergleich sollen beide Compiler auf dem Cluster mit derselben Simulationskonfiguration getestet werden.
+Wichtig ist dabei, dass der Solver nicht auf den Login Nodes ausgeführt wird, sondern nur in einem interaktiven Job oder Batch Job auf einem Compute Node.
+Damit die Laufzeiten vergleichbar bleiben, verwenden wir für alle Messungen dieselbe Konfiguration, zum Beispiel die Tohoku-Simulation mit 3500m-Auflösung aus Abschnitt 8.1.
+
+Der Ablauf für GNU ist:
+
+.. code-block:: bash
+
+    scons -c
+    CXX=g++ scons opt=O3
+    srun ./build/tsunami_lab
+
+Der Ablauf für Clang ist:
+
+.. code-block:: bash
+
+    scons -c
+    CXX=clang++ scons opt=O3
+    srun ./build/tsunami_lab
+
+Gemessen wird vor allem die Dauer der Zeitschritt-Schleife, da diese den eigentlichen Rechenaufwand besser beschreibt als die gesamte Programmlaufzeit inklusive Setup und Ein-/Ausgabe.
+
+.. list-table::
+    :header-rows: 1
+
+    * - Compiler
+      - Optimierung
+      - Duration of time step loop
+      - Duration of program
+      - Bemerkung
+    * - ``g++``
+      - ``-O3``
+      - wird nach Clusterlauf eingetragen
+      - wird nach Clusterlauf eingetragen
+      - GNU Compiler
+    * - ``clang++``
+      - ``-O3``
+      - wird nach Clusterlauf eingetragen
+      - wird nach Clusterlauf eingetragen
+      - LLVM/Clang Compiler
+
+Aus diesen Messungen lässt sich anschliessend ableiten, welcher Compiler fuer unsere konkrete Implementierung schnelleren Code erzeugt.
+Da Compileroptimierungen stark vom Code, von der CPU und von den verwendeten Flags abhängen, erwarten wir nicht automatisch, dass ein Compiler immer schneller ist.
 
 3. Optimierungs-Switches
 ------------------------
 
+Um verschiedene Optimierungslevel einfacher testen zu können, wurde im ``SConstruct`` eine neue Option ``opt`` hinzugefügt.
+Diese Option kann die Werte ``O0``, ``O1``, ``O2``, ``O3`` und ``Ofast`` annehmen.
+Für Release-Builds wird daraus automatisch das passende Compiler-Flag erzeugt, zum Beispiel ``-O2`` oder ``-Ofast``.
+
+Beispiele für die Messungen:
+
+.. code-block:: bash
+
+    scons -c
+    CXX=g++ scons opt=O2
+    srun ./build/tsunami_lab
+
+    scons -c
+    CXX=g++ scons opt=Ofast
+    srun ./build/tsunami_lab
+
+    scons -c
+    CXX=clang++ scons opt=O2
+    srun ./build/tsunami_lab
+
+    scons -c
+    CXX=clang++ scons opt=Ofast
+    srun ./build/tsunami_lab
+
+Die Messergebnisse können dann in folgender Tabelle verglichen werden:
+
+.. list-table::
+    :header-rows: 1
+
+    * - Compiler
+      - ``-O2``
+      - ``-O3``
+      - ``-Ofast``
+    * - ``g++``
+      - wird nach Clusterlauf eingetragen
+      - wird nach Clusterlauf eingetragen
+      - wird nach Clusterlauf eingetragen
+    * - ``clang++``
+      - wird nach Clusterlauf eingetragen
+      - wird nach Clusterlauf eingetragen
+      - wird nach Clusterlauf eingetragen
+
+Bei numerischen Simulationen muss man bei Optimierungsflags vorsichtig sein.
+Besonders ``-Ofast`` kann die Laufzeit verbessern, ist aber nicht immer unproblematisch.
+Dieses Flag erlaubt dem Compiler aggressivere Optimierungen und kann unter anderem strenge Floating-Point-Regeln lockern.
+Dadurch können Operationen umsortiert werden oder Annahmen ueber ``NaN``- und ``Inf``-Werte getroffen werden.
+Für unsere Tsunami-Simulation bedeutet das: Auch wenn ``-Ofast`` schneller ist, muessen wir prüfen, ob die berechneten Wasserhoehen, Ankunftszeiten und Wellenausbreitungen weiterhin plausibel bleiben.
+Deshalb vergleichen wir nicht nur die Laufzeit, sondern kontrollieren auch, ob die Simulationsergebnisse gegenüber ``-O2`` oder ``-O3`` sichtbar abweichen.
+
 4. Optimierungsberichte
 -----------------------
+
+Compiler können Optimierungsberichte ausgeben.
+Diese Berichte helfen zu verstehen, welche Schleifen optimiert oder vektorisiert wurden und welche Funktionen inline gesetzt wurden.
+Für Clang haben wir im Build-Script die Option ``use_report`` ergänzt.
+Wenn diese Option aktiviert ist und ``clang++`` verwendet wird, werden folgende Flags gesetzt:
+
+.. code-block:: bash
+
+    -Rpass=.*
+    -Rpass-missed=.*
+    -Rpass-analysis=.*
+
+Der Build mit Clang-Report kann so gestartet werden:
+
+.. code-block:: bash
+
+    scons -c
+    CXX=clang++ scons opt=O3 use_report=yes 2> clang_report.txt
+
+Die Ausgabe wird in diesem Beispiel in ``clang_report.txt`` gespeichert.
+Darin können wir nach den zeitintensiven Bereichen suchen, insbesondere nach ``WavePropagation2d::timeStep`` und ``fwave::netUpdates``.
+Diese Teile sind für uns besonders interessant, weil die Zeitschritt-Schleife sehr oft ausgeführt wird und der f-wave Solver in jeder Zelle Updates berechnet.
+
+Für GCC haben wir ebenfalls einfache Report-Flags ergänzt:
+
+.. code-block:: bash
+
+    -fopt-info-vec-optimized
+    -fopt-info-vec-missed
+    -fopt-info-inline-optimized
+    -fopt-info-inline-missed
+
+Damit kann auch fuer ``g++`` untersucht werden, ob Schleifen vektorisiert wurden und ob Funktionen inline gesetzt wurden.
+Besonders wichtig sind dabei zwei Fragen:
+
+* Kann der Compiler die grossen Schleifen in der Zeitschrittberechnung vektorisieren?
+* Wird der f-wave Solver, insbesondere ``fwave::netUpdates``, in die Zeitschritt-Schleife hinein inlined?
+
+Falls der Bericht zeigt, dass wichtige Schleifen nicht vektorisiert werden, können mögliche Ursachen Datenabhaengigkeiten, Funktionsaufrufe innerhalb der Schleife oder unklare Speicherzugriffe sein.
+Falls ``fwave::netUpdates`` nicht inlined wird, kann das ebenfalls Laufzeit kosten, weil diese Funktion sehr häufig aufgerufen wird.
+Die Optimierungsberichte geben uns damit Hinweise, an welchen Stellen weitere Performance-Verbesserungen sinnvoll sein koennten.
 
 
 8.3 Instrumentalisierung und Performance Zähler

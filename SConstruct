@@ -20,6 +20,13 @@ vars.AddVariables(
                 'compile modes, option \'san\' enables address and undefined behavior sanitizers',
                 'release',
                 allowed_values=( 'release', 'debug', 'release+san', 'debug+san' ) ),
+  EnumVariable( 'opt',
+                'optimization level for release builds',
+                'O3',
+                allowed_values=( 'O0', 'O1', 'O2', 'O3', 'Ofast' ) ),
+  BoolVariable( 'use_report',
+                'enable compiler optimization reports',
+                False ),
   EnumVariable( 'netcdf',
                 'enable netCDF output support (auto/on/off)',
                 'on',
@@ -39,7 +46,13 @@ if vars.UnknownVariables():
 env = Environment( variables = vars,
                    ENV = os.environ.copy() )
 
+if 'CXX' in os.environ:
+  env.Replace( CXX = os.environ['CXX'] )
+
 l_isMsvc = 'msvc' in env['TOOLS']
+l_compilerName = os.path.basename( env.subst( '$CXX' ) ).lower()
+
+print( 'selected C++ compiler: ' + env.subst( '$CXX' ) )
 
 if env['netcdf_include']:
   env.Append( CPPPATH = [ env['netcdf_include'] ] )
@@ -71,7 +84,24 @@ else:
   if l_isMsvc:
     env.Append( CXXFLAGS = [ '/O2' ] )
   else:
-    env.Append( CXXFLAGS = [ '-O3' ] )
+    env.Append( CXXFLAGS = [ '-' + env['opt'] ] )
+
+if env['use_report']:
+  if 'clang' in l_compilerName:
+    env.Append( CXXFLAGS = [ '-Rpass=.*',
+                             '-Rpass-missed=.*',
+                             '-Rpass-analysis=.*' ] )
+    print( 'optimization reports: enabled for Clang' )
+  elif 'g++' in l_compilerName or 'gcc' in l_compilerName:
+    env.Append( CXXFLAGS = [ '-fopt-info-vec-optimized',
+                             '-fopt-info-vec-missed',
+                             '-fopt-info-inline-optimized',
+                             '-fopt-info-inline-missed' ] )
+    print( 'optimization reports: enabled for GCC' )
+  elif l_isMsvc:
+    print( 'warning: optimization reports are not configured for MSVC' )
+  else:
+    print( 'warning: unknown compiler, no optimization report flags added' )
 
 if 'san' in env['mode']:
   if l_isMsvc:
