@@ -332,7 +332,7 @@ void tsunami_lab::io::NetCdf::createCheckPoint(std::string   i_solver,
                           std::string  i_checkpointfile){
   int l_ncId, l_err;
   //writing checkpoint files
-  std::string l_basePath = "tsunami_lab/outputs";
+  std::string l_basePath = "outputs";
   std::string l_path = l_basePath + "/checkpoints";
   std::string l_cpPath = l_path + "/" + i_checkpointfile;
   std::string l_tmpPath = l_cpPath + ".tmp";

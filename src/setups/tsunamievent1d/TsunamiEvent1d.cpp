@@ -10,7 +10,7 @@
 
 tsunami_lab::setups::TsunamiEvent1d::TsunamiEvent1d(){
 
-    const std::string filename = "tsunami_lab/data/data_end.csv";
+    const std::string filename = "data/data_end.csv";
     std::size_t columnIndex = 3;
     m_bathymetry_values = tsunami_lab::io::Csv::read(filename,columnIndex); 
     
