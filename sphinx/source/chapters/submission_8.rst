@@ -29,6 +29,12 @@ sowie die interaktiven und batch Jobs im nächsten Abschnitt.
 2. Interaktive und batch Jobs
 -----------------------------
 
+Für die interaktiven und batch Jobs wurden die Simulationen von dem ``tsunami_lab`` Ordner ausgeführt. 
+Demnach ist auch das batch-Skript entstanden. 
+Um das Ausführen der Simulation mit dem batch-Skript zu vereinfachen, haben wir eine boolean Variable eingeführt, um 
+die Launch-Settings Eingabe zu überspringen. 
+Wir ändern die Konfiguration für die batch-Jobs nicht. 
+
 Wir haben verschiedene Szenarien ausprobiert, um zu testen, dass wir die gleichen Resultate auf dem Cluster bekommen, wie bei vorherigen Simulationen. 
 
 Dafür überprüften wir zuerst Tohoku mit 3500m-Auflösung.
@@ -64,48 +70,135 @@ Die ``config.json`` Datei, die für diese Simulation genutzt wurde (wie vorher s
         "dam_location" : 0
     }
 
-*Vergleichstabelle von persönlichen PC, interaktiven und batch Jobs*
+*Vergleichstabelle von persönlichen Computer, interaktiven und batch Jobs*
 
 .. list-table::
     :header-rows: 1
 
     * - Information
-      - Persönlicher PC
+      - Persönlicher Computer
       - Interaktiver Job
       - Batch Job
     * - cells
       - 771 x 429
-      - 
-      - 
+      - 771 x 429
+      - 771 x 429
     * - cell width
       - 3501.95 m
-      - 
-      - 
+      - 3501.95 m
+      - 3501.95 m
     * - time step
       - 5.72301 seconds
-      - 
-      - 
+      - 5.72301 seconds
+      - 5.72304 seconds
     * - steps
       - 630
-      - 
-      - 
+      - 630
+      - 630
     * - Duration of time step loop
       - 5 s, 726 ms, 966 µs, 700 ns
-      - 
-      - 
+      - 22 s, 548 ms, 348 µs, 261 ns
+      - 21 s, 717 ms, 561 µs, 433 ns
     * - Duration of programm
       - 7 s, 300 ms, 386 µs, 0 ns
-      - 
-      - 
+      - 28 s, 772 ms, 981 µs, 698 ns
+      - 26 s, 621 ms, 999 µs, 269 ns
      
+Es war überraschend, dass auf meinem persönlichen Computer die Simulationen wesentlich schneller waren als auf dem Cluster. 
+Dabei ist aber zu bedenken, dass wir noch keine Parallelisierung hinzugefügt hatten oder andere Optimierungen. 
+Spannend ist auch, dass die Simulation über einen batch-Job schneller ging, als ein interaktiver Job. 
+Dabei wird bei der Zeit nur die tatsächliche Berechnung der Simulation gemessen und nichts von der Konfiguration.
+
 Hier nochmal die Visualisierung von der berechnenten Simulation:
 
 .. raw:: html
 
    <video src="../_static/tohoku_3500_personalPC.mp4" controls style="width: 72%; max-width: 760px; display: block; margin: 1rem auto;"></video>
 
-Visualisierung der Daten berechnet mit persönlichen PC.
+Visualisierung der Daten berechnet mit persönlichen Computer. 
+Die Visualiserung der Daten, die das Cluster überliefert hat, war identisch, demnach entsprechen auch die Werte.
 
+
+**Chile 2500m Auflösung**
+
+.. code-block:: json
+
+    {
+        "numerical_solver" : "fwave",
+        "scenario" :  "tsunamievent2d",
+        "wave_model" : "2d",
+        "domain_size_x" : 3500000,
+        "domain_size_y" : 2950000,
+        "cells_x" : 1400,
+        "cells_y" : 1180,
+        "coarse_factor" : 1,
+        "origin_x" : -3000000,
+        "origin_y" : -1500000,
+        "simulation_end_time" : 3600,
+        "output_format" : "netcdf",
+        "bathymetry_file" : "data/nc/data_in/output/chile_gebco20_usgs_250m_bath_fixed.nc",
+        "displacement_file" : "data/nc/data_in/output/chile_gebco20_usgs_250m_displ_fixed.nc",
+        "output_name": "chile_2500m_coarse_k1.nc",
+        "reflective_boundary" : false,
+        "initial_momentum_x" : 0,
+        "initial_momentum_y": 0.0,
+        "left_height": 25,
+        "right_height": 55,
+        "dam_location" : 0
+    }
+
+*Vergleichstabelle von persönlichen Computer, interaktiven und batch Jobs*
+
+.. list-table::
+    :header-rows: 1
+
+    * - Information
+      - Persönlicher Computer
+      - Interaktiver Job
+      - Batch Job
+    * - cells
+      - 1400 x 1180
+      - 1400 x 1180
+      - 1400 x 1180
+    * - cell width
+      - 2500 m
+      - 2500 m
+      - 2500 m
+    * - time step
+      - 4.40831 seconds
+      - 4.40831 seconds
+      - 4.40831 seconds
+    * - steps
+      - 817
+      - 817
+      - 817
+    * - Duration of time step loop
+      - 0 min, 38 s, 144 ms, 639 µs, 300 ns
+      - 2 min, 21 seconds, 69 milliseconds, 896 microseconds, 165 nanoseconds
+      - 1 min, 50 seconds, 624 milliseconds, 224 microseconds, 284 nanoseconds
+    * - Duration of programm
+      - 0 min, 49 s, 821 ms, 237 µs, 600 ns
+      - 3 min, 5 s, 65 ms, 49 µs, 37 ns
+      - 2 min, 29 s, 349 ms, 708 µs, 569 ns
+     
+Auch hier war mein persönlicher Computer wesentlich schneller als das Cluster. Genauso war der batch-Job schneller als der interaktive. 
+
+Hier nochmal die Visualisierung von der berechnenten Simulation:
+
+.. raw:: html
+
+   <video src="../_static/chile_2500_personalPC.mp4" controls style="width: 72%; max-width: 760px; display: block; margin: 1rem auto;"></video>
+
+Auch hier war die Visualiserung der Dateien von den interaktiven und batch Jobs identisch zu der Ausgabe vom persönlichen PC.
+
+**Erkenntnisse**
+
+In diesem Fall war der persönliche Computer immer am schnellsten, danach kam der batch-Job und zuletzt der interaktive Job. 
+Ob diese Zeiten bei weiter Optimierung und Parallelisierung bei behalten werden, bezweifle ich, aufgrund der Tatsache, 
+dass die Cluster auf Parallelisierung ausgelegt sind oder zumindest größeren Berechnungen. 
+Da eine große Auflösung untersucht wurde, wissen wir nicht wie sich die Rechner bei kleinerer Auflösung verhalten. 
+Anhand den Unterschieden zwischen Tohoku und Chile lässt sich aber erschließen, dass die Cluster weiterhin deutlich länger gebraucht hätten 
+als der persönliche Computer.
 
 8.2 Compiler
 ============
