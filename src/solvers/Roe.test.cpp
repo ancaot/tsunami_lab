@@ -5,9 +5,13 @@
  * Unit tests of the Roe Riemann solver.
  **/
 #include <catch2/catch.hpp>
+#ifndef __clang__
 #define private public
+#endif
 #include "Roe.h"
+#ifndef __clang__
 #undef public
+#endif
 
 TEST_CASE( "Test the derivation of the Roe speeds.", "[RoeSpeeds]" ) {
    /*

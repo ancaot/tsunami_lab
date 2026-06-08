@@ -1,14 +1,18 @@
 #include <catch2/catch.hpp>
 #include "../../constants.h"
 #include <sstream>
+#ifndef __clang__
 #define private public
+#endif
 #include "Station.h"
 #include "string"
 #include <sstream>
 #include <iostream>
 #include <fstream>
 
+#ifndef __clang__
 #undef public
+#endif
 
 
 TEST_CASE( "Test the Station IO", "[Station]" ) {

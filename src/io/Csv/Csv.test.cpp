@@ -8,9 +8,13 @@
 #include "../../constants.h"
 #include <sstream>
 #include <vector>
+#ifndef __clang__
 #define private public
+#endif
 #include "Csv.h"
+#ifndef __clang__
 #undef public
+#endif
 
 TEST_CASE( "Test the CSV-writer for 1D settings. Example 1", "[CsvWrite1d]" ) {
   // define a simple example

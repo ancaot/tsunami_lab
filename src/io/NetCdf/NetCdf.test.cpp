@@ -4,12 +4,16 @@
 #include "../../constants.h"
 #include <sstream>
 #include <vector>
+#ifndef __clang__
 #define private public
+#endif
 #include "NetCdf.h"
 #include <filesystem>
 #include <cstdio>
 #include <string>
+#ifndef __clang__
 #undef public
+#endif
 
 TEST_CASE("Test the NetCdf-writer", "[NetCdfWrite]")
 {

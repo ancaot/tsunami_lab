@@ -1,9 +1,13 @@
 #include <catch2/catch.hpp>
 #include "../../constants.h"
 #include <string>
+#ifndef __clang__
 #define private public
+#endif
 #include "Configuration.h"
+#ifndef __clang__
 #undef public
+#endif
 
 TEST_CASE( "Test the Json Reader", "[JsonReader]" ) {
 

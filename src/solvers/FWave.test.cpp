@@ -1,7 +1,11 @@
 /*#include <catch2/catch.hpp>
+#ifndef __clang__
 #define private public
+#endif
 #include "fwave.h"
+#ifndef __clang__
 #undef public
+#endif
 
 TEST_CASE( "Testing The InverseMatrix ", "[InverseMatrix]" ) {
 
