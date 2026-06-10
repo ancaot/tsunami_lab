@@ -70,6 +70,26 @@ Die ``config.json`` Datei, die für diese Simulation genutzt wurde (wie vorher s
         "dam_location" : 0
     }
 
+Für den batch-Job wurde folgendes batch-Skript verwendet:
+
+.. code-block:: bash
+
+    #!/bin/bash
+    #SBATCH --job-name=tsunami
+    #SBATCH --partition=short
+    #SBATCH --ntasks=1
+    #SBATCH --output=tsunami.out.%j
+    #SBATCH --error=tsunami.err.%j
+    #SBATCH --time=10:00
+    #SBATCH --cpus-per-task=96
+    echo "Job startet at: $(date)"
+    scons
+    ./build/tsunami_lab << EOF
+    yes
+    EOF
+    echo "Job finished at: $(date)"
+
+
 *Vergleichstabelle von persönlichen Computer, interaktiven und batch Jobs*
 
 .. list-table::
@@ -159,6 +179,8 @@ Die ``config.json`` Datei, die für diese Simulation genutzt wurde (wie vorher s
         "right_height": 55,
         "dam_location" : 0
     }
+
+Das batch-Skript ist analog zur Tohoku Simulation.
 
 *Vergleichstabelle von persönlichen Computer, interaktiven und batch Jobs*
 
@@ -415,7 +437,218 @@ Die Optimierungsberichte geben uns damit Hinweise, an welchen Stellen weitere Pe
 1. VTune
 --------
 
+Ich hatte am Anfang ein paar Probleme VTune zu starten und dann das Interface korrekt zu verstehen, aber am Ende hatte ich dann alles herausgefunden. 
+Die Aufgabenstellung war, was die erste Analyse durchführen betrifft, bezüglich der Ausführung auf einem Knoten etwas unklar gewesen. 
+Am Ende habe ich es interaktiv über die Command-Line gemacht, aber aufgrund der verschieden Optionen im VTune Menü war dies nicht direkt klar gewesen. 
+
+Für unsere erste VTune Analyse haben wir eine Hotspots-Analyse durchgeführt. Dazu haben wir folgenden Command eingegeben:
+
+.. code-block:: bash
+  
+  /cluster/intel/oneapi/2025.0.0/vtune/2025.0/bin64/vtune -collect hotspots --app-working-dir=/home/ne67fuh/tsunami_lab -- /home/ne67fuh/tsunami_lab/build/tsunami_lab
+
+Der VTune Bericht wurde dann auch in unserem ``tsunami_lab`` Verzeichnis gespeichert. 
+Folgende Bilder sind der Bericht mit dem VTune-Interface gelesen.
+
+.. figure:: ../_static/tohoku_alloc_summary_1.png
+  :width: 70%
+  :align: center
+  
+  Zusammenfassung: Zeit und Top Hotspots
+
+Hier können wir herauslesen, wie lange das Programm dauerte und welche Funktionen, die top Hotspots sind. 
+
+Für unser Programm werden hier ``solver::fwave::netUpdates``, ``WavePropagation2d::timeStep``, ``solver::fwave::decompose`` und die ``TsunamiEvent2d::get*`` Funktionen 
+als die top Hotspots übergeben. 
+
+.. figure:: ../_static/tohoku_alloc_summary_2.png
+  :width: 70%
+  :align: center
+  
+  Zusammenfassung: Histogramm von effektiver CPU Nutzung
+
+Da wir bis jetzt noch keine Parallelisierung implementiert haben, ist es kein Wunder, dass die CPUs so genutzt wurden.
+
+.. figure:: ../_static/tohoku_alloc_summary_3.png
+  :width: 70%
+  :align: center
+  
+  Zusammenfassung: Information über Analyse und Platform
+
+Hier stehen ledglich Informationen über wann, wo und worauf die Analyse durchgeführt wurde.
+
+.. figure:: ../_static/tohoku_alloc_bottom-up.png
+  :width: 70%
+  :align: center
+  
+  Bottom-Up Graph von den Funktionen und deren CPU Laufzeit
+
+Hier gibt es die Funktionen und Hotspots nocheinmal im Detail. 
+Auch hier ist natürlich die ``fwave::netUpdates`` Funktion ganz oben. 
+Einige Hotspots kommen aus unserem Programm, aber einige entstehen auch durch die NetCDF Datei Schreibung beziehungsweise Lesung. 
+
+.. figure:: ../_static/tohoku_alloc_flame-graph.png
+  :width: 70%
+  :align: center
+  
+  Flame-Graph des Programms
+
+Hier wird nochmal dargestellt, wie im Verlauf des Programms, die Hotspot-Funktionen genutzt werden und wo sie überlappen.
+
+Dies war der erste Eindruck der VTune Analyse und die Informationen, die wir dadurch bekommen.
 
 
-2. Verbesserung der Performance
+2. Analyse in batch-Job
+-----------------------
+
+Unser batch-Skript folgt für die Ausführung der Analyse:
+
+.. code-block:: bash
+
+    #!/bin/bash
+    #SBATCH --job-name=tsunami_analysis
+    #SBATCH --partition=short
+    #SBATCH --ntasks=1
+    #SBATCH --output=tsunami_analysis.out.%j
+    #SBATCH --error=tsunami_analysis.err.%j
+    #SBATCH --time=30:00
+    #SBATCH --cpus-per-task=96
+    echo "Job startet at: $(date)"
+    module load intel/oneapi/2025.0.0
+    export PATH=/cluster/intel/oneapi/2025.0.0/vtune/2025.0/bin64:$PATH
+    scons
+    /cluster/intel/oneapi/2025.0.0/vtune/2025.0/bin64/vtune -collect hotspots --app-working-dir=/home/ne67fuh/tsunami_lab -- /home/ne67fuh/tsunami_lab/build/tsunami_lab << EOF
+    yes
+    EOF
+    echo "Job finished at: $(date)"
+
+Folgende Bilder zeigen die Analyse Visualiserungen aus VTune. Viele Informationen überschneiden sich mit den vorherigen.
+
+.. figure:: ../_static/tohoku_batch_summary_1.png
+  :width: 70%
+  :align: center
+  
+  Zusammenfassung: Zeit und Top Hotspots
+
+Hier können wir herauslesen, wie lange das Programm dauerte, was hier 29,375s waren im Gegensatz zum vorherigen Durchlauf über ``salloc`` 
+und welche Funktionen, die top Hotspots sind. 
+
+Für unser Programm werden hier auch wieder ``solver::fwave::netUpdates``, ``WavePropagation2d::timeStep``, ``solver::fwave::decompose`` und die ``TsunamiEvent2d::get*`` Funktionen 
+als die top Hotspots übergeben. Jedoch hat sich die Reihenfolge bei den Getter-Funktionen etwas verändert.
+
+.. figure:: ../_static/tohoku_batch_summary_2.png
+  :width: 70%
+  :align: center
+  
+  Zusammenfassung: Histogramm von effektiver CPU Nutzung
+
+Hier gibt es keinen Unterschied, da immernoch keine Parallelisierung vorhanden ist.
+
+.. figure:: ../_static/tohoku_batch_bottom-up.png
+  :width: 70%
+  :align: center
+  
+  Bottom-Up Graph von den Funktionen und deren CPU Laufzeit
+
+Was hier besonders auffällt, ist das ``nc_put_vars_float`` viel mehr CPU Zeit einnimmt als in der ``salloc`` Analyse. 
+Woran das liegt, kann ich mir zunächst nicht erschließen. 
+
+.. figure:: ../_static/tohoku_batch_flame-graph.png
+  :width: 70%
+  :align: center
+  
+  Flame-Graph des Programms
+
+Dieser Graph ist dem Flame-Graph von dem ``salloc`` Durchlauf gleich.
+
+3. Rechenaufwand Erkenntnisse nach Analysen
+-------------------------------------------
+
+Was bei den ersten beiden Analysen auffällt sind die Funktionen ``fwave::netUpdates`` und ``WavePropagation::timeStep``. 
+Diese beiden Funktionen sind die aktivsten Funktionen in unserem Programm, was zu erwarten war, da sie unsere Zellen berechen.
+
+Demnach wird es hier sehr wichtig sein, Optimierungen zu finden und zu implementieren.
+
+Was etwas überraschender war, aber im nachhinein Sinn ergibt, ist die Aktivität der Getter-Funktionen für Wasserhöhe, die Impulse und Bathymetrie. 
+Da wir diese für unsere NetCDF-Dateien bzw. Ausgabe benötigen, ist es verständlich, dass sie so oft aufgerufen werden. 
+Diese zu optimieren würde unserem Programm auch helfen.
+
+*Ausführung mit -g*
+
+Danach haben wir nochmal eine Analyse mit Debug Symbolen durchgeführt. 
+Dazu haben wir im batch-Skript bei der Kompilierung folgendes ergänzt:
+
+.. code-block:: bash
+
+    scons -g
+
+Dabei haben wir dann folgende Ergebnisse bekommen.
+
+.. figure:: ../_static/tohoku_analysis_batch_g_summary.png
+  :width: 70%
+  :align: center
+  
+  Zusammenfassung: Zeit und Top Hotspots
+
+Die Zeit war wieder anders mit 28,045s etwas schneller als die Durchführung ohne Debug-Symbol ``-g``, jedoch weiterhin langsamer als der ``salloc`` interaktive Job. 
+
+Die top Hotspots waren wie zuvor, was zu erwarten war.
+
+.. figure:: ../_static/tohoku_analysis_batch_g_bottom-up.png
+  :width: 70%
+  :align: center
+  
+  Bottom-Up Graph von den Funktionen und deren CPU Laufzeit
+
+Hier sieht man genauer, dass sich bezüglich der Hotspot-Funktionen nicht viel verändert hat.
+
+*Ausführung mit -g -fno-inline*
+
+Und dann haben wir es auch nocheinmal mit der Ergänzung ``-fno-inline`` durchgeführt.
+
+.. code-block:: bash
+
+    scons -g -fno-inline
+
+Folgend, die Visualiserungen aus VTune:
+
+.. figure:: ../_static/tohoku_analysis_batch_g_no-inline_summary.png
+  :width: 70%
+  :align: center
+  
+  Zusammenfassung: Zeit und Top Hotspots
+
+Zeitlich gesehen gab es wenig Veränderung zu den vorherigen Jobs, diesmal dauerte die Durchführung 28,884s.
+
+Bei den Hotspot-Funktionen gibt es auch keine Veränderung.
+
+.. figure:: ../_static/tohoku_analysis_batch_g_no-inline_bottom-up.png
+  :width: 70%
+  :align: center
+  
+  Bottom-Up Graph von den Funktionen und deren CPU Laufzeit
+
+Hier gibt es dann eine große Veränderung gegenüber den vorherigen Analysen: 
+aufgrund des ``-fno-inline`` Befehls werden weniger Funktionen in dem Bottom-Up-Graph angezeigt. 
+
+Die Hotspot-Funktionen wurden davon natürlich nicht beeinflusst, jedoch wurden die angegeben Inforamtionen übersichtlicher.
+
+**Zusammenfassung aller Analysen**
+
+Generell dauerten die Simulationen von Tohoku in 3500m Auflösung mit Analyse um die 25 bis 30 Sekunden.
+
+Die herausstechenden Hotspot-Funktionen waren ``fwave::netUpdates`` sowie ``WavePropagation2d::timeStep``. 
+Diese Funktionen sollen der Hauptfokus für die Optimierung sein.
+
+
+4. Verbesserung der Performance
 -------------------------------
+
+**Mögliche Verbesserungen in der fwave::netUpdates Funktion**
+
+
+
+**Mögliche Verbesserungen in der WavePropagation2d::timeStep Funktion**
+
+Da die ``timeStep`` Funktion im jeden Schritt die ``netUpdates`` Funktion aufruft, müssen wir dies bei der Optimierung beachten. 
+
