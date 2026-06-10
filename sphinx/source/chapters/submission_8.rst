@@ -475,7 +475,7 @@ Da wir bis jetzt noch keine Parallelisierung implementiert haben, ist es kein Wu
   
   Zusammenfassung: Information über Analyse und Platform
 
-Hier stehen ledglich Informationen über wann, wo und worauf die Analyse durchgeführt wurde.
+Hier stehen lediglich Informationen über wann, wo und worauf die Analyse durchgeführt wurde.
 
 .. figure:: ../_static/tohoku_alloc_bottom-up.png
   :width: 70%
@@ -644,14 +644,152 @@ Diese Funktionen sollen der Hauptfokus für die Optimierung sein.
 4. Verbesserung der Performance
 -------------------------------
 
-Wie mittlerweile schon öfter erwähnt, werden wir unser Performance sehr verbessern können durch das Einführen von Paralleliserung.
+Wie mittlerweile schon öfter erwähnt, werden wir unser Performance sehr verbessern können durch das Einführen von Paralleliserung, 
+da einige For-Schleifen im Programm vorkommen, vorallem in ``WavePropagation2d::timeStep``.
 
 **Mögliche Verbesserungen in der fwave::netUpdates Funktion**
 
 Da die ``timeStep`` Funktion im jeden Schritt die ``netUpdates`` Funktion aufruft, müssen wir dies bei der Optimierung beachten. 
 
+Die erste Idee für die Verbesserung der Performance ist bei dieser Funktion, die folgende Funktionen, die von ``netUpdates`` aufgerufen werden, 
+zu inline Funktionen zu machen.
+
+.. code-block:: cpp
+
+    void tsunami_lab::solvers::fwave::eigencoefficientAlpha(t_real i_inverse[4],
+                                                        t_real i_delta_f[2],
+                                                        t_real i_b,
+                                                        t_real o_eigencoefficients[2]){
+
+      i_delta_f[1] = i_delta_f[1] - i_b;
+      //m x n ° n x p = 
+      o_eigencoefficients[0] = (i_inverse[0] * i_delta_f[0]) + (i_inverse[1] * i_delta_f[1]);
+      o_eigencoefficients[1] = (i_inverse[2] * i_delta_f[0]) + (i_inverse[3] * i_delta_f[1]);
+
+    }
+
+.. code-block:: cpp
+
+    void tsunami_lab::solvers::fwave::inverseMatrix(t_real i_eigen1,
+                                                t_real i_eigen2,
+                                                t_real o_inverse[4]){
+      //Compute the determinant of a 2x2 matrix 
+      t_real det = 1 / (i_eigen2 - i_eigen1);
+
+      //Compute the inverses of specific 2x2 matrices. (first row contains only ones)
+      o_inverse[0] = i_eigen2 * det;
+      o_inverse[1] = -1 * det;
+      o_inverse[2] = -i_eigen1 * det;
+      o_inverse[3] = 1 * det;
+    
+    }
+
+Inlining lässt den Compiler entscheiden, ob er die Funktionsaufrufe als tatsächliche Funktionsaufrufe behandeln möchte oder sie als im 
+aufrufenden Programm geschrieben (also inline des aufrufenden Programms) ansieht. 
+
+Der Vorteil von Inlining ist, dass Overhead reduziert wird, was bei den genannten zwei Funktionen eine gute Optimierung sein könnte. 
+Bei den zwei Funktionen werden relativ einfache Rechnung ohne jegliche Art von Schleifen durchgeführt, was der Compiler als gut genug für inline ansehen könnte. 
+
+Inline könnte eventuell auch eine Möglichkeit für die Funktionen ``fwave::flux`` und ``fwave::eigenvalues`` sein. 
+Jedoch sind die Funktionen vielleicht schon zu komplex, dass sich Inline nicht lohnen würde.
+
+(Informationen über Inline Funktion von `GeeksForGeeks <https://www.geeksforgeeks.org/cpp/inline-functions-cpp/>`__)
+
+Desweiteren fallen einige kleine Rechnungsdetails auf, die verbessert werden können.
+
+Zum Beispiel könnte in der ``inverseMatrix`` Funktion ``o_inverse[1] = -det`` und analog ``o_inverse[3] = det`` gesetzt werden. 
+Da wird sich die Multiplikation mit 1 gespart.
 
 **Mögliche Verbesserungen in der WavePropagation2d::timeStep Funktion**
 
+Was bei unserem ``WavePropagation2d`` auffällt, dass wir öfter komplexere For-Schleifen haben, in denen sich lediglich eine Variable unterscheidet. 
+In diesem Fall wäre es logisch weitere Funktionen einzuführen, die diese aus der jeweiligen Funktion auslagern.
 
+Ein Beispiel ist folgender Codeausschnitt aus der ``WavePropagation::timeStep`` Funktion:
+
+.. code-block:: cpp
+
+    ...
+    t_real * l_hOld = m_h[m_step];
+    t_real * l_huOld = m_hu[m_step];
+    t_real * l_hvOld = m_hv[m_step];
+
+    m_step = (m_step + 1) % 2;
+    t_real * l_hNew = m_h[m_step];
+    t_real * l_huNew = m_hu[m_step];
+    t_real * l_hvNew = m_hv[m_step];
+
+    for (t_idx l_ce = 0; l_ce < l_size; l_ce++) {
+      l_hNew[l_ce] = l_hOld[l_ce];
+      l_huNew[l_ce] = l_huOld[l_ce];
+      l_hvNew[l_ce] = l_hvOld[l_ce];
+    }
+
+Dieser Codeausschnitt wird zweimal aufgerufen ohne Änderung der Variablen, demnach wäre es vorteilhaft zunächst nur die jeweiligen Pointer zu initialiseren 
+und in einer seperaten Funktion diese Pointer dann ordentlich zu setzen. Die einzige Variable, die sie ändert ist ``m_step``.
+
+Weiter bei der ``timeStep`` Funktion fällt ähnliches auf mit folgendem Codeausschnitt:
+
+.. code-block:: cpp
+
+    ...
+    for (t_idx l_ex = 1; l_ex < m_xCells + 1; l_ex++) {
+      for (t_idx l_ey = 0; l_ey < m_yCells + 1; l_ey++) {
+        t_real l_netUpdates[2][2];
+        t_idx l_ceL = getIndex(l_ex, l_ey);
+        t_idx l_ceR = getIndex(l_ex, l_ey + 1);
+
+        if (m_choice) {
+          solvers::Roe::netUpdates(l_hOld[l_ceL],
+                                 l_hOld[l_ceR],
+                                 l_hvOld[l_ceL],
+                                 l_hvOld[l_ceR],
+                                 l_netUpdates[0],
+                                 l_netUpdates[1]);
+        }
+        else {
+          solvers::fwave::netUpdates(l_hOld[l_ceL],
+                                   l_hOld[l_ceR],
+                                   l_hvOld[l_ceL],
+                                   l_hvOld[l_ceR],
+                                   m_b[l_ceL],
+                                   m_b[l_ceR],
+                                   l_netUpdates[0],
+                                   l_netUpdates[1]);
+        }
+
+        l_hNew[l_ceL] -= i_scaling * l_netUpdates[0][0];
+        l_hvNew[l_ceL] -= i_scaling * l_netUpdates[0][1];
+        l_hNew[l_ceR] -= i_scaling * l_netUpdates[1][0];
+        l_hvNew[l_ceR] -= i_scaling * l_netUpdates[1][1];
+      }
+    }
+
+    setGhostCollumn();
+
+Das gleiche machen wir mit ``l_hu``, wo ``l_hv`` durch ``l_hu`` ersetzt wird. 
+Dementsprechend würde sich eine weitere Funktion, die diese verschachtelten For-Schleifen berechnet eventuell lohnen. 
+
+Etwas ähnliches kommt bei der ``WavePropagation2d::setGhostCollum`` vor:
+
+.. code-block:: cpp
+
+  for (t_idx l_g = 1; l_g < m_yCells + 1; l_g++) {
+    l_h[getIndex(0, l_g)] = l_h[getIndex(1, l_g)];
+    l_h[getIndex(m_xCells + 1, l_g)] = l_h[getIndex(m_xCells, l_g)];
+    m_b[getIndex(0, l_g)] = m_b[getIndex(1, l_g)];
+    m_b[getIndex(m_xCells + 1, l_g)] = m_b[getIndex(m_xCells, l_g)];
+
+    if (m_choiceBoundry) {
+      l_hu[getIndex(0, l_g)] = -l_hu[getIndex(1, l_g)];
+      l_hu[getIndex(m_xCells + 1, l_g)] = -l_hu[getIndex(m_xCells, l_g)];
+    }
+    else {
+      l_hu[getIndex(0, l_g)] = l_hu[getIndex(1, l_g)];
+      l_hu[getIndex(m_xCells + 1, l_g)] = l_hu[getIndex(m_xCells, l_g)];
+    }
+  }
+
+Hier werden im zweiten Aufruf ``m_yCells`` und ``m_xCells`` vertauscht, sowie ``l_hu`` durch ``l_hv`` ersetzt. 
+Ähnlich wie bei der tatsächlichen ``timeStep`` Funktion könnte eine Funktion mit den restlichen Variablen unverändert vom Vorteil sein.
 
