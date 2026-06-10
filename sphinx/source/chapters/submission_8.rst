@@ -386,6 +386,14 @@ Dadurch können Operationen umsortiert werden oder Annahmen ueber ``NaN``- und `
 Für unsere Tsunami-Simulation bedeutet das: Auch wenn ``-Ofast`` schneller ist, müssen wir prüfen, ob die berechneten Wasserhöhen, Ankunftszeiten und Wellenausbreitungen weiterhin plausibel bleiben.
 Deshalb vergleichen wir nicht nur die Laufzeit, sondern kontrollieren auch, ob die Simulationsergebnisse gegenüber ``-O2`` oder ``-O3`` sichtbar abweichen.
 
+Zur Kontrolle der numerischen Genauigkeit haben wir die erzeugten NetCDF-Dateien der verschiedenen Builds miteinander verglichen.
+Die Ausgaben von ``g++ -O2``, ``g++ -O3`` und ``clang++ -O3`` waren dabei identisch.
+Bei den ``-Ofast``-Builds traten dagegen kleine numerische Unterschiede auf, vor allem in den Impulsfeldern ``hu`` und ``hv``.
+Das passt zu den aggressiveren Floating-Point-Optimierungen von ``-Ofast``.
+Für reine Laufzeitvergleiche ist ``-Ofast`` deshalb interessant, für wissenschaftliche Simulationen sollte man die Ergebnisse aber zusätzlich gegen eine konservativere Optimierung wie ``-O2`` oder ``-O3`` validieren.
+Die Datei des ``clang++ -O2``-Laufs wich bereits in der Bathymetrie ``b`` von den anderen Dateien ab.
+Da die Bathymetrie nicht vom Optimierungslevel abhängen sollte, betrachten wir diesen Lauf als verdächtig und würden ihn für eine finale Auswertung erneut erzeugen.
+
 4. Optimierungsberichte
 -----------------------
 
