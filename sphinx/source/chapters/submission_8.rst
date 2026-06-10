@@ -644,11 +644,14 @@ Diese Funktionen sollen der Hauptfokus für die Optimierung sein.
 4. Verbesserung der Performance
 -------------------------------
 
+Wie mittlerweile schon öfter erwähnt, werden wir unser Performance sehr verbessern können durch das Einführen von Paralleliserung.
+
 **Mögliche Verbesserungen in der fwave::netUpdates Funktion**
 
+Da die ``timeStep`` Funktion im jeden Schritt die ``netUpdates`` Funktion aufruft, müssen wir dies bei der Optimierung beachten. 
 
 
 **Mögliche Verbesserungen in der WavePropagation2d::timeStep Funktion**
 
-Da die ``timeStep`` Funktion im jeden Schritt die ``netUpdates`` Funktion aufruft, müssen wir dies bei der Optimierung beachten. 
+
 
