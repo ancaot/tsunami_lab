@@ -9,7 +9,7 @@
 echo "Job startet at: $(date)"
 module load intel/oneapi/2025.0.0
 export PATH=/cluster/intel/oneapi/2025.0.0/vtune/2025.0/bin64:$PATH
-scons
+scons -g
 /cluster/intel/oneapi/2025.0.0/vtune/2025.0/bin64/vtune -collect hotspots --app-working-dir=/home/ne67fuh/tsunami_lab -- /home/ne67fuh/tsunami_lab/build/tsunami_lab << EOF
 yes
 EOF
