@@ -33,24 +33,37 @@ tsunami_lab::patches::WavePropagation2d::~WavePropagation2d() {
   delete[] m_b;
 }
 
-void tsunami_lab::patches::WavePropagation2d::timeStep(t_real i_scaling) {
-  t_idx l_size = (m_xCells + 2) * (m_yCells + 2);
-
-  t_real * l_hOld = m_h[m_step];
-  t_real * l_huOld = m_hu[m_step];
-  t_real * l_hvOld = m_hv[m_step];
+inline void tsunami_lab::patches::WavePropagation2d::initialiseArrays(t_idx l_size,
+                          t_real * l_hOld,
+                          t_real * l_huOld,
+                          t_real * l_hvOld,
+                          t_real * l_hNew,
+                          t_real * l_huNew,
+                          t_real * l_hvNew){
+  //setting size of arrays
+  l_hOld = m_h[m_step];
+  l_huOld = m_hu[m_step];
+  l_hvOld = m_hv[m_step];
 
   m_step = (m_step + 1) % 2;
-  t_real * l_hNew = m_h[m_step];
-  t_real * l_huNew = m_hu[m_step];
-  t_real * l_hvNew = m_hv[m_step];
+
+  l_hNew = m_h[m_step];
+  l_huNew = m_hu[m_step];
+  l_hvNew = m_hv[m_step];
+
 
   for (t_idx l_ce = 0; l_ce < l_size; l_ce++) {
     l_hNew[l_ce] = l_hOld[l_ce];
     l_huNew[l_ce] = l_huOld[l_ce];
     l_hvNew[l_ce] = l_hvOld[l_ce];
   }
+}
 
+inline void tsunami_lab::patches::WavePropagation2d::computeImpulse(t_real i_scaling,
+                                                                    t_real * l_hOld, 
+                                                                    t_real * l_iOld, 
+                                                                    t_real * l_hNew, 
+                                                                    t_real * l_iNew){
   for (t_idx l_ex = 0; l_ex < m_xCells + 1; l_ex++) {
     for (t_idx l_ey = 1; l_ey < m_yCells + 1; l_ey++) {
       t_real l_netUpdates[2][2];
@@ -60,16 +73,16 @@ void tsunami_lab::patches::WavePropagation2d::timeStep(t_real i_scaling) {
       if (m_choice) {
         solvers::Roe::netUpdates(l_hOld[l_ceL],
                                  l_hOld[l_ceR],
-                                 l_huOld[l_ceL],
-                                 l_huOld[l_ceR],
+                                 l_iOld[l_ceL],
+                                 l_iOld[l_ceR],
                                  l_netUpdates[0],
                                  l_netUpdates[1]);
       }
       else {
         solvers::fwave::netUpdates(l_hOld[l_ceL],
                                    l_hOld[l_ceR],
-                                   l_huOld[l_ceL],
-                                   l_huOld[l_ceR],
+                                   l_iOld[l_ceL],
+                                   l_iOld[l_ceR],
                                    m_b[l_ceL],
                                    m_b[l_ceR],
                                    l_netUpdates[0],
@@ -77,60 +90,33 @@ void tsunami_lab::patches::WavePropagation2d::timeStep(t_real i_scaling) {
       }
 
       l_hNew[l_ceL] -= i_scaling * l_netUpdates[0][0];
-      l_huNew[l_ceL] -= i_scaling * l_netUpdates[0][1];
+      l_iNew[l_ceL] -= i_scaling * l_netUpdates[0][1];
       l_hNew[l_ceR] -= i_scaling * l_netUpdates[1][0];
-      l_huNew[l_ceR] -= i_scaling * l_netUpdates[1][1];
+      l_iNew[l_ceR] -= i_scaling * l_netUpdates[1][1];
     }
   }
+}
+
+void tsunami_lab::patches::WavePropagation2d::timeStep(t_real i_scaling) {
+  t_idx l_size = (m_xCells + 2) * (m_yCells + 2);
+
+  t_real * l_hOld = m_h[m_step];
+  t_real * l_huOld = m_hu[m_step];
+  t_real * l_hvOld = m_hv[m_step];
+
+  t_real * l_hNew = m_h[m_step];
+  t_real * l_huNew = m_hu[m_step];
+  t_real * l_hvNew = m_hv[m_step];
+
+  initialiseArrays(l_size, l_hOld, l_huOld, l_hvOld, l_hNew, l_huNew, l_hvNew);
+
+  computeImpulse(i_scaling, l_hOld, l_huOld, l_hNew, l_huNew);
 
   setGhostCollumn();
 
-  l_hOld = m_h[m_step];
-  l_huOld = m_hu[m_step];
-  l_hvOld = m_hv[m_step];
+  initialiseArrays(l_size, l_hOld, l_huOld, l_hvOld, l_hNew, l_huNew, l_hvNew);
 
-  m_step = (m_step + 1) % 2;
-  l_hNew = m_h[m_step];
-  l_huNew = m_hu[m_step];
-  l_hvNew = m_hv[m_step];
-
-  for (t_idx l_ce = 0; l_ce < l_size; l_ce++) {
-    l_hNew[l_ce] = l_hOld[l_ce];
-    l_huNew[l_ce] = l_huOld[l_ce];
-    l_hvNew[l_ce] = l_hvOld[l_ce];
-  }
-
-  for (t_idx l_ex = 1; l_ex < m_xCells + 1; l_ex++) {
-    for (t_idx l_ey = 0; l_ey < m_yCells + 1; l_ey++) {
-      t_real l_netUpdates[2][2];
-      t_idx l_ceL = getIndex(l_ex, l_ey);
-      t_idx l_ceR = getIndex(l_ex, l_ey + 1);
-
-      if (m_choice) {
-        solvers::Roe::netUpdates(l_hOld[l_ceL],
-                                 l_hOld[l_ceR],
-                                 l_hvOld[l_ceL],
-                                 l_hvOld[l_ceR],
-                                 l_netUpdates[0],
-                                 l_netUpdates[1]);
-      }
-      else {
-        solvers::fwave::netUpdates(l_hOld[l_ceL],
-                                   l_hOld[l_ceR],
-                                   l_hvOld[l_ceL],
-                                   l_hvOld[l_ceR],
-                                   m_b[l_ceL],
-                                   m_b[l_ceR],
-                                   l_netUpdates[0],
-                                   l_netUpdates[1]);
-      }
-
-      l_hNew[l_ceL] -= i_scaling * l_netUpdates[0][0];
-      l_hvNew[l_ceL] -= i_scaling * l_netUpdates[0][1];
-      l_hNew[l_ceR] -= i_scaling * l_netUpdates[1][0];
-      l_hvNew[l_ceR] -= i_scaling * l_netUpdates[1][1];
-    }
-  }
+  computeImpulse(i_scaling, l_hOld, l_hvOld, l_hNew, l_hvNew);
 
   setGhostCollumn();
 }

@@ -1,7 +1,7 @@
 #include "FWave.h"
 #include <cmath>
 
-void tsunami_lab::solvers::fwave::eigenvalues( t_real   i_hL,
+inline void tsunami_lab::solvers::fwave::eigenvalues( t_real   i_hL,
                                 t_real   i_hR,
                                 t_real   i_uL,
                                 t_real   i_uR,
@@ -26,7 +26,7 @@ void tsunami_lab::solvers::fwave::eigenvalues( t_real   i_hL,
   o_waveSpeedR = l_uRoe + l_ghSqrtRoe;
 }
 
-void tsunami_lab::solvers::fwave::flux( t_real i_hL,
+inline void tsunami_lab::solvers::fwave::flux( t_real i_hL,
                                         t_real i_hR,
                                         t_real i_huL,
                                         t_real i_huR,
@@ -78,7 +78,7 @@ void tsunami_lab::solvers::fwave::decompose(t_real i_alphas[2],
  }
 
     
-void tsunami_lab::solvers::fwave::inverseMatrix(t_real i_eigen1,
+inline void tsunami_lab::solvers::fwave::inverseMatrix(t_real i_eigen1,
                                                 t_real i_eigen2,
                                                 t_real o_inverse[4]){
     //Compute the determinant of a 2x2 matrix 
@@ -86,13 +86,13 @@ void tsunami_lab::solvers::fwave::inverseMatrix(t_real i_eigen1,
 
     //Compute the inverses of specific 2x2 matrices. (first row contains only ones)
     o_inverse[0] = i_eigen2 * det;
-    o_inverse[1] = -1 * det;
+    o_inverse[1] = -det;
     o_inverse[2] = -i_eigen1 * det;
-    o_inverse[3] = 1 * det;
+    o_inverse[3] = det;
     
 }
 
-void tsunami_lab::solvers::fwave::eigencoefficientAlpha(t_real i_inverse[4],
+inline void tsunami_lab::solvers::fwave::eigencoefficientAlpha(t_real i_inverse[4],
                                                         t_real i_delta_f[2],
                                                         t_real i_b,
                                                         t_real o_eigencoefficients[2]){

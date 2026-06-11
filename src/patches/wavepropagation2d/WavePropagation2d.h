@@ -60,7 +60,29 @@ class tsunami_lab::patches::WavePropagation2d: public WavePropagation {
      **/
     void timeStep( t_real i_scaling_x);
    
- 
+    /**
+    * @brief Sets arrays for new and old height and momenta
+    *
+    * @param
+    */
+    void initialiseArrays(t_idx l_size,
+                          t_real * l_hOld,
+                          t_real * l_huOld,
+                          t_real * l_hvOld,
+                          t_real * l_hNew,
+                          t_real * l_huNew,
+                          t_real * l_hvNew);
+
+    /**
+    * @brief compute Impulse for cells
+    *
+    * @param 
+    */
+    void computeImpulse(t_real i_scaling,
+                        t_real * l_hOld,
+                        t_real * l_iOld,
+                        t_real * l_hNew,
+                        t_real * l_iNew);
 
     /**
      * @brief Sets all ghost cells.
