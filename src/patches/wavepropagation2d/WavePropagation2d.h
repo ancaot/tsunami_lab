@@ -65,24 +65,35 @@ class tsunami_lab::patches::WavePropagation2d: public WavePropagation {
     *
     * @param
     */
-    void initialiseArrays(t_idx l_size,
-                          t_real * l_hOld,
-                          t_real * l_huOld,
-                          t_real * l_hvOld,
-                          t_real * l_hNew,
-                          t_real * l_huNew,
-                          t_real * l_hvNew);
+    void copyOldToNew(t_idx l_size,
+                      t_real const * i_hOld,
+                      t_real const * i_huOld,
+                      t_real const * i_hvOld,
+                      t_real       * o_hNew,
+                      t_real       * o_huNew,
+                      t_real       * o_hvNew);
 
     /**
     * @brief compute Impulse for cells
     *
     * @param 
     */
-    void computeImpulse(t_real i_scaling,
-                        t_real * l_hOld,
-                        t_real * l_iOld,
-                        t_real * l_hNew,
-                        t_real * l_iNew);
+    void computeXImpulse(t_real i_scaling,
+                         t_real const * i_hOld,
+                         t_real const * i_momentumOld,
+                         t_real       * io_hNew,
+                         t_real       * io_momentumNew);
+
+    /**
+    * @brief compute y-direction edge updates for cells
+    *
+    * @param 
+    */
+    void computeYImpulse(t_real i_scaling,
+                         t_real const * i_hOld,
+                         t_real const * i_momentumOld,
+                         t_real       * io_hNew,
+                         t_real       * io_momentumNew);
 
     /**
      * @brief Sets all ghost cells.

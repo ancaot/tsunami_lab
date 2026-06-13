@@ -30,6 +30,10 @@
 #include <thread>
 #include <ctime>
 
+#ifdef _OPENMP
+#include <omp.h>
+#endif
+
 #ifdef _WIN32
 #include <conio.h>
 #endif
@@ -437,6 +441,8 @@ int main() {
   l_temp_endtime = cli::getOr<tsunami_lab::t_real>(l_config, {"simulation_end_time", "endtime"}, 36000);
   l_temp_writer = cli::getOr<std::string>(l_config, {"output_format", "writer"}, "csv");
   tsunami_lab::t_idx l_k = cli::getOr<tsunami_lab::t_idx>(l_config, {"coarse_factor", "k"}, 1);
+  tsunami_lab::t_idx l_outputInterval = cli::getOr<tsunami_lab::t_idx>(l_config, {"output_interval", "io_interval"}, 25);
+  tsunami_lab::t_idx l_maxTimeSteps = cli::getOr<tsunami_lab::t_idx>(l_config, {"time_steps", "max_time_steps"}, 0);
   l_temp_bathFile = cli::getOr<std::string>(l_config, {"bathymetry_file", "bathfile"}, "");
   l_temp_disFile = cli::getOr<std::string>(l_config, {"displacement_file", "disfile"}, "");
   std::string l_temp_outputfilename = cli::getOr<std::string>(l_config, {"output_name", "outputfilename"}, "tsunami_output.csv");
@@ -448,6 +454,9 @@ int main() {
   tsunami_lab::t_real l_temp_location = cli::getOr<tsunami_lab::t_real>(l_config, {"dam_location", "location"}, 0);
 
   l_frequency = tsunami_lab::io::Configuration::getFrequencyFromJson();
+  if (l_outputInterval == 0) {
+    l_outputInterval = 25;
+  }
 
   tsunami_lab::t_real * l_cp_h = nullptr;
   tsunami_lab::t_real * l_cp_hu = nullptr;
@@ -632,6 +641,11 @@ int main() {
   std::cout << cli::soft << "  output       " << cli::reset << l_temp_outputfile << std::endl;
   std::cout << cli::soft << "  cells        " << cli::reset << l_nx << " x " << l_ny << std::endl;
   std::cout << cli::soft << "  cell width   " << cli::reset << l_dxy << " m" << std::endl;
+#ifdef _OPENMP
+  std::cout << cli::soft << "  OpenMP       " << cli::reset << omp_get_max_threads() << " threads" << std::endl;
+#else
+  std::cout << cli::soft << "  OpenMP       " << cli::reset << "disabled" << std::endl;
+#endif
 
   //timer for whole computation including initialising the setup
   std::cout << cli::soft << "  starting the timer  " << cli::reset << std::endl;
@@ -679,7 +693,7 @@ int main() {
   l_dt = 0.50 * l_dxy / l_speedMax;
   if (l_useCheckpoint && l_dt > 0) {
     l_timeStep = static_cast<tsunami_lab::t_idx>(std::ceil(l_simTime / l_dt));
-    l_time_step_index = static_cast<tsunami_lab::t_idx>(std::ceil(l_timeStep / 25.0));
+    l_time_step_index = static_cast<tsunami_lab::t_idx>(std::ceil(static_cast<double>(l_timeStep) / static_cast<double>(l_outputInterval)));
   }
   
   // derive scaling for a time step
@@ -688,6 +702,9 @@ int main() {
   std::cout << cli::soft << "  time step    " << cli::reset << l_dt << " seconds" << std::endl;
 
   tsunami_lab::t_real amount_time_steps = ceil(l_temp_endtime/l_dt);
+  if (l_maxTimeSteps > 0) {
+    amount_time_steps = static_cast<tsunami_lab::t_real>(l_maxTimeSteps);
+  }
   std::cout << cli::soft << "  steps        " << cli::reset << amount_time_steps << std::endl;
 
   // set up time and print control
@@ -757,8 +774,9 @@ int main() {
 
   // timer for timestep loop
   auto cell_loop_start = std::chrono::high_resolution_clock::now();
-  while( l_simTime < l_temp_endtime ){
-    if( l_timeStep % 25 == 0 ) {
+  while( (l_maxTimeSteps > 0 && l_timeStep < l_maxTimeSteps) ||
+         (l_maxTimeSteps == 0 && l_simTime < l_temp_endtime) ){
+    if( l_timeStep % l_outputInterval == 0 ) {
 
       if(l_temp_writer == "csv"){
         std::string l_path = "outputs/solution_" + std::to_string(l_time_step_index) + ".csv";
@@ -856,6 +874,14 @@ int main() {
   auto cell_loop_duration = std::chrono::duration_cast<std::chrono::nanoseconds>(cell_loop_end - cell_loop_start);
   std::cout << "\n\n" << cli::green << "Duration of time step loop: " << cli::reset << std::endl;
   printDuration(cell_loop_duration);
+  const double l_loopSeconds = static_cast<double>(cell_loop_duration.count()) * 1.0e-9;
+  const double l_cellUpdates = static_cast<double>(l_nx) *
+                               static_cast<double>(l_ny) *
+                               static_cast<double>(l_timeStep);
+  if (l_loopSeconds > 0) {
+    std::cout << cli::soft << "  Cell updates/s: " << cli::reset
+              << (l_cellUpdates / l_loopSeconds) << std::endl;
+  }
 
   auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
   std::cout << "\n\n" << cli::green << "Duration of programm: " << cli::reset << std::endl;

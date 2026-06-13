@@ -27,6 +27,9 @@ vars.AddVariables(
   BoolVariable( 'use_report',
                 'enable compiler optimization reports',
                 False ),
+  BoolVariable( 'openmp',
+                'enable OpenMP shared-memory parallelization',
+                True ),
   EnumVariable( 'netcdf',
                 'enable netCDF output support (auto/on/off)',
                 'on',
@@ -103,6 +106,17 @@ if env['use_report']:
   else:
     print( 'warning: unknown compiler, no optimization report flags added' )
 
+if env['openmp']:
+  if l_isMsvc:
+    env.Append( CXXFLAGS = [ '/openmp' ] )
+    print( 'OpenMP support: enabled' )
+  else:
+    env.Append( CXXFLAGS = [ '-fopenmp' ] )
+    env.Append( LINKFLAGS = [ '-fopenmp' ] )
+    print( 'OpenMP support: enabled' )
+else:
+  print( 'OpenMP support: disabled' )
+
 if 'san' in env['mode']:
   if l_isMsvc:
     print( 'warning: sanitizers are not enabled for MSVC builds' )
@@ -168,7 +182,8 @@ if env['netcdf'] != 'off':
       Exit( 1 )
     print( 'netCDF support: disabled (libraries not found)' )
 
-env.Append(LIBS=['stdc++fs'])
+if not l_isMsvc:
+  env.Append(LIBS=['stdc++fs'])
 
 VariantDir( variant_dir = 'build/src',
             src_dir     = 'src' )
