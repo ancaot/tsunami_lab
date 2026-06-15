@@ -7,16 +7,16 @@ Submission 9: Paralleliserung
 
 Wir haben den zweidimensionalen Solver mit OpenMP parallelisiert. Die
 Parallelisierung liegt bewusst im ``WavePropagation2d``-Patch, weil dort die
-meiste Zeit verbracht wird und weil die Schleifenstruktur dort gross genug ist,
+meiste Zeit verbracht wird und weil die Schleifenstruktur dort groß genug ist,
 damit Threading nicht nur Overhead erzeugt.
 
-Im Build-System wurde dafuer eine neue Option eingefuehrt:
+Im Build-System wurde dafür eine neue Option eingeführt:
 
 .. code-block:: bash
 
     scons mode=release opt=O3 openmp=true
 
-Bei GCC und Clang fuegt SCons dadurch ``-fopenmp`` zu Compile- und Link-Flags
+Bei GCC und Clang fügt SCons dadurch ``-fopenmp`` zu Compile- und Link-Flags
 hinzu. Bei MSVC wird ``/openmp`` verwendet. Zum Vergleich kann OpenMP auch
 abgeschaltet werden:
 
@@ -24,18 +24,18 @@ abgeschaltet werden:
 
     scons mode=release opt=O3 openmp=false
 
-Die wichtigsten Aenderungen im Solver sind:
+Die wichtigsten Änderungen im Solver sind:
 
 * Die alten Werte werden vor jedem Sweep parallel in das neue Array kopiert.
 * Die x-Richtung wird zeilenweise parallelisiert.
 * Die y-Richtung wird spaltenweise parallelisiert.
 * Die Ghost-Zellen werden ebenfalls parallel gesetzt.
-* Die Initialisierung der grossen Arrays erfolgt parallel. Damit wird auf NUMA-Systemen auch das First-Touch-Prinzip unterstuetzt, wenn die Initialisierung auf Grace mit der finalen Thread-/Pinning-Konfiguration laeuft.
-* Die OpenMP-Schleifen verwenden ``schedule(runtime)``, damit wir die Scheduling-Strategie ueber ``OMP_SCHEDULE`` messen koennen.
+* Die Initialisierung der großen Arrays erfolgt parallel. Damit wird auf NUMA-Systemen auch das First-Touch-Prinzip unterstützt, wenn die Initialisierung auf Grace mit der finalen Thread-/Pinning-Konfiguration läuft.
+* Die OpenMP-Schleifen verwenden ``schedule(runtime)``, damit wir die Scheduling-Strategie ueber ``OMP_SCHEDULE`` messen können.
 
-Beim Umbau ist uns ausserdem aufgefallen, dass die alte Hilfsfunktion
+Beim Umbau ist uns außerdem aufgefallen, dass die alte Hilfsfunktion
 ``initialiseArrays`` Pointer nur by value bekommen hat. Dadurch wurden die
-``old``- und ``new``-Pointer ausserhalb der Funktion nicht wirklich
+``old``- und ``new``-Pointer außerhalb der Funktion nicht wirklich
 umgesetzt. Fuer die OpenMP-Version wurde das durch eine klare
 ``copyOldToNew``-Funktion ersetzt.
 
@@ -50,9 +50,9 @@ Varianten bestanden die Tests:
 2. Parallelisiert vs Seriell
 ============================
 
-Die echten Speedup-Werte muessen auf NVIDIA Grace gemessen werden, weil unser
+Die echten Speedup-Werte müssen auf NVIDIA Grace gemessen werden, weil unser
 lokaler Rechner nicht dieselbe Kernzahl, Speicherbandbreite und NUMA-Struktur
-hat. Fuer die Messung verwenden wir immer dieselbe Konfiguration und variieren
+hat. Für die Messung verwenden wir immer dieselbe Konfiguration und variieren
 nur die OpenMP-Umgebung.
 
 Serielle Referenz:
@@ -137,8 +137,8 @@ Laufzeit mit ``p`` Threads.
       - auf Grace berechnen
       - auf Grace eintragen
 
-Wir erwarten keinen idealen Speedup bis 144 Threads. Gruende dafuer sind die
-seriellen Teile ausserhalb des Zeitschritt-Kerns, Speicherbandbreite,
+Wir erwarten keinen idealen Speedup bis 144 Threads. Gründe dafür sind die
+seriellen Teile außerhalb des Zeitschritt-Kerns, Speicherbandbreite,
 Thread-Overhead, Ghost-Zell-Behandlung und Datei-I/O.
 
 
@@ -147,26 +147,26 @@ Thread-Overhead, Ghost-Zell-Behandlung und Datei-I/O.
 
 Beim 2D-Solver ist die Wahl der Schleife wichtig. Innerhalb einer Zeile teilen
 sich benachbarte Kanten dieselbe Zelle. Wenn man diese innere Kantenschleife
-parallelisiert, koennen zwei Threads gleichzeitig dieselbe Hoehe oder denselben
-Impuls aktualisieren. Das waere eine Race Condition.
+parallelisiert, koennen zwei Threads gleichzeitig dieselbe Höhe oder denselben
+Impuls aktualisieren. Das wäre eine Race Condition.
 
 Besser ist deshalb:
 
-* Im x-Sweep parallelisieren wir die aeussere Schleife ueber die y-Zeilen.
+* Im x-Sweep parallelisieren wir die äußere Schleife über die y-Zeilen.
   Jede Thread-Zeile schreibt nur in ihre eigene Zeile.
-* Im y-Sweep parallelisieren wir die aeussere Schleife ueber die x-Spalten.
+* Im y-Sweep parallelisieren wir die äußere Schleife über die x-Spalten.
   Jede Thread-Spalte schreibt nur in ihre eigene Spalte.
 
 Damit bleiben die Updates innerhalb einer Zeile bzw. Spalte seriell, aber die
-unabhaengigen Zeilen bzw. Spalten koennen gleichzeitig berechnet werden. Diese
-Variante ist weniger spektakulaer als einfach ``collapse(2)`` auf alle
+unabhängigen Zeilen bzw. Spalten können gleichzeitig berechnet werden. Diese
+Variante ist weniger spektakulär als einfach ``collapse(2)`` auf alle
 Schleifen zu schreiben, aber sie ist korrekt.
 
 
 4. Scheduling und Pinning Strategien
 ====================================
 
-Fuer unsere Schleifen ist ``schedule(static)`` der natuerliche Startpunkt. Die
+Fuer unsere Schleifen ist ``schedule(static)`` der natürliche Startpunkt. Die
 Arbeit pro Zeile bzw. Spalte ist nahezu gleich, deshalb bringt dynamisches
 Scheduling wahrscheinlich mehr Overhead als Nutzen.
 
@@ -188,12 +188,12 @@ und zum Vergleich:
 
 Unsere Erwartung:
 
-* ``static`` ist am besten oder sehr nah am besten, weil die Last gleichmaessig ist.
+* ``static`` ist am besten oder sehr nah am besten, weil die Last gleichmäßig ist.
 * ``close`` kann bei kleineren Threadzahlen helfen, weil Daten lokal bleiben.
 * ``spread`` kann bei hohen Threadzahlen besser sein, weil mehr Speichercontroller genutzt werden.
-* NUMA-Effekte sieht man besonders bei 96 bis 144 Threads. Darum initialisieren wir die grossen Arrays parallel, sodass First Touch zur spaeteren Thread-Platzierung passt.
+* NUMA-Effekte sieht man besonders bei 96 bis 144 Threads. Darum initialisieren wir die großen Arrays parallel, sodass First Touch zur späteren Thread-Platzierung passt.
 
-Das Skript ``tools/run_openmp_grace_benchmark.sh`` fuehrt diese Kombinationen
+Das Skript ``tools/run_openmp_grace_benchmark.sh`` führt diese Kombinationen
 automatisch aus und schreibt pro Lauf eine Logdatei nach
 ``outputs/omp_benchmarks``.
 
@@ -204,12 +204,12 @@ automatisch aus und schreibt pro Lauf eine Logdatei nach
 Fuer den optionalen Benchmark nutzen wir:
 
 * 2011 M 9.1 Tohoku Event
-* 250m Aufloesung
+* 250m Auflösung
 * 10000 Zeitschritte
 * Datei-I/O alle 100 Zeitschritte
 * maximal 144 Threads auf Grace
 
-Damit diese Vorgabe direkt ueber die Konfiguration steuerbar ist, wurden zwei
+Damit diese Vorgabe direkt über die Konfiguration steuerbar ist, wurden zwei
 optionale Keys ergaenzt:
 
 .. code-block:: json
@@ -217,7 +217,7 @@ optionale Keys ergaenzt:
     "time_steps": 10000,
     "output_interval": 100
 
-Wenn ``time_steps`` gesetzt ist, laeuft die Simulation genau diese Anzahl von
+Wenn ``time_steps`` gesetzt ist, läuft die Simulation genau diese Anzahl von
 Zeitschritten. Ohne diesen Key wird weiterhin wie bisher bis zur konfigurierten
 Endzeit gerechnet. Ohne ``output_interval`` bleibt der alte Standard von 25
 Zeitschritten erhalten.
@@ -229,7 +229,7 @@ Das Programm gibt am Ende neben der Laufzeit der Zeitschritt-Schleife auch
 
     \frac{n_x \cdot n_y \cdot n_\text{steps}}{T_\text{loop}}
 
-Unser Teamname fuer die Benchmark-Liste:
+Unser Teamname für die Benchmark-Liste:
 
 .. code-block:: text
 
