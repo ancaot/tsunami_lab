@@ -97,45 +97,45 @@ Laufzeit mit ``p`` Threads.
       - Speedup
       - Cell updates/s
     * - 1
-      - auf Grace eintragen
+      - 10 minutes, 0 seconds, 303 milliseconds, 278 microseconds, 783 nanoseconds
       - 1.00
-      - auf Grace eintragen
+      - 954238
     * - 2
-      - auf Grace eintragen
-      - auf Grace berechnen
-      - auf Grace eintragen
+      - 3 minutes, 31 seconds, 807 milliseconds, 434 microseconds, 454 nanoseconds
+      - 2.83419
+      - 2.70449e+06
     * - 4
-      - auf Grace eintragen
-      - auf Grace berechnen
-      - auf Grace eintragen
+      - 3 minutes, 24 seconds, 822 milliseconds, 681 microseconds, 491 nanoseconds
+      - 2.93084
+      - 2.79672e+06
     * - 8
-      - auf Grace eintragen
-      - auf Grace berechnen
-      - auf Grace eintragen
+      - 2 minutes, 27 seconds, 239 milliseconds, 14 microseconds, 384 nanoseconds
+      - 4.07707
+      - 3.89049e+06
     * - 16
-      - auf Grace eintragen
-      - auf Grace berechnen
-      - auf Grace eintragen
+      - 2 minutes, 19 seconds, 356 milliseconds, 373 microseconds, 858 nanoseconds
+      - 4.30768
+      - 4.11055e+06
     * - 32
-      - auf Grace eintragen
-      - auf Grace berechnen
-      - auf Grace eintragen
+      - 2 minutes, 3 seconds, 648 milliseconds, 891 microseconds, 921 nanoseconds
+      - 4.85490
+      - 4.63273e+06
     * - 64
-      - auf Grace eintragen
-      - auf Grace berechnen
-      - auf Grace eintragen
+      - 1 minutes, 59 seconds, 200 milliseconds, 837 microseconds, 561 nanoseconds
+      - 5.03606
+      - 4.8056e+06
     * - 96
-      - auf Grace eintragen
-      - auf Grace berechnen
-      - auf Grace eintragen
+      - 3 minutes, 21 seconds, 457 milliseconds, 676 microseconds, 385 nanoseconds
+      - 2.97980
+      - 2.84344e+06
     * - 128
-      - auf Grace eintragen
-      - auf Grace berechnen
-      - auf Grace eintragen
+      - 3 minutes, 30 seconds, 671 milliseconds, 700 microseconds, 630 nanoseconds
+      - 2.84947
+      - 2.71907e+06
     * - 144
-      - auf Grace eintragen
-      - auf Grace berechnen
-      - auf Grace eintragen
+      - 3 minutes, 27 seconds, 226 milliseconds, 815 microseconds, 971 nanoseconds
+      - 2.89684
+      - 2.76428e+06
 
 Wir erwarten keinen idealen Speedup bis 144 Threads. Gründe dafür sind die
 seriellen Teile außerhalb des Zeitschritt-Kerns, Speicherbandbreite,
@@ -166,7 +166,7 @@ Schleifen zu schreiben, aber sie ist korrekt.
 4. Scheduling und Pinning Strategien
 ====================================
 
-Fuer unsere Schleifen ist ``schedule(static)`` der natürliche Startpunkt. Die
+Für unsere Schleifen ist ``schedule(static)`` der natürliche Startpunkt. Die
 Arbeit pro Zeile bzw. Spalte ist nahezu gleich, deshalb bringt dynamisches
 Scheduling wahrscheinlich mehr Overhead als Nutzen.
 
@@ -201,7 +201,7 @@ automatisch aus und schreibt pro Lauf eine Logdatei nach
 5. Benchmark vom parallelisierten Solver
 ========================================
 
-Fuer den optionalen Benchmark nutzen wir:
+Für den optionalen Benchmark nutzen wir:
 
 * 2011 M 9.1 Tohoku Event
 * 250m Auflösung
@@ -210,7 +210,7 @@ Fuer den optionalen Benchmark nutzen wir:
 * maximal 144 Threads auf Grace
 
 Damit diese Vorgabe direkt über die Konfiguration steuerbar ist, wurden zwei
-optionale Keys ergaenzt:
+optionale Keys ergänzt:
 
 .. code-block:: json
 

@@ -23,6 +23,7 @@ for schedule in static dynamic guided; do
     export OMP_PROC_BIND="${binding}"
     export OMP_PLACES=cores
     for threads in 1 2 4 8 16 32 64 96 128 144; do
+      rm outputs/checkpoints/checkpoint.nc
       export OMP_NUM_THREADS="${threads}"
       log="outputs/omp_benchmarks/grace_t${threads}_${schedule}_${binding}.log"
       echo "threads=${threads} schedule=${schedule} bind=${binding}"
