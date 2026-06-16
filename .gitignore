@@ -21,6 +21,7 @@ symmetry_*.csv
 !/data/csv/
 /data/nc/
 /data/output/
+!/outputs/omp_benchmarks
 /outputs/
 /station/
 /stations/
