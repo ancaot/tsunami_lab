@@ -340,18 +340,20 @@ Unser Teamname für die Benchmark-Liste:
 
     Wavefront Witnesses
 
-Die finalen Grace-Zahlen tragen wir nach dem Lauf hier ein:
+Die finalen Grace-Zahlen stehen in folgender Tabelle:
 
 .. list-table:: Optionaler Grace-Benchmark
     :header-rows: 1
 
     * - Team
       - Threads
-      - Laufzeit
+      - Laufzeit (Zeitschritt-Schleife)
+      - Laufzeit (gesamt)
       - Cell updates/s
       - Beste Strategie
     * - Wavefront Witnesses
       - 144
-      - auf Grace eintragen
-      - auf Grace eintragen
-      - auf Grace eintragen
+      - 1 hours, 9 minutes, 26 seconds, 50 milliseconds, 456 microseconds, 701 nanoseconds
+      - 1 hours, 18 minutes, 35 seconds, 603 milliseconds, 651 microseconds, 699 nanoseconds
+      - 1.55543e+08
+      - schedule(static), binding(close)
