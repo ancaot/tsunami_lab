@@ -197,6 +197,111 @@ Das Skript ``tools/run_openmp_grace_benchmark.sh`` führt diese Kombinationen
 automatisch aus und schreibt pro Lauf eine Logdatei nach
 ``outputs/omp_benchmarks``.
 
+Folgende Tabellen zeigen die Laufzeiten der Zeitschritt-Schleifen für die Thread-Counts 1, 64 und 144. 
+Die Simulation war wie zuvor Tohoku 2500m Auflösung.
+
+.. list-table:: Vergleich der Ergebnisse aus Logdateien (Thread-Count = 1)
+    :header-rows: 1
+
+    * - OMP_SCHEDULE
+      - OMP_PROC_BIND
+      - Zeitschritt-Schleife
+      - Programm
+    * - static
+      - closed
+      - 16 seconds, 311 milliseconds, 185 microseconds, 258 nanoseconds
+      - 21 seconds, 380 milliseconds, 990 microseconds, 998 nanoseconds
+    * - static
+      - spread
+      - 16 seconds, 26 milliseconds, 513 microseconds, 329 nanoseconds
+      - 21 seconds, 95 milliseconds, 314 microseconds, 661 nanoseconds
+    * - dynamic
+      - closed
+      - 1 minutes, 0 seconds, 393 milliseconds, 550 microseconds, 266 nanoseconds
+      - 1 minutes, 11 seconds, 73 milliseconds, 34 microseconds, 134 nanoseconds
+    * - dynamic
+      - spread
+      - 31 seconds, 802 milliseconds, 244 microseconds, 671 nanoseconds
+      - 36 seconds, 956 milliseconds, 647 microseconds, 372 nanoseconds
+    * - guided
+      - closed
+      - 21 seconds, 376 milliseconds, 761 microseconds, 378 nanoseconds
+      - 28 seconds, 18 milliseconds, 528 microseconds, 760 nanoseconds
+    * - guided
+      - spread
+      - 16 seconds, 315 milliseconds, 959 microseconds, 784 nanoseconds
+      - 21 seconds, 992 milliseconds, 328 microseconds, 918 nanoseconds
+
+.. list-table:: Vergleich der Ergebnisse aus Logdateien (Thread-Count = 64)
+    :header-rows: 1
+
+    * - OMP_SCHEDULE
+      - OMP_PROC_BIND
+      - Zeitschritt-Schleife
+      - Programm
+    * - static
+      - closed
+      - 966 milliseconds, 892 microseconds, 330 nanoseconds
+      - 6 seconds, 44 milliseconds, 880 microseconds, 455 nanoseconds
+    * - static
+      - spread
+      - 1 seconds, 183 milliseconds, 129 microseconds, 710 nanoseconds
+      - 7 seconds, 488 milliseconds, 757 microseconds, 408 nanoseconds
+    * - dynamic
+      - closed
+      - 1 minutes, 31 seconds, 871 milliseconds, 674 microseconds, 929 nanoseconds
+      - 1 minutes, 36 seconds, 945 milliseconds, 625 microseconds, 75 nanoseconds
+    * - dynamic
+      - spread
+      - 2 minutes, 58 seconds, 532 milliseconds, 602 microseconds, 1 nanoseconds
+      - 3 minutes, 4 seconds, 42 milliseconds, 649 microseconds, 606 nanoseconds
+    * - guided
+      - closed
+      - 1 seconds, 200 milliseconds, 408 microseconds, 76 nanoseconds
+      - 6 seconds, 276 milliseconds, 176 microseconds, 484 nanoseconds
+    * - guided
+      - spread
+      - 1 seconds, 901 milliseconds, 54 microseconds, 349 nanoseconds
+      - 7 seconds, 152 milliseconds, 32 microseconds, 83 nanoseconds
+
+.. list-table:: Vergleich der Ergebnisse aus Logdateien (Thread-Count = 144)
+    :header-rows: 1
+
+    * - OMP_SCHEDULE
+      - OMP_PROC_BIND
+      - Zeitschritt-Schleife
+      - Programm
+    * - static
+      - closed
+      - 8 seconds, 163 milliseconds, 429 microseconds, 861 nanoseconds
+      - 13 seconds, 244 milliseconds, 825 microseconds, 175 nanoseconds
+    * - static
+      - spread
+      - 31 seconds, 310 milliseconds, 631 microseconds, 914 nanoseconds
+      - 41 seconds, 998 milliseconds, 880 microseconds, 160 nanoseconds
+    * - dynamic
+      - closed
+      - 4 minutes, 24 seconds, 998 milliseconds, 81 microseconds, 757 nanoseconds
+      - 4 minutes, 30 seconds, 524 milliseconds, 594 microseconds, 513 nanoseconds
+    * - dynamic
+      - spread
+      - 3 minutes, 20 seconds, 935 milliseconds, 712 microseconds, 388 nanoseconds
+      - 3 minutes, 26 seconds, 21 milliseconds, 435 microseconds, 654 nanoseconds
+    * - guided
+      - closed
+      - 6 seconds, 416 milliseconds, 452 microseconds, 229 nanoseconds
+      - 11 seconds, 496 milliseconds, 478 microseconds, 448 nanoseconds
+    * - guided
+      - spread
+      - 6 seconds, 585 milliseconds, 191 microseconds, 227 nanoseconds
+      - 11 seconds, 672 milliseconds, 818 microseconds, 607 nanoseconds
+
+Generell war ``static`` bei niedriegeren Thread-Counts die beste Option für die Laufzeit. 
+Bei 144 Threads war jedoch ``guided`` schneller. 
+``dynamic`` war generell am langsamsten. 
+
+``spread`` im Vergleich zu ``close`` schien sich abhängig von der Schedule Art schneller oder langsamer zu verhalten. 
+
 
 5. Benchmark vom parallelisierten Solver
 ========================================

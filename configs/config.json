@@ -4,8 +4,8 @@
     "wave_model" : "2d",
     "domain_size_x" : 2700000,
     "domain_size_y" : 1500000,
-    "cells_x" : 1080,
-    "cells_y" : 600,
+    "cells_x" : 10800,
+    "cells_y" : 6000,
     "coarse_factor" : 4,
     "origin_x" : -200000,
     "origin_y" : -750000,
@@ -19,6 +19,8 @@
     "initial_momentum_y": 0.0,
     "left_height": 25,
     "right_height": 55,
-    "dam_location" : 0
+    "dam_location" : 0,
+    "time_steps": 10000,
+    "output_interval": 100
     
 }
