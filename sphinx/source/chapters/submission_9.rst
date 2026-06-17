@@ -86,8 +86,8 @@ Der Speedup wird mit
 
     S_p = \frac{T_1}{T_p}
 
-berechnet. ``T_1`` ist dabei die Laufzeit mit einem Thread, ``T_p`` die
-Laufzeit mit ``p`` Threads.
+berechnet. :math:`T_1` ist dabei die Laufzeit mit einem Thread, :math:`T_p` die
+Laufzeit mit :math:`p` Threads.
 
 .. list-table:: Messwerte auf Grace
     :header-rows: 1
@@ -208,7 +208,7 @@ Die Simulation war wie zuvor Tohoku 2500m Auflösung.
       - Zeitschritt-Schleife
       - Programm
     * - static
-      - closed
+      - close
       - 16 seconds, 311 milliseconds, 185 microseconds, 258 nanoseconds
       - 21 seconds, 380 milliseconds, 990 microseconds, 998 nanoseconds
     * - static
@@ -216,7 +216,7 @@ Die Simulation war wie zuvor Tohoku 2500m Auflösung.
       - 16 seconds, 26 milliseconds, 513 microseconds, 329 nanoseconds
       - 21 seconds, 95 milliseconds, 314 microseconds, 661 nanoseconds
     * - dynamic
-      - closed
+      - close
       - 1 minutes, 0 seconds, 393 milliseconds, 550 microseconds, 266 nanoseconds
       - 1 minutes, 11 seconds, 73 milliseconds, 34 microseconds, 134 nanoseconds
     * - dynamic
@@ -224,7 +224,7 @@ Die Simulation war wie zuvor Tohoku 2500m Auflösung.
       - 31 seconds, 802 milliseconds, 244 microseconds, 671 nanoseconds
       - 36 seconds, 956 milliseconds, 647 microseconds, 372 nanoseconds
     * - guided
-      - closed
+      - close
       - 21 seconds, 376 milliseconds, 761 microseconds, 378 nanoseconds
       - 28 seconds, 18 milliseconds, 528 microseconds, 760 nanoseconds
     * - guided
@@ -240,7 +240,7 @@ Die Simulation war wie zuvor Tohoku 2500m Auflösung.
       - Zeitschritt-Schleife
       - Programm
     * - static
-      - closed
+      - close
       - 966 milliseconds, 892 microseconds, 330 nanoseconds
       - 6 seconds, 44 milliseconds, 880 microseconds, 455 nanoseconds
     * - static
@@ -248,7 +248,7 @@ Die Simulation war wie zuvor Tohoku 2500m Auflösung.
       - 1 seconds, 183 milliseconds, 129 microseconds, 710 nanoseconds
       - 7 seconds, 488 milliseconds, 757 microseconds, 408 nanoseconds
     * - dynamic
-      - closed
+      - close
       - 1 minutes, 31 seconds, 871 milliseconds, 674 microseconds, 929 nanoseconds
       - 1 minutes, 36 seconds, 945 milliseconds, 625 microseconds, 75 nanoseconds
     * - dynamic
@@ -256,7 +256,7 @@ Die Simulation war wie zuvor Tohoku 2500m Auflösung.
       - 2 minutes, 58 seconds, 532 milliseconds, 602 microseconds, 1 nanoseconds
       - 3 minutes, 4 seconds, 42 milliseconds, 649 microseconds, 606 nanoseconds
     * - guided
-      - closed
+      - close
       - 1 seconds, 200 milliseconds, 408 microseconds, 76 nanoseconds
       - 6 seconds, 276 milliseconds, 176 microseconds, 484 nanoseconds
     * - guided
@@ -272,7 +272,7 @@ Die Simulation war wie zuvor Tohoku 2500m Auflösung.
       - Zeitschritt-Schleife
       - Programm
     * - static
-      - closed
+      - close
       - 8 seconds, 163 milliseconds, 429 microseconds, 861 nanoseconds
       - 13 seconds, 244 milliseconds, 825 microseconds, 175 nanoseconds
     * - static
@@ -280,7 +280,7 @@ Die Simulation war wie zuvor Tohoku 2500m Auflösung.
       - 31 seconds, 310 milliseconds, 631 microseconds, 914 nanoseconds
       - 41 seconds, 998 milliseconds, 880 microseconds, 160 nanoseconds
     * - dynamic
-      - closed
+      - close
       - 4 minutes, 24 seconds, 998 milliseconds, 81 microseconds, 757 nanoseconds
       - 4 minutes, 30 seconds, 524 milliseconds, 594 microseconds, 513 nanoseconds
     * - dynamic
@@ -288,7 +288,7 @@ Die Simulation war wie zuvor Tohoku 2500m Auflösung.
       - 3 minutes, 20 seconds, 935 milliseconds, 712 microseconds, 388 nanoseconds
       - 3 minutes, 26 seconds, 21 milliseconds, 435 microseconds, 654 nanoseconds
     * - guided
-      - closed
+      - close
       - 6 seconds, 416 milliseconds, 452 microseconds, 229 nanoseconds
       - 11 seconds, 496 milliseconds, 478 microseconds, 448 nanoseconds
     * - guided
@@ -348,7 +348,7 @@ Die finalen Grace-Zahlen stehen in folgender Tabelle:
     * - Team
       - Threads
       - Laufzeit (Zeitschritt-Schleife)
-      - Laufzeit (gesamt)
+      - Laufzeit (Gesamtes Programm)
       - Cell updates/s
       - Beste Strategie
     * - Wavefront Witnesses
