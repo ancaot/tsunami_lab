@@ -127,30 +127,30 @@ Wir prüfen die CUDA-Umgebung und binden CUDA entweder direkt in das Build-Syste
 ein oder erstellen zunächst einen separaten Prototyp. Ziel ist, CUDA-Code zuverlässig 
 kompilieren und ausführen zu können. 
 
-**WP3: CUDA-Kernel-Implementierung **
+**WP3: CUDA-Kernel-Implementierung**
 
 Wir implementieren einen ersten CUDA-Kernel für einen numerischen Kern der 
 Simulation. Dabei achten wir auf sinnvolle Thread- und Blockgrößen sowie auf möglichst 
 einfache und nachvollziehbare Speicherzugriffe. 
 
-**WP4: Datenübertragung und Speicherverwaltung **
+**WP4: Datenübertragung und Speicherverwaltung**
 
 Wir verwalten GPU-Speicher für die relevanten Arrays, z.B. Wasserhöhe, Impuls und 
 Bathymetrie. Außerdem untersuchen wir, wie oft Daten zwischen CPU und GPU kopiert 
 werden müssen. 
 
-**WP5: Tests und Ergebnisvergleich **
+**WP5: Tests und Ergebnisvergleich**
 
 Die CUDA-Ergebnisse werden mit der CPU-Version verglichen. Dabei prüfen wir, ob die 
 Werte plausibel bleiben und ob numerische Abweichungen akzeptabel sind. 
 
-**WP6: Benchmarking **
+**WP6: Benchmarking**
 
 Wir messen die Laufzeiten verschiedener Varianten und erstellen Tabellen oder Plots für 
 CPU, OpenMP und CUDA. Dabei testen wir verschiedene Gittergrößen und eventuell 
 verschiedene Szenarien. 
 
-**WP7: Dokumentation und Präsentation **
+**WP7: Dokumentation und Präsentation**
 
 Wir dokumentieren die Implementierung, die Messergebnisse, Probleme und Grenzen. 
 Außerdem bereiten wir die Statuspräsentationen und die finale Präsentation vor. 
@@ -159,9 +159,9 @@ Außerdem bereiten wir die Statuspräsentationen und die finale Präsentation vo
 4. Zeitplan
 -----------
 
-**Bis 25.06. – 1. Statuspräsentation **
+**Bis 25.06. – 1. Statuspräsentation**
 
-*Ziele: *
+*Ziele:*
 
 * OpenMP-Arbeit als Ausgangspunkt zusammenfassen 
 * CUDA-Ziel und technischen Fokus festlegen
@@ -170,14 +170,14 @@ Außerdem bereiten wir die Statuspräsentationen und die finale Präsentation vo
 * ersten kleinen CUDA-Testkernel erstellen 
 * entscheiden, ob zuerst fwave::netUpdates oder ein Teil von WavePropagation2d::timeStep portiert wird 
 
-*Präsentierbares Ergebnis: *
+*Präsentierbares Ergebnis:*
 
 * Projektziel geplanter CUDA-Fokus 
 * erste technische Einschätzung Risiken und nächster Schritt 
 
 **Bis 02.07. – 2. Statuspräsentation** 
 
-*Ziele: *
+*Ziele:*
 
 * ersten CUDA-Prototyp implementieren 
 * Speicher auf GPU allokieren 
@@ -186,14 +186,14 @@ Außerdem bereiten wir die Statuspräsentationen und die finale Präsentation vo
 * Ergebnisse mit CPU-Version vergleichen 
 * erste kleine Laufzeitmessungen durchführen 
 
-*Präsentierbares Ergebnis: *
+*Präsentierbares Ergebnis:*
 
 * erster CUDA-Prototyp Beispielvergleich CPU vs. CUDA 
 * erste Probleme oder Erkenntnisse Plan für finale Benchmarks
 
-**Bis 09.07. – Finale Präsentation **
+**Bis 09.07. – Finale Präsentation**
 
-*Ziele: *
+*Ziele:*
 
 * CUDA-Version benchmarken 
 * Vergleich: CPU seriell vs. OpenMP vs. CUDA 
@@ -203,16 +203,16 @@ Außerdem bereiten wir die Statuspräsentationen und die finale Präsentation vo
 * Grenzen der Implementierung erklären 
 * mögliche weitere Optimierungen nennen 
 
-*Präsentierbares Ergebnis: *
+*Präsentierbares Ergebnis:*
 
 * finale Laufzeittabellen 
 * Speedup-Vergleich 
 * Bewertung, ob CUDA für unsere Simulation sinnvoll ist 
 * Lessons Learned 
 
-**Bis 31.07. – Finale Abgabe **
+**Bis 31.07. – Finale Abgabe**
 
-*Ziele: *
+*Ziele:*
 
 * Bugfixes, Code aufräumen 
 * Dokumentation vervollständigen
