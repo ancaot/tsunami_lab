@@ -79,7 +79,8 @@ Nach dem CUDA-Prototyp testen wir verschiedene Szenarien. Zunächst verwenden wi
 kleinere künstliche Setups, weil diese einfacher zu debuggen sind. Danach können wir, 
 falls die CUDA-Version stabil läuft, größere Szenarien testen: 
 
-* Tohoku in grober Auflösung Chile in grober Auflösung
+* Tohoku in grober Auflösung
+* Chile in grober Auflösung
 * optional verschiedene Gittergrößen, z.B. 500 x 500, 1000 x 1000, 2000 x 2000
 
 **5. Optimierung und Analyse**
@@ -87,9 +88,11 @@ falls die CUDA-Version stabil läuft, größere Szenarien testen:
 Nach den ersten Simulationsläufen analysieren wir mögliche Performance-Probleme. 
 Dabei betrachten wir: 
 
-* Speichertransfers zwischen CPU und GPU Speicherzugriffsmuster auf der GPU
+* Speichertransfers zwischen CPU und GPU
+* Speicherzugriffsmuster auf der GPU
 * Arbeitsverteilung auf GPU-Threads 
-* mögliche Bottlenecks im Kernel Vergleich mit den bisherigen OpenMP-Hotspots 
+* mögliche Bottlenecks im Kernel
+* Vergleich mit den bisherigen OpenMP-Hotspots 
 
 Falls möglich, nutzen wir Profiling-Werkzeuge wie NVIDIA Nsight oder andere verfügbare 
 Tools. VTune ist eher für CPU/OpenMP hilfreich, für CUDA wären NVIDIA-Tools 
@@ -271,4 +274,8 @@ dann besser verstehen, welche Teile unseres Codes GPU-freundlich sind und welche
 * CUDA Toolkit / GPU-Umgebung prüfen 
 * ersten kleinen CUDA-Testkernel erstellen 
 * entscheiden, ob zuerst fwave::netUpdates oder ein Teil von WavePropagation2d::timeStep portiert wird
+
+
+2. OpenMP Ausgangspunkt und OpenMP-Hotspots des parallelisierten Programms
+--------------------------------------------------------------------------
 
