@@ -410,7 +410,13 @@ Die Datei ``cuda/smoke_test.cu`` enthält einen minimalen CUDA-Kernel:
 Dieser Test ist bewusst unabhängig von SCons. Er beantwortet zuerst die
 Grundfrage: "Kann diese Maschine CUDA-Code kompilieren und ausführen?"
 
-Nach dem erfolgreichen CUDA-Smoke-Test:
+.. figure:: ../_static/cuda-testkernel.png
+  :width: 70%
+  :align: center
+  
+  Ausgabe nach smoke_test.cu Lauf
+
+Nach dem erfolgreichen CUDA-Smoke-Test beschäftigen wir uns mit:
 
 1. CUDA-Variante ``fwaveNetUpdatesKernel`` erstellen, bei der jeder Thread eine
    Kante berechnet,
