@@ -284,7 +284,7 @@ wollten wir vorher analysieren, welche Hotspots bei der OpenMP-Version auffallen
 Dazu haben wir mit VTune eine Hotspots-Analyse durchgeführt für Tohoku mit 2500m Auflösung. 
 Dabei führten wir unsere Simulation mit 16 Threads, mit ``static`` schedule und ``close`` binding. 
 
-.. figure:: ../_static/vtune-para-hotspots-summary1.png
+.. figure:: ../_static/vtune-para-tohoku-hotspots-summary1.png
   :width: 70%
   :align: center
   
@@ -293,7 +293,7 @@ Dabei führten wir unsere Simulation mit 16 Threads, mit ``static`` schedule und
 Hier sehen wir, dass unsere ``fwave::netUpdates`` Funktion weiterhin die aktivste Funktion ist, und somit zuerst portiert werden sollte. 
 Danach kommt zusammengefasst unsere ``WavePropagation2d::timeStep``, welche die Momenta in x- und y-Richtung berechnet. 
 
-.. figure:: ../_static/vtune-para-hotspots-summary2.png
+.. figure:: ../_static/vtune-para-tohoku-hotspots-summary2.png
   :width: 70%
   :align: center
   
@@ -301,7 +301,7 @@ Danach kommt zusammengefasst unsere ``WavePropagation2d::timeStep``, welche die 
 
 Vermutlich auch zu verbessern mit höherer Thread-Anzahl.
 
-.. figure:: ../_static/vtune-para-hotspots-bottomup.png
+.. figure:: ../_static/vtune-para-tohoku-hotspots-bottomup.png
   :width: 70%
   :align: center
   
@@ -310,7 +310,7 @@ Vermutlich auch zu verbessern mit höherer Thread-Anzahl.
 Auch hier sehen wir wieder, dass ``fwave::netUpdates``, ``WavePropagation2d::computeYImpulse`` 
 und ``WavePropagation2d::computeXImpulse`` die meiste CPU-Zeit einnimmt. 
 
-.. figure:: ../_static/vtune-para-hotspots-flamegraph.png
+.. figure:: ../_static/vtune-para-tohoku-hotspots-flamegraph.png
   :width: 70%
   :align: center
   
