@@ -132,3 +132,63 @@ Nach dem erfolgreichen CUDA-Smoke-Test:
 3. CPU-Version `fwave::netUpdates` und CUDA-Version ausführen,
 4. Ergebnisarrays mit einer kleinen Floating-Point-Toleranz vergleichen,
 5. erst danach den Kernel in `WavePropagation2d` einbinden.
+
+## F-Wave-Prototyp
+
+Der erste numerische Prototyp liegt in `cuda/fwave_benchmark.cu`. Ein CUDA-
+Thread berechnet die vier Net-Updates einer Kante. Das Programm allokiert zehn
+Arrays auf der GPU, kopiert sechs Eingabearrays auf die GPU, führt den Kernel
+aus und kopiert vier Ergebnisarrays zur CPU zurück. Danach werden alle Werte
+mit der produktiven CPU-Implementierung `fwave::netUpdates` verglichen.
+
+Build, Vergleich und Benchmark werden gemeinsam gestartet:
+
+```powershell
+.\tools\build_cuda_fwave.ps1
+```
+
+Problemgröße und Anzahl der Messwiederholungen sind konfigurierbar:
+
+```powershell
+.\tools\build_cuda_fwave.ps1 -Edges 100000 -Iterations 50
+```
+
+Ausgegeben werden GPU-Allokationszeit, CPU-Laufzeit, H2D-Transfer, mittlere
+Kernel-Laufzeit, D2H-Transfer, Kernel-Speedup, End-to-End-Speedup und maximale
+Abweichung. Ein Warm-up-Aufruf verhindert, dass die einmalige CUDA-
+Initialisierung die Kernelmessung verfälscht.
+
+### Messergebnis vom 29.06.2026
+
+Testsystem: NVIDIA GeForce RTX 4060, eine Million Kanten, 100 Kernel-
+Wiederholungen, Release-Build für `sm_89`:
+
+| Messwert | Ergebnis |
+|---|---:|
+| CPU `fwave::netUpdates` | 14,711 ms |
+| H2D-Transfer | 4,354 ms |
+| CUDA-Kernel | 0,176 ms |
+| D2H-Transfer | 2,789 ms |
+| CUDA H2D + Kernel + D2H | 7,319 ms |
+| reiner Kernel-Speedup | 83,707x |
+| End-to-End-Speedup | 2,010x |
+| geprüfte Ausgabewerte | 4.000.000 |
+| Abweichungen außerhalb der Toleranz | 0 |
+
+Die GPU-Allokation von 40 MB dauerte beim ersten Lauf 79,547 ms und wird daher
+nicht pro Zeitschritt wiederholt werden. Der große Unterschied zwischen
+Kernel- und End-to-End-Speedup zeigt, dass Transfers den Prototyp dominieren.
+
+### Erkenntnisse und nächster Schritt
+
+- Rundungsunterschiede zwischen CPU und GPU erfordern einen Vergleich mit
+  absoluter und relativer Toleranz; exakte Bitgleichheit ist nicht sinnvoll.
+- Trockene Randzellen werden in der CPU-Version durch Umleiten eines lokalen
+  Ausgabezeigers behandelt. Der CUDA-Kernel bildet dieses Verhalten explizit
+  nach.
+- Für `WavePropagation2d` sollen die Simulationsarrays dauerhaft im GPU-
+  Speicher bleiben. Sonst wird der mögliche Kernel-Speedup durch PCIe-
+  Transfers aufgezehrt.
+- Als nächstes werden x- und y-Kanten separat parallelisiert. Zellupdates
+  brauchen dabei eine konfliktfreie Strategie, beispielsweise getrennte
+  Net-Update-Arrays mit anschließendem Zellkernel.
