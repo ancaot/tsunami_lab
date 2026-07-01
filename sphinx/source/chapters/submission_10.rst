@@ -438,3 +438,117 @@ Nach dem erfolgreichen CUDA-Smoke-Test beschäftigen wir uns mit:
 * ersten numerischen Kernel ausführen 
 * Ergebnisse mit CPU-Version vergleichen 
 * erste kleine Laufzeitmessungen durchführen 
+
+
+2. CUDA FWave-Prototyp
+----------------------
+
+Der erste numerische Prototyp liegt in ``cuda/fwave_benchmark.cu``. Ein CUDA-
+Thread berechnet die vier Net-Updates einer Kante. Das Programm allokiert zehn
+Arrays auf der GPU, kopiert sechs Eingabearrays auf die GPU, führt den Kernel
+aus und kopiert vier Ergebnisarrays zur CPU zurück. Danach werden alle Werte
+mit der produktiven CPU-Implementierung ``fwave::netUpdates`` verglichen.
+
+Build, Vergleich und Benchmark werden gemeinsam gestartet:
+
+.. code:: powershell
+
+  .\tools\build_cuda_fwave.ps1
+
+
+Problemgröße und Anzahl der Messwiederholungen sind konfigurierbar:
+
+
+.. code:: powershell
+
+  .\tools\build_cuda_fwave.ps1 -Edges 100000 -Iterations 50
+
+
+Ausgegeben werden GPU-Allokationszeit, CPU-Laufzeit, H2D-Transfer, mittlere
+Kernel-Laufzeit, D2H-Transfer, Kernel-Speedup, End-to-End-Speedup und maximale
+Abweichung. Ein Warm-up-Aufruf verhindert, dass die einmalige CUDA-
+Initialisierung die Kernelmessung verfälscht.
+
+
+3. Testergebnisse lokale PC sowie Draco Cluster
+-----------------------------------------------
+
+Testsystem: NVIDIA GeForce RTX 4060, eine Million Kanten, 100 Kernel-
+Wiederholungen, Release-Build für `sm_89`:
+
+.. list-table:: NVIDIA GeForce RTX 4060
+    :header-rows: 1
+
+    * - Messwert
+      - Ergebnis
+    * - CPU ``fwave::netUpdates``
+      - 14,711 ms
+    * - H2D-Transfer
+      - 4,354 ms
+    * - CUDA-Kernel
+      - 0,176 ms
+    * - D2H-Transfer
+      - 2,789 ms
+    * - CUDA H2D + Kernel + D2H
+      - 7,319 ms
+    * - reiner Kernel-Speedup
+      - 83,707x
+    * - End-to-End-Speedup
+      - 2,010x
+    * - geprüfte Ausgabewerte
+      - 4.000.000
+    * - Abweichungen außerhalb der Toleranz
+      - 0
+
+
+Die GPU-Allokation von 40 MB dauerte beim ersten Lauf 79,547 ms und wird daher
+nicht pro Zeitschritt wiederholt werden. Der große Unterschied zwischen
+Kernel- und End-to-End-Speedup zeigt, dass Transfers den Prototyp dominieren.
+
+
+Jetzt probieren wir das auf dem Draco-Cluster.
+
+Testsystem: NVIDIA A100-SXM4-80GB, eine Million Kanten, 100 Kernel-
+Wiederholungen, Release-Build für `sm_80`:
+
+.. list-table:: NVIDIA A100-SXM4-80GB
+    :header-rows: 1
+
+    * - Messwert
+      - Ergebnis
+    * - CPU ``fwave::netUpdates``
+      - 13,734 ms
+    * - H2D-Transfer
+      - 4,580
+    * - CUDA-Kernel
+      - 0,031
+    * - D2H-Transfer
+      - 2,357
+    * - CUDA H2D + Kernel + D2H
+      - 6,967
+    * - reiner Kernel-Speedup
+      - 446,911x
+    * - End-to-End-Speedup
+      - 1,971
+    * - geprüfte Ausgabewerte
+      - 4.000.000
+    * - Abweichungen außerhalb der Toleranz
+      - 0
+
+Die Erkenntnisse von End-to-End-Speedup und Kernel-Speedup, die wir vom lokalen Durchlauf gezogen haben, werden hier bestätigt.
+
+
+4. Erkenntnisse und nächster Schritt
+------------------------------------
+
+* Rundungsunterschiede zwischen CPU und GPU erfordern einen Vergleich mit
+  absoluter und relativer Toleranz; exakte Bitgleichheit ist nicht sinnvoll.
+* Trockene Randzellen werden in der CPU-Version durch Umleiten eines lokalen
+  Ausgabezeigers behandelt. Der CUDA-Kernel bildet dieses Verhalten explizit
+  nach.
+* Für `WavePropagation2d` sollen die Simulationsarrays dauerhaft im GPU-
+  Speicher bleiben. Sonst wird der mögliche Kernel-Speedup durch PCIe-
+  Transfers aufgezehrt.
+* Als nächstes werden x- und y-Kanten separat parallelisiert. Zellupdates
+  brauchen dabei eine konfliktfreie Strategie, beispielsweise getrennte
+  Net-Update-Arrays mit anschließendem Zellkernel.
