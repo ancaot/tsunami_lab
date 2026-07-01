@@ -552,3 +552,20 @@ Die Erkenntnisse von End-to-End-Speedup und Kernel-Speedup, die wir vom lokalen 
 * Als nächstes werden x- und y-Kanten separat parallelisiert. Zellupdates
   brauchen dabei eine konfliktfreie Strategie, beispielsweise getrennte
   Net-Update-Arrays mit anschließendem Zellkernel.
+
+
+
+
+10.3 Finales Status-Update (02.07. bis 09.07.)
+==============================================
+
+1. Vorgenommene Ziele
+---------------------
+
+* CUDA-Version benchmarken 
+* Vergleich: CPU seriell vs. OpenMP vs. CUDA 
+* verschiedene Gittergrößen testen 
+* Speedup berechnen 
+* Speichertransferkosten diskutieren 
+* Grenzen der Implementierung erklären 
+* mögliche weitere Optimierungen nennen
