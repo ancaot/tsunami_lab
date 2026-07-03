@@ -2,7 +2,8 @@ param(
   [string] $CudaPath = $env:CUDA_PATH,
   [string] $CudaArch = "sm_89",
   [UInt64] $Edges = 1000000,
-  [int] $Iterations = 100
+  [int] $Iterations = 100,
+  [switch] $BuildOnly
 )
 
 $ErrorActionPreference = "Stop"
@@ -33,9 +34,10 @@ $outDir = Join-Path $repoRoot "build\cuda"
 $outExe = Join-Path $outDir "fwave_benchmark.exe"
 New-Item -ItemType Directory -Force -Path $outDir | Out-Null
 
-$command = "`"$vsDevCmd`" -arch=x64 && `"$nvcc`" -std=c++17 -O2 -arch=$CudaArch `"$source`" `"$cpuSource`" -o `"$outExe`""
+$command = "`"$vsDevCmd`" -arch=x64 && `"$nvcc`" -std=c++17 -O2 -arch=$CudaArch -Xcompiler=/openmp `"$source`" `"$cpuSource`" -o `"$outExe`""
 cmd.exe /c $command
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
+if ($BuildOnly) { exit 0 }
 & $outExe $Edges $Iterations
 exit $LASTEXITCODE

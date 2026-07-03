@@ -14,6 +14,10 @@
 #include <string>
 #include <vector>
 
+#ifdef _OPENMP
+#include <omp.h>
+#endif
+
 namespace {
 constexpr float g = 9.80665f;
 constexpr float gSqrt = 3.131557121f;
@@ -153,9 +157,14 @@ int main(int argc, char ** argv) {
   }
   cudaDeviceProp properties{};
   CUDA_CHECK(cudaGetDeviceProperties(&properties, 0));
+  int openmpThreads = 1;
+  #ifdef _OPENMP
+  openmpThreads = omp_get_max_threads();
+  #endif
 
   std::vector<float> hL(count), hR(count), huL(count), huR(count), bL(count), bR(count);
   std::vector<float> cpuMinusH(count), cpuMinusHu(count), cpuPlusH(count), cpuPlusHu(count);
+  std::vector<float> ompMinusH(count), ompMinusHu(count), ompPlusH(count), ompPlusHu(count);
   std::vector<float> gpuMinusH(count), gpuMinusHu(count), gpuPlusH(count), gpuPlusHu(count);
 
   for (std::size_t edge = 0; edge < count; ++edge) {
@@ -170,19 +179,33 @@ int main(int argc, char ** argv) {
     if (edge % 1597 == 0) hR[edge] = 0.0f;
   }
 
-  auto const cpuStart = std::chrono::steady_clock::now();
-  for (std::size_t edge = 0; edge < count; ++edge) {
-    float minus[2];
-    float plus[2];
-    tsunami_lab::solvers::fwave::netUpdates(hL[edge], hR[edge], huL[edge], huR[edge],
-                                             bL[edge], bR[edge], minus, plus);
-    cpuMinusH[edge] = minus[0];
-    cpuMinusHu[edge] = minus[1];
-    cpuPlusH[edge] = plus[0];
-    cpuPlusHu[edge] = plus[1];
-  }
-  auto const cpuStop = std::chrono::steady_clock::now();
-  double const cpuMs = std::chrono::duration<double, std::milli>(cpuStop - cpuStart).count();
+  int const cpuIterations = std::max(3, std::min(20, static_cast<int>(10'000'000 / count)));
+  auto runCpu = [&](bool parallel, std::vector<float> & outMinusH,
+                    std::vector<float> & outMinusHu, std::vector<float> & outPlusH,
+                    std::vector<float> & outPlusHu, int repeats) {
+    auto const startTime = std::chrono::steady_clock::now();
+    for (int repeat = 0; repeat < repeats; ++repeat) {
+      #pragma omp parallel for if(parallel) schedule(static)
+      for (std::ptrdiff_t rawEdge = 0; rawEdge < static_cast<std::ptrdiff_t>(count); ++rawEdge) {
+        std::size_t const edge = static_cast<std::size_t>(rawEdge);
+        float minus[2];
+        float plus[2];
+        tsunami_lab::solvers::fwave::netUpdates(hL[edge], hR[edge], huL[edge], huR[edge],
+                                                 bL[edge], bR[edge], minus, plus);
+        outMinusH[edge] = minus[0];
+        outMinusHu[edge] = minus[1];
+        outPlusH[edge] = plus[0];
+        outPlusHu[edge] = plus[1];
+      }
+    }
+    auto const stopTime = std::chrono::steady_clock::now();
+    return std::chrono::duration<double, std::milli>(stopTime - startTime).count() / repeats;
+  };
+
+  double const cpuMs = runCpu(false, cpuMinusH, cpuMinusHu, cpuPlusH, cpuPlusHu, cpuIterations);
+  // One untimed call creates the OpenMP worker pool before measurement.
+  runCpu(true, ompMinusH, ompMinusHu, ompPlusH, ompPlusHu, 1);
+  double const openmpMs = runCpu(true, ompMinusH, ompMinusHu, ompPlusH, ompPlusHu, cpuIterations);
 
   float * device[10]{};
   std::size_t const bytes = count * sizeof(float);
@@ -234,6 +257,7 @@ int main(int argc, char ** argv) {
   float const deviceToHostMs = elapsedMs(start, stop);
 
   std::size_t mismatches = 0;
+  std::size_t openmpMismatches = 0;
   float maxAbsoluteError = 0.0f;
   float maxRelativeError = 0.0f;
   auto compare = [&](char const * component, std::vector<float> const & cpu,
@@ -258,6 +282,16 @@ int main(int argc, char ** argv) {
   compare("plus height", cpuPlusH, gpuPlusH);
   compare("plus momentum", cpuPlusHu, gpuPlusHu);
 
+  auto compareOpenmp = [&](std::vector<float> const & serial, std::vector<float> const & parallel) {
+    for (std::size_t edge = 0; edge < count; ++edge) {
+      if (serial[edge] != parallel[edge]) ++openmpMismatches;
+    }
+  };
+  compareOpenmp(cpuMinusH, ompMinusH);
+  compareOpenmp(cpuMinusHu, ompMinusHu);
+  compareOpenmp(cpuPlusH, ompPlusH);
+  compareOpenmp(cpuPlusHu, ompPlusHu);
+
   for (float * pointer : device) CUDA_CHECK(cudaFree(pointer));
   CUDA_CHECK(cudaEventDestroy(start));
   CUDA_CHECK(cudaEventDestroy(stop));
@@ -265,22 +299,33 @@ int main(int argc, char ** argv) {
   float const endToEndMs = hostToDeviceMs + kernelMs + deviceToHostMs;
   std::cout << std::fixed << std::setprecision(3)
             << "GPU:                 " << properties.name << '\n'
+            << "OpenMP threads:      " << openmpThreads << '\n'
             << "Edges:               " << count << '\n'
             << "GPU allocation:      " << allocationMs << " ms (" << (10 * bytes / 1.0e6) << " MB)\n"
-            << "CPU net updates:     " << cpuMs << " ms\n"
+            << "CPU serial:          " << cpuMs << " ms (average of " << cpuIterations << ")\n"
+            << "CPU OpenMP:          " << openmpMs << " ms (average of " << cpuIterations << ")\n"
             << "Host -> device:      " << hostToDeviceMs << " ms\n"
             << "CUDA kernel:         " << kernelMs << " ms (average of " << iterations << ")\n"
             << "Device -> host:      " << deviceToHostMs << " ms\n"
             << "CUDA end-to-end:     " << endToEndMs << " ms\n"
-            << "Kernel speedup:      " << (cpuMs / kernelMs) << "x\n"
-            << "End-to-end speedup:  " << (cpuMs / endToEndMs) << "x\n"
+            << "OpenMP speedup:      " << (cpuMs / openmpMs) << "x vs. serial\n"
+            << "CUDA kernel speedup: " << (cpuMs / kernelMs) << "x vs. serial\n"
+            << "CUDA E2E speedup:    " << (cpuMs / endToEndMs) << "x vs. serial\n"
+            << "CUDA vs. OpenMP:     " << (openmpMs / endToEndMs) << "x (end-to-end)\n"
             << std::scientific
             << "Maximum abs. error:  " << maxAbsoluteError << '\n'
             << "Maximum rel. error:  " << maxRelativeError << '\n'
-            << "Mismatches:          " << mismatches << " / " << (4 * count) << '\n';
+            << "CUDA mismatches:     " << mismatches << " / " << (4 * count) << '\n'
+            << "OpenMP mismatches:   " << openmpMismatches << " / " << (4 * count) << '\n'
+            << std::fixed << std::setprecision(6)
+            << "CSV," << count << ',' << cpuMs << ',' << openmpMs << ',' << hostToDeviceMs
+            << ',' << kernelMs << ',' << deviceToHostMs << ',' << endToEndMs << ','
+            << (cpuMs / openmpMs) << ',' << (cpuMs / kernelMs) << ','
+            << (cpuMs / endToEndMs) << ',' << (openmpMs / endToEndMs) << ','
+            << mismatches << ',' << openmpMismatches << '\n';
 
-  if (mismatches != 0) {
-    std::cerr << "CPU/CUDA comparison failed.\n";
+  if (mismatches != 0 || openmpMismatches != 0) {
+    std::cerr << "Serial/OpenMP/CUDA comparison failed.\n";
     return EXIT_FAILURE;
   }
   std::cout << "CPU/CUDA comparison passed.\n";
