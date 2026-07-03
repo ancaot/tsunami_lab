@@ -556,7 +556,7 @@ Die Erkenntnisse von End-to-End-Speedup und Kernel-Speedup, die wir vom lokalen 
 
 
 
-10.3 Finales Status-Update (02.07. bis 09.07.)
+10.4 Finales Status-Update (02.07. bis 09.07.)
 ==============================================
 
 1. Vorgenommene Ziele
@@ -569,3 +569,294 @@ Die Erkenntnisse von End-to-End-Speedup und Kernel-Speedup, die wir vom lokalen 
 * Speichertransferkosten diskutieren 
 * Grenzen der Implementierung erklären 
 * mögliche weitere Optimierungen nennen
+
+
+2. Benchmark-Aufbau
+-------------------
+
+Im finalen Benchmark vergleichen wir drei Varianten desselben F-Wave-
+Workloads: die serielle CPU-Version, die mit OpenMP parallelisierte CPU-Version
+und den CUDA-Kernel. Gemessen wird die Batch-Version von
+``fwave::netUpdates``. Der komplette ``WavePropagation2d::timeStep`` ist noch
+nicht auf CUDA portiert. Die Ergebnisse zeigen deshalb das Potenzial des
+numerischen Kerns und noch nicht den Speedup der vollständigen Simulation.
+
+Für ein quadratisches Gitter mit ``N x N`` Zellen verwenden wir
+``2 * N * (N + 1)`` horizontale und vertikale Kanten. Ein CUDA-Thread berechnet
+die vier Net-Updates genau einer Kante.
+
+Testsystem und Messmethodik:
+
+* CPU: AMD Ryzen 7 5800X, 8 Kerne und 16 logische Prozessoren,
+* OpenMP: 16 Threads mit statischem Scheduling,
+* GPU: NVIDIA GeForce RTX 4060 mit 8 GB Speicher,
+* CUDA Toolkit 13.3, Zielarchitektur ``sm_89`` und Datentyp ``float``,
+* CPU-Kompilierung mit ``/O2`` und CUDA-Blockgröße 256 Threads,
+* 100 CUDA-Messwiederholungen nach einem Warm-up-Aufruf.
+
+Die CPU-Zeiten werden abhängig von der Problemgröße über 3 bis 20 Läufe
+gemittelt. Bei CUDA messen wir H2D-Transfer, Kernel und D2H-Transfer getrennt
+mit CUDA-Events. Die CUDA-End-to-End-Zeit ist:
+
+.. math::
+
+  T_{CUDA,E2E} = T_{H2D} + T_{Kernel} + T_{D2H}
+
+Die einmalige GPU-Allokation ist nicht enthalten, weil der Speicher in der
+vollständigen Simulation einmal beim Start reserviert werden soll.
+
+Die Messreihe wird ausgeführt mit:
+
+.. code:: powershell
+
+  .\tools\run_cuda_fwave_benchmarks.ps1
+
+Die Rohdaten liegen in ``outputs/cuda/fwave_final_benchmark.csv``.
+
+
+3. Finale Laufzeitergebnisse
+----------------------------
+
+Alle Laufzeiten sind in Millisekunden angegeben.
+
+.. list-table:: Laufzeiten von CPU, OpenMP und CUDA
+    :header-rows: 1
+    :widths: 12 14 12 12 12 14 12 14
+
+    * - Gitter
+      - Kanten
+      - Seriell
+      - OpenMP
+      - H2D
+      - CUDA-Kernel
+      - D2H
+      - CUDA E2E
+    * - 128 x 128
+      - 33.024
+      - 0,412
+      - 0,094
+      - 0,286
+      - 0,013
+      - 0,251
+      - 0,550
+    * - 256 x 256
+      - 131.584
+      - 1,705
+      - 0,419
+      - 0,960
+      - 0,014
+      - 0,573
+      - 1,547
+    * - 512 x 512
+      - 525.312
+      - 7,300
+      - 1,072
+      - 2,634
+      - 0,029
+      - 1,734
+      - 4,397
+    * - 1024 x 1024
+      - 2.099.200
+      - 29,496
+      - 6,869
+      - 8,674
+      - 0,373
+      - 5,637
+      - 14,683
+    * - 2048 x 2048
+      - 8.392.704
+      - 121,004
+      - 21,112
+      - 32,068
+      - 1,482
+      - 21,058
+      - 54,607
+
+
+4. Speedup-Vergleich
+--------------------
+
+Der Speedup gegenüber der seriellen CPU wird berechnet als:
+
+.. math::
+
+  S = \frac{T_{seriell}}{T_{parallel}}
+
+Ein Wert größer als eins bedeutet eine Beschleunigung. Für den direkten
+Vergleich CUDA gegen OpenMP verwenden wir ``T_OpenMP / T_CUDA,E2E``. Ein Wert
+kleiner als eins bedeutet dort, dass OpenMP schneller ist.
+
+.. list-table:: Speedups der parallelen Varianten
+    :header-rows: 1
+    :widths: 16 20 24 24 24
+
+    * - Gitter
+      - OpenMP vs. seriell
+      - CUDA-Kernel vs. seriell
+      - CUDA E2E vs. seriell
+      - CUDA E2E vs. OpenMP
+    * - 128 x 128
+      - 4,40x
+      - 31,87x
+      - 0,75x
+      - 0,17x
+    * - 256 x 256
+      - 4,07x
+      - 118,86x
+      - 1,10x
+      - 0,27x
+    * - 512 x 512
+      - 6,81x
+      - 255,14x
+      - 1,66x
+      - 0,24x
+    * - 1024 x 1024
+      - 4,29x
+      - 79,14x
+      - 2,01x
+      - 0,47x
+    * - 2048 x 2048
+      - 5,73x
+      - 81,66x
+      - 2,22x
+      - 0,39x
+
+OpenMP beschleunigt den Kern je nach Gitter um Faktor 4,1 bis 6,8. Der reine
+CUDA-Kernel ist zwischen etwa 32- und 255-mal schneller als die serielle CPU.
+Der besonders hohe Wert bei ``512 x 512`` darf nicht als garantierter Speedup
+der Gesamtsimulation interpretiert werden. Die wiederholten Kernelaufrufe
+verwenden dieselben Arrays, wodurch kleine und mittlere Problemgrößen stark von
+GPU-Caches profitieren können.
+
+Inklusive Transfers ist CUDA beim kleinsten Gitter langsamer als die serielle
+CPU. Ab ``256 x 256`` ist CUDA End-to-End schneller als seriell. Gegenüber
+OpenMP verliert CUDA mit dem aktuellen Transfermodell jedoch bei allen
+getesteten Größen.
+
+
+5. Korrektheitsprüfung
+----------------------
+
+OpenMP liefert für alle getesteten Werte exakt dasselbe Ergebnis wie die
+serielle CPU. CUDA wird mit einer kombinierten absoluten und relativen
+Floating-Point-Toleranz geprüft:
+
+.. math::
+
+  |q_{CPU} - q_{CUDA}| \leq 10^{-4} + 10^{-4}|q_{CPU}|
+
+Beim größten Gitter wurden ``8.392.704 * 4 = 33.570.816`` Ausgabewerte
+verglichen. Über alle Gittergrößen gab es 0 OpenMP-Abweichungen und 0 CUDA-
+Abweichungen außerhalb der Toleranz. Die maximale absolute CUDA-Abweichung war
+``6,104e-05``, die maximale relative Abweichung ``8,719e-04``.
+
+Exakte Bitgleichheit ist nicht zu erwarten, weil CPU und GPU Floating-Point-
+Operationen unterschiedlich anordnen oder als kombinierte Multiply-Add-
+Operation ausführen können.
+
+
+6. Analyse der Speichertransferkosten
+-------------------------------------
+
+Beim größten Gitter benötigt der reine CUDA-Kernel ``1,482 ms``. Der H2D-
+Transfer benötigt ``32,068 ms`` und der D2H-Transfer ``21,058 ms``. Zusammen
+dauern die Transfers:
+
+.. math::
+
+  32{,}068\,ms + 21{,}058\,ms = 53{,}126\,ms
+
+Von der CUDA-End-to-End-Zeit von ``54,607 ms`` entfallen damit etwa ``97,3 %``
+auf Transfers. Der Kernel selbst macht nur etwa ``2,7 %`` aus.
+
+Der CUDA-Kernel ist beim größten Gitter ungefähr ``81,66x`` schneller als die
+serielle CPU und etwa ``14,25x`` schneller als OpenMP. Inklusive Transfers ist
+CUDA ``2,22x`` schneller als seriell, aber OpenMP ist noch etwa ``2,59x``
+schneller als CUDA End-to-End.
+
+Die Simulationsarrays müssen deshalb dauerhaft im GPU-Speicher bleiben:
+
+1. Daten einmal zu Beginn auf die GPU kopieren,
+2. viele Zeitschritte vollständig auf der GPU berechnen,
+3. Daten nur für Ausgabe oder Checkpoints zur CPU zurückkopieren.
+
+
+7. Bewertung für die Tsunami-Simulation
+---------------------------------------
+
+Der F-Wave-Kern ist sehr gut GPU-parallelisierbar, weil die Berechnungen der
+einzelnen Kanten unabhängig sind. Wenn die Daten bereits auf der GPU liegen,
+ist CUDA deutlich schneller als die serielle und die OpenMP-Variante.
+
+Eine Portierung nur von ``fwave::netUpdates`` ist gegenüber OpenMP allerdings
+nicht sinnvoll, wenn bei jedem Aufruf sechs Eingabearrays auf die GPU und vier
+Ergebnisarrays zurück zur CPU kopiert werden. Die Transferkosten überdecken
+dann den größten Teil des Kernel-Speedups.
+
+CUDA ist für unsere Simulation sinnvoll, wenn nicht nur eine einzelne
+Funktion, sondern eine zusammenhängende Rechenkette mit vielen Zeitschritten
+auf der GPU bleibt. Dafür müssen die x- und y-Sweeps, Zellupdates, Ghost Cells
+und Bufferwechsel von ``WavePropagation2d`` portiert werden.
+
+
+8. Grenzen der Implementierung
+------------------------------
+
+* Portiert wurde nur ``fwave::netUpdates`` und noch nicht der vollständige
+  ``WavePropagation2d::timeStep``.
+* Die synthetischen Eingabedaten prüfen Wasserhöhen, Impulse, Bathymetrien und
+  trockene Zellen, ersetzen aber keinen vollständigen Tohoku- oder Chile-Lauf.
+* Die Ergebnisse gelten nur für die getestete CPU/GPU-Kombination.
+* Wiederholte Kernel arbeiten auf denselben Arrays. Kleine Gitter können
+  dadurch von GPU-Caches profitieren.
+* Der Prototyp verwendet zehn GPU-Arrays. Beim größten Test belegen diese etwa
+  336 MB. Eine vollständige Simulation braucht weitere Puffer.
+* Im 2D-Solver beeinflusst jede Kante zwei Zellen. Direkte parallele
+  Zellupdates können deshalb Race Conditions erzeugen.
+* Der CUDA-Prototyp ist noch separat vom SCons-Hauptbuild.
+
+
+9. Mögliche weitere Optimierungen
+---------------------------------
+
+* Zustandsarrays dauerhaft im GPU-Speicher halten.
+* Kanten- und Zellupdates in zwei konfliktfreie Kernel aufteilen: Der erste
+  Kernel schreibt getrennte Kantenupdates, der zweite lässt jeden Thread genau
+  eine Zelle aktualisieren.
+* Kernel-Fusion untersuchen, um Zwischenarrays und Speicherzugriffe zu sparen.
+* Transfers mit ``cudaMemcpyAsync``, CUDA Streams und Pinned Memory überlappen.
+* Blockgrößen wie 128, 256 und 512 Threads systematisch benchmarken.
+* Speicherzugriffe, Occupancy, Registerverbrauch und Branch Divergence mit
+  NVIDIA Nsight Compute untersuchen.
+* CUDA Graphs für die wiederkehrende Kernelabfolge eines Zeitschritts prüfen.
+* Nach vollständiger Portierung reale Tohoku- und Chile-Szenarien benchmarken.
+
+
+10. Lessons Learned
+-------------------
+
+* Ein schneller Kernel allein garantiert noch keine schnelle Anwendung.
+* Datenbewegung kann teurer sein als die eigentliche Berechnung.
+* Kernelzeit und End-to-End-Zeit müssen getrennt ausgewiesen werden.
+* CPU- und GPU-Ergebnisse benötigen einen toleranzbasierten Vergleich.
+* Sonderfälle wie trockene Zellen müssen dasselbe Verhalten besitzen.
+* OpenMP ist einfacher in vorhandenen CPU-Code zu integrieren und bei häufigen
+  CPU-GPU-Transfers im Vorteil.
+* CUDA eignet sich besonders für große, regelmäßige und unabhängige Aufgaben.
+* Mehrere Rechenschritte auf der GPU sind sinnvoller als eine isolierte
+  Funktion mit Transfers bei jedem Aufruf.
+
+
+11. Fazit
+---------
+
+Die serielle CPU-Version, OpenMP und CUDA wurden für fünf Gittergrößen
+verglichen. Speedups und Transferkosten wurden berechnet und alle Ergebnisse
+auf Korrektheit geprüft.
+
+Der CUDA-Kernel zeigt ein deutliches Parallelisierungspotenzial. Der aktuelle
+End-to-End-Prototyp kann dieses Potenzial wegen der PCIe-Transfers noch nicht
+gegenüber OpenMP ausspielen. CUDA ist für den F-Wave-Kern und perspektivisch
+für die Tsunami-Simulation sinnvoll, wenn die gesamte zeitkritische
+Rechenkette auf der GPU bleibt. Eine isolierte Auslagerung von
+``fwave::netUpdates`` mit Transfers bei jedem Aufruf reicht dafür nicht aus.
