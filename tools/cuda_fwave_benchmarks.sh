@@ -1,7 +1,9 @@
 #!/bin/bash
 #SBATCH --job-name=fwave-cuda
 #SBATCH --partition=gpu
+#SBATCH --ntasks=1
 #SBATCH --gres=gpu:1
+#SBATCH --cpus-per-task=16
 #SBATCH --output=fwave_cuda.%j.out
 #SBATCH --error=fwave_cuda.%j.err
 #SBATCH --time=02:00:00
