@@ -2,8 +2,7 @@
 
 ## Gegenstand und Testsystem
 
-Gemessen wird die Batch-Version von `fwave::netUpdates`, nicht der komplette
-`WavePropagation2d::timeStep`. Eine Kante erzeugt vier Net-Updates. Fuer ein
+Die erste Messreihe misst die Batch-Version von `fwave::netUpdates`. Eine Kante erzeugt vier Net-Updates. Fuer ein
 quadratisches Gitter mit `N x N` Zellen werden `2 * N * (N + 1)` horizontale
 und vertikale Kanten angesetzt.
 
@@ -102,3 +101,24 @@ Aufruf ist gegenueber der vorhandenen OpenMP-Version nicht sinnvoll.
 ```
 
 Die Rohdaten werden nach `outputs/cuda/fwave_final_benchmark.csv` geschrieben.
+
+## Nachtrag: WavePropagation2d
+
+Der vollständige F-Wave-Zeitschritt wurde anschließend als separater CUDA-
+Prototyp in `cuda/wavepropagation2d_benchmark.cu` portiert. Er enthält x- und
+y-Sweep, konfliktfreie Zellkernel, Ghost Cells, Doppelbuffer und persistente
+GPU-Zustandsarrays. Nach 20 Schritten gab es bei allen getesteten Gittergrößen
+keine Abweichung außerhalb der Toleranz.
+
+| Gitter | Seriell [ms] | OpenMP [ms] | CUDA resident [ms] | CUDA vs. OpenMP |
+|---:|---:|---:|---:|---:|
+| 128 x 128 | 0,453 | 0,087 | 0,129 | 0,68x |
+| 256 x 256 | 1,938 | 0,457 | 0,173 | 2,64x |
+| 512 x 512 | 9,006 | 1,951 | 0,145 | 13,46x |
+| 1024 x 1024 | 53,623 | 8,550 | 0,650 | 13,15x |
+| 2048 x 2048 | 204,782 | 42,145 | 3,191 | 13,21x |
+
+Damit wird die vorherige Bewertung bestätigt: Wenn die Daten zwischen den
+Zeitschritten auf der GPU bleiben, ist CUDA ab mittleren Gittergrößen auch
+gegenüber OpenMP sinnvoll. Noch offen ist die Integration dieses Prototyps in
+den produktiven SCons- und Anwendungspfad.
