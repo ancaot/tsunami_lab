@@ -682,6 +682,62 @@ Alle Laufzeiten sind in Millisekunden angegeben.
   sichtbar.
 
 
+Folgendes sind die Laufzeiten berechnet auf dem Draco Cluster. 
+
+.. list-table:: Laufzeiten von CPU, OpenMP und CUDA
+    :header-rows: 1
+    :widths: 12 14 12 12 12 14 12 14
+
+    * - Gitter
+      - Kanten
+      - Seriell
+      - OpenMP
+      - H2D
+      - CUDA-Kernel
+      - D2H
+      - CUDA E2E
+    * - 128 x 128
+      - 33.024
+      - 0,442
+      - 0,493
+      - 0,382
+      - 0,004
+      - 0,272
+      - 0,677
+    * - 256 x 256
+      - 131.584
+      - 1,949
+      - 1,814
+      - 1,415
+      - 0,005
+      - 1,158
+      - 2,578
+    * - 512 x 512
+      - 525.312
+      - 7,826
+      - 7,138
+      - 5,151
+      - 0,012
+      - 3,478
+      - 8,641
+    * - 1024 x 1024
+      - 2.099.200
+      - 31,235
+      - 28,491
+      - 18,766
+      - 0,057
+      - 3,495
+      - 22,318
+    * - 2048 x 2048
+      - 8.392.704
+      - 124,675
+      - 114,849
+      - 29,888
+      - 0,209
+      - 11,773
+      - 41,871
+
+
 4. Speedup-Vergleich
 --------------------
 
@@ -748,6 +804,44 @@ Inklusive Transfers ist CUDA beim kleinsten Gitter langsamer als die serielle
 CPU. Ab ``256 x 256`` ist CUDA End-to-End schneller als seriell. Gegenüber
 OpenMP verliert CUDA mit dem aktuellen Transfermodell jedoch bei allen
 getesteten Größen.
+
+
+Die Speedups für die Berechnungen auf dem Draco Cluster.
+
+.. list-table:: Speedups der parallelen Varianten
+    :header-rows: 1
+    :widths: 16 20 24 24 24
+
+    * - Gitter
+      - OpenMP vs. seriell
+      - CUDA-Kernel vs. seriell
+      - CUDA E2E vs. seriell
+      - CUDA E2E vs. OpenMP
+    * - 128 x 128
+      - 0,898x
+      - 103,119x
+      - 0,673x
+      - 0,749x
+    * - 256 x 256
+      - 1,074x
+      - 362,475x
+      - 0,756x
+      - 0,704x
+    * - 512 x 512
+      - 1,096x
+      - 661,099x
+      - 0,906x
+      - 0,826x
+    * - 1024 x 1024
+      - 1,096x
+      - 546,845x
+      - 1,400x
+      - 1,277x
+    * - 2048 x 2048
+      - 1,086x
+      - 596,010x
+      - 1,978x
+      - 2,743x
 
 
 5. Korrektheitsprüfung
@@ -974,3 +1068,48 @@ Die verbleibende Grenze ist jetzt nicht mehr der numerische 2D-Zeitschritt,
 sondern seine Integration in das Hauptprogramm. Konfiguration, reale Setups,
 Ausgabe, Checkpoints und SCons-Auswahl zwischen CPU und CUDA müssen für eine
 produktive CUDA-Simulation noch angebunden werden.
+
+
+Hier nochmal Zeiten von den Berechnungen auf dem Draco Cluster.
+(Notiz: vermutlich ist bei der OpenMP Berechnung etwas schief gelaufen, da die Werte konstant ähnlich zu den seriellen Laufzeiten sind.)
+
+.. list-table:: Vollständiger WavePropagation2d-Zeitschritt
+    :header-rows: 1
+    :widths: 16 18 18 18 18 18
+
+    * - Gitter
+      - Seriell [ms]
+      - OpenMP [ms]
+      - CUDA [ms]
+      - CUDA vs. seriell
+      - CUDA vs. OpenMP
+    * - 128 x 128
+      - 1,489
+      - 1,303 
+      - 0,036
+      - 41,008x
+      - 35,885x
+    * - 256 x 256
+      - 3,832
+      - 4,227
+      - 0,042
+      - 92,227x
+      - 101,733x
+    * - 512 x 512
+      - 10,780
+      - 15,610
+      - 0,055
+      - 195,605x
+      - 283,233x
+    * - 1024 x 1024
+      - 54,391
+      - 68,32o
+      - 0,133
+      - 408,660x
+      - 513,316x
+    * - 2048 x 2048
+      - 205,336
+      - 273,604
+      - 0,523
+      - 392,549x
+      - 523,061x
