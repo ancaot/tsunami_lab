@@ -21,7 +21,7 @@ for GRID_SIZE in 128 256 512 1024 2048; do
     echo
     echo "Benchmarking ${GRID_SIZE}x${GRID_SIZE} grid..."
 
-    echo OMP_NUM_THREADS=16 ./fwave_benchmark ${GRID_SIZE} 100 2>&1
+    OMP_NUM_THREADS=16 ./waveprog_benchmark ${GRID_SIZE} 20
 
 done
 

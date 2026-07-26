@@ -1,5 +1,6 @@
 {
     "numerical_solver" : "fwave",
+    "compute_backend" : "cpu",
     "scenario" :  "tsunamievent2d",
     "wave_model" : "2d",
     "domain_size_x" : 2700000,

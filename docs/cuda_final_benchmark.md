@@ -73,8 +73,12 @@ Aufruf ist gegenueber der vorhandenen OpenMP-Version nicht sinnvoll.
 
 ## Grenzen und weitere Optimierungen
 
-- Portiert ist nur `fwave::netUpdates`; Bufferwechsel, Zellupdates, Ghost Cells,
-  Randbedingungen und der komplette 2D-Zeitschritt fehlen noch.
+- Der isolierte F-Wave-Benchmark portiert nur `fwave::netUpdates` und zeigt
+  deshalb besonders deutlich den Einfluss von Speichertransfers.
+- Der numerische `WavePropagation2d`-Zeitschritt wurde anschließend als
+  separater CUDA-Prototyp portiert und zusätzlich als minimaler CUDA-Backend-
+  Pfad in die Hauptanwendung eingebunden. Noch offen ist die Integration in
+  den normalen SCons- und NetCDF/Tohoku/Chile-Produktionspfad.
 - Synthetische Eingaben ersetzen noch keinen Benchmark einer realen
   Tsunami-Konfiguration.
 - Die Messung verwendet eine einzelne CPU/GPU-Kombination und ist nicht direkt
@@ -84,8 +88,8 @@ Aufruf ist gegenueber der vorhandenen OpenMP-Version nicht sinnvoll.
 - GPU-Speicher wird im Prototyp als zehn getrennte Arrays belegt. Fuer die
   Gesamtsimulation muss der Speicherbedarf mit allen Zeitschritt- und
   Kantenpuffern geplant werden.
-- Naechster Hauptschritt: Simulationsarrays einmal auf die GPU kopieren, x- und
-  y-Richtung dort berechnen und nur fuer Ausgabe oder Checkpoints zurueckkopieren.
+- Naechster Hauptschritt: CUDA auch im normalen SCons-Build anbieten, reale
+  Setups anbinden und nur fuer Ausgabe oder Checkpoints gezielt zurueckkopieren.
 - Konfliktfreie Zellupdates koennen in einem zweiten Kernel aus getrennten
   Kantenupdates gesammelt werden; damit werden atomare Operationen vermieden.
 - CUDA Streams, asynchrone Transfers und Pinned Memory koennen unvermeidbare
@@ -120,5 +124,7 @@ keine Abweichung außerhalb der Toleranz.
 
 Damit wird die vorherige Bewertung bestätigt: Wenn die Daten zwischen den
 Zeitschritten auf der GPU bleiben, ist CUDA ab mittleren Gittergrößen auch
-gegenüber OpenMP sinnvoll. Noch offen ist die Integration dieses Prototyps in
-den produktiven SCons- und Anwendungspfad.
+gegenüber OpenMP sinnvoll. Der Prototyp ist inzwischen auch über
+`compute_backend = cuda` in der Hauptanwendung auswählbar, wenn diese mit
+`tools/build_cuda_app.ps1` gebaut wurde. Noch offen ist die Integration in den
+produktiven SCons- und NetCDF/Tohoku/Chile-Pfad.

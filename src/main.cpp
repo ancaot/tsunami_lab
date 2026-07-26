@@ -1,6 +1,11 @@
 #include "patches/wavepropagation1d/WavePropagation1d.h"
+#ifdef USE_NETCDF
 #include "setups/tsunamievent2d/TsunamiEvent2d.h"
+#endif
 #include "patches/wavepropagation2d/WavePropagation2d.h"
+#ifdef TSUNAMI_LAB_ENABLE_CUDA
+#include "patches/wavepropagation2d/WavePropagation2dCuda.h"
+#endif
 #include "setups/ArtificialTsunami2d/ArtificialTsunami2d.h"
 #include "setups/dambreak/DamBreak1d.h"
 #include "setups/dambreak2d/DamBreak2d.h"
@@ -10,10 +15,14 @@
 #include "setups/supercriticalflow/SupercriticalFlow.h"
 #include "setups/tsunamievent1d/TsunamiEvent1d.h"
 #include "io/Csv/Csv.h"
+#ifdef USE_NETCDF
 #include "io/NetCdf/NetCdf.h"
+#endif
 #include "io/Stations/Station.h"
 #include "io/JsReader/Configuration.h"
+#ifdef USE_NETCDF
 #include "setups/CheckPoint/CheckPoint.h"
+#endif
 #include <filesystem>
 
 #include <algorithm>
@@ -420,7 +429,7 @@ int main() {
 
 
   tsunami_lab::setups::Setup *l_setup = nullptr;
-  std::string l_temp_setup,l_temp_solver,l_temp_waveprop,l_temp_bathFile,l_temp_disFile,l_temp_writer;
+  std::string l_temp_setup,l_temp_solver,l_temp_waveprop,l_temp_backend,l_temp_bathFile,l_temp_disFile,l_temp_writer;
   tsunami_lab::t_real l_domain_start_x = -1,l_domain_start_y = -1,l_temp_dimension_x = -1,l_temp_dimension_y = -1,l_frequency = -1,l_temp_endtime = -1;
   tsunami_lab::t_idx  l_timeStep = 0;
   tsunami_lab::t_real l_simTime = 0,l_dt = 0,l_last_simTime_time = 0;
@@ -434,6 +443,7 @@ int main() {
   l_temp_setup = cli::getOr<std::string>(l_config, {"scenario", "setup"}, "tsunamievent2d");
   l_temp_solver = cli::getOr<std::string>(l_config, {"numerical_solver", "solver"}, "fwave");
   l_temp_waveprop = cli::getOr<std::string>(l_config, {"wave_model", "wavepropagation"}, "2d");
+  l_temp_backend = cli::lower(cli::getOr<std::string>(l_config, {"compute_backend", "backend"}, "cpu"));
   l_domain_start_x = cli::getOr<tsunami_lab::t_real>(l_config, {"origin_x", "domain_start_x"}, -200000);
   l_domain_start_y = cli::getOr<tsunami_lab::t_real>(l_config, {"origin_y", "domain_start_y"}, -750000);
   l_temp_dimension_x = cli::getOr<tsunami_lab::t_real>(l_config, {"domain_size_x", "dimension_x"}, 2700000);
@@ -465,6 +475,7 @@ int main() {
   bool l_useCheckpoint = false;
   tsunami_lab::t_real l_simTimeLastCP = 0;
 
+#ifdef USE_NETCDF
   if (std::filesystem::exists("outputs/checkpoints/checkpoint.nc")) {
     try {
       l_useCheckpoint = true;
@@ -499,19 +510,25 @@ int main() {
       l_useCheckpoint = false;
     }
   }
+#endif
 
   bool l_batch_job = false;
   if (!l_useCheckpoint) {
     //making it easier to run batch jobs
     l_batch_job = cli::promptBool("Batch Job?", l_batch_job);
     if (!l_batch_job){
-      cli::section("Launch settings");
+    cli::section("Launch settings");
     l_temp_solver = cli::promptChoice("Numerical solver", {"fwave", "roe"}, cli::lower(l_temp_solver));
     l_temp_waveprop = cli::promptChoice("Wave model", {"2d", "1d"}, cli::lower(l_temp_waveprop));
+    l_temp_backend = cli::promptChoice("Compute backend", {"cpu", "cuda"}, cli::lower(l_temp_backend));
     if (l_temp_waveprop == "2d") {
+#ifdef USE_NETCDF
       const std::vector<std::string> l_2dSetups = {"tsunamievent2d", "dambreak2d", "artificialtsunami2D"};
+#else
+      const std::vector<std::string> l_2dSetups = {"dambreak2d", "artificialtsunami2D"};
+#endif
       if (std::find(l_2dSetups.begin(), l_2dSetups.end(), l_temp_setup) == l_2dSetups.end()) {
-        l_temp_setup = "tsunamievent2d";
+        l_temp_setup = l_2dSetups.front();
       }
       l_temp_setup = cli::promptChoice("Scenario", l_2dSetups, l_temp_setup);
     }
@@ -522,7 +539,12 @@ int main() {
       }
       l_temp_setup = cli::promptChoice("Scenario", l_1dSetups, l_temp_setup);
     }
+#ifdef USE_NETCDF
     l_temp_writer = cli::promptChoice("Output format", {"csv", "netcdf"}, cli::lower(l_temp_writer));
+#else
+    l_temp_writer = "csv";
+    std::cout << cli::soft << "NetCDF support is not built in; using CSV output." << cli::reset << std::endl;
+#endif
 
     cli::section("Domain");
     l_temp_dimension_x = cli::promptReal("Domain size x [m]", l_temp_dimension_x);
@@ -536,11 +558,13 @@ int main() {
     reflecting_boundary = cli::promptBool("Reflective boundary", reflecting_boundary);
 
     cli::section("Input data");
+#ifdef USE_NETCDF
     const std::vector<std::string> l_ncFiles = cli::findNetCdfFiles("data/nc/data_in");
     if (l_temp_setup == "tsunamievent2d") {
       l_temp_bathFile = cli::promptNetCdfFile("Bathymetry NetCDF", l_temp_bathFile, l_ncFiles);
       l_temp_disFile = cli::promptNetCdfFile("Displacement NetCDF", l_temp_disFile, l_ncFiles);
     }
+#endif
     l_temp_outputfilename = cli::promptString("Output base name", l_temp_outputfilename);
     }
   }
@@ -551,6 +575,20 @@ int main() {
   if (l_temp_writer == "netcdf" && std::filesystem::path(l_temp_outputfilename).extension().empty()) {
     l_temp_outputfilename += ".nc";
   }
+#ifndef USE_NETCDF
+  if (cli::lower(l_temp_writer) == "netcdf") {
+    std::cout << cli::red
+              << "NetCDF output requested, but this executable was built without NetCDF. Falling back to CSV."
+              << cli::reset << std::endl;
+    l_temp_writer = "csv";
+  }
+  if (cli::lower(l_temp_setup) == "tsunamievent2d") {
+    std::cout << cli::red
+              << "tsunamievent2d requested, but this executable was built without NetCDF input support. Falling back to dambreak2d."
+              << cli::reset << std::endl;
+    l_temp_setup = "dambreak2d";
+  }
+#endif
   std::string l_temp_outputfile =  "outputs/" + l_temp_outputfilename;
 
   const char * l_bathFile = l_temp_bathFile.c_str();
@@ -572,9 +610,30 @@ int main() {
     l_solver = false;
   }
   //Reading the Solver from the Json file-------------------------------------------------END
+
+  bool const l_cudaRequested = cli::lower(l_temp_backend) == "cuda";
+  bool l_useCudaBackend = false;
+  if (l_cudaRequested) {
+#ifdef TSUNAMI_LAB_ENABLE_CUDA
+    if (l_temp_waveprop == "2d" && !l_solver) {
+      l_useCudaBackend = true;
+    }
+    else {
+      std::cout << cli::red
+                << "CUDA backend requested, but currently only 2d + fwave is supported. Falling back to CPU/OpenMP."
+                << cli::reset << std::endl;
+    }
+#else
+    std::cout << cli::red
+              << "CUDA backend requested, but this executable was built without TSUNAMI_LAB_ENABLE_CUDA. Falling back to CPU/OpenMP."
+              << cli::reset << std::endl;
+#endif
+  }
+
   //Determine which setup and which wavepropagation to use--------------------------------START
   tsunami_lab::patches::WavePropagation *l_waveProp = nullptr;
   if (l_useCheckpoint) {
+#ifdef USE_NETCDF
     l_setup = new tsunami_lab::setups::CheckPoint(l_temp_dimension_x,
                                                   l_temp_dimension_y,
                                                   l_nx,
@@ -585,20 +644,38 @@ int main() {
                                                   l_cp_hu,
                                                   l_cp_hv,
                                                   l_cp_b);
-    l_waveProp = (l_temp_waveprop == "2d")
-        ? static_cast<tsunami_lab::patches::WavePropagation*>(new tsunami_lab::patches::WavePropagation2d(l_nx, l_ny, l_solver, reflecting_boundary))
-        : static_cast<tsunami_lab::patches::WavePropagation*>(new tsunami_lab::patches::WavePropagation1d(l_nx, l_solver, reflecting_boundary));
+    if (l_temp_waveprop == "2d") {
+#ifdef TSUNAMI_LAB_ENABLE_CUDA
+      l_waveProp = l_useCudaBackend
+          ? static_cast<tsunami_lab::patches::WavePropagation*>(new tsunami_lab::patches::WavePropagation2dCuda(l_nx, l_ny, l_solver, reflecting_boundary))
+          : static_cast<tsunami_lab::patches::WavePropagation*>(new tsunami_lab::patches::WavePropagation2d(l_nx, l_ny, l_solver, reflecting_boundary));
+#else
+      l_waveProp = new tsunami_lab::patches::WavePropagation2d(l_nx, l_ny, l_solver, reflecting_boundary);
+#endif
+    }
+    else {
+      l_waveProp = new tsunami_lab::patches::WavePropagation1d(l_nx, l_solver, reflecting_boundary);
+    }
+#endif
   }
   else if(l_temp_waveprop == "2d"){
+#ifdef TSUNAMI_LAB_ENABLE_CUDA
+    l_waveProp = l_useCudaBackend
+        ? static_cast<tsunami_lab::patches::WavePropagation*>(new tsunami_lab::patches::WavePropagation2dCuda(l_nx, l_ny, l_solver, reflecting_boundary))
+        : static_cast<tsunami_lab::patches::WavePropagation*>(new tsunami_lab::patches::WavePropagation2d(l_nx, l_ny, l_solver, reflecting_boundary));
+#else
     l_waveProp = new tsunami_lab::patches::WavePropagation2d( l_nx, l_ny, l_solver, reflecting_boundary);
+#endif
     if(l_temp_setup == "artificialtsunami2D")
     {
       l_setup = new tsunami_lab::setups::ArtificialTsunami2d();
     }
+#ifdef USE_NETCDF
     else if(l_temp_setup == "tsunamievent2d")
     {
       l_setup = new tsunami_lab::setups::TsunamiEvent2d(l_bathFile ,l_disFile);
     }
+#endif
     else
     {
       l_setup = new tsunami_lab::setups::DamBreak2d();
@@ -636,6 +713,7 @@ int main() {
     //Determine which setup and which wavepropagation to use--------------------------------END
   cli::section("Runtime matrix");
   std::cout << cli::soft << "  solver       " << cli::reset << l_temp_solver << std::endl;
+  std::cout << cli::soft << "  backend      " << cli::reset << (l_useCudaBackend ? "cuda" : "cpu/openmp") << std::endl;
   std::cout << cli::soft << "  scenario     " << cli::reset << l_temp_setup << std::endl;
   std::cout << cli::soft << "  model        " << cli::reset << l_temp_waveprop << std::endl;
   std::cout << cli::soft << "  output       " << cli::reset << l_temp_outputfile << std::endl;
@@ -758,6 +836,7 @@ int main() {
   tsunami_lab::t_real  l_current_frequency_time = l_frequency+l_last_simTime_time;
 
   //create the netCdf file reader/writer
+#ifdef USE_NETCDF
   tsunami_lab::io::NetCdf* l_netCdf = nullptr ;
 
   if(l_temp_writer == "netcdf"){
@@ -771,6 +850,7 @@ int main() {
                             l_waveProp->getBathymetry(),
                             l_outputFile);
   }
+#endif
 
   // timer for timestep loop
   auto cell_loop_start = std::chrono::high_resolution_clock::now();
@@ -796,6 +876,7 @@ int main() {
                                     l_file);
 
         l_file.close();
+#ifdef USE_NETCDF
       }else{
         l_netCdf->updateFile( l_nx,
                               l_ny,
@@ -807,13 +888,18 @@ int main() {
                               l_waveProp->getMomentumY(),
                               l_outputFile);
       }
+#else
+      }
+#endif
 
+#ifdef USE_NETCDF
       tsunami_lab::io::NetCdf* cp_netCdf = (l_netCdf != nullptr) ? l_netCdf : new tsunami_lab::io::NetCdf(l_nx, l_ny, l_k, "outputs/temp.nc");
       cp_netCdf->createCheckPoint(l_temp_solver, l_temp_setup, l_temp_waveprop, l_temp_dimension_x, l_temp_dimension_y, l_nx, l_ny, l_domain_start_x, l_domain_start_y, l_temp_endtime, l_temp_writer, l_temp_bathFile, l_temp_disFile, l_temp_outputfilename, reflecting_boundary, l_simTime, l_waveProp->getMomentumX(), l_waveProp->getMomentumY(), l_waveProp->getHeight(), l_temp_location, l_waveProp->getBathymetry(), l_waveProp->getStride(), l_dxy, "checkpoint.nc");
       if (l_netCdf == nullptr) {
         delete cp_netCdf;
         std::filesystem::remove("outputs/temp.nc");
       }
+#endif
 
       l_time_step_index++;
     }
@@ -893,7 +979,9 @@ int main() {
   std::cout << cli::soft << "Releasing memory..." << cli::reset << std::endl;
   delete l_setup;
   delete l_waveProp;
+#ifdef USE_NETCDF
   delete l_netCdf;
+#endif
   std::cout << cli::pink << "Goodbye from TSUNAMI." << cli::reset << std::endl;
   return EXIT_SUCCESS;
 }

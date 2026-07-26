@@ -919,8 +919,11 @@ Prototyp überprüft genau dieses residente Ausführungsmodell.
 8. Grenzen der Implementierung
 ------------------------------
 
-* ``WavePropagation2d::timeStep`` ist als separater CUDA-Prototyp portiert,
-  aber noch nicht in den produktiven SCons-/Anwendungspfad integriert.
+* ``WavePropagation2d::timeStep`` ist als CUDA-Prototyp portiert und über
+  ``compute_backend = cuda`` in der Hauptanwendung auswählbar, wenn das
+  separate CUDA-App-Buildskript verwendet wird.
+* Der CUDA-Pfad ist noch nicht in den normalen SCons-Build und nicht in den
+  vollständigen NetCDF-/Tohoku-/Chile-Produktionspfad integriert.
 * Die synthetischen Eingabedaten prüfen Wasserhöhen, Impulse, Bathymetrien und
   trockene Zellen, ersetzen aber keinen vollständigen Tohoku- oder Chile-Lauf.
 * Die Ergebnisse gelten nur für die getestete CPU/GPU-Kombination.
@@ -1064,14 +1067,19 @@ Faktor 13 gegenüber OpenMP. Dieses Ergebnis bestätigt die Schlussfolgerung des
 F-Wave-Benchmarks: CUDA ist dann sinnvoll, wenn die Daten auf der GPU bleiben
 und mehrere zusammenhängende Rechenschritte dort ausgeführt werden.
 
-Die verbleibende Grenze ist jetzt nicht mehr der numerische 2D-Zeitschritt,
-sondern seine Integration in das Hauptprogramm. Konfiguration, reale Setups,
-Ausgabe, Checkpoints und SCons-Auswahl zwischen CPU und CUDA müssen für eine
-produktive CUDA-Simulation noch angebunden werden.
+Die verbleibende Grenze ist jetzt nicht mehr der numerische 2D-Zeitschritt.
+Dieser kann inzwischen über ``compute_backend = cuda`` in der Hauptanwendung
+ausgewählt werden, wenn die Anwendung mit ``tools/build_cuda_app.ps1`` gebaut
+wurde. Für eine produktive CUDA-Simulation fehlen aber noch die Einbindung in
+den normalen SCons-Build sowie der vollständige NetCDF-/Tohoku-/Chile-Pfad mit
+Checkpoints und optimierter Ausgabe.
 
 
-Hier nochmal Zeiten von den Berechnungen auf dem Draco Cluster.
-(Notiz: vermutlich ist bei der OpenMP Berechnung etwas schief gelaufen, da die Werte konstant ähnlich zu den seriellen Laufzeiten sind.)
+Zusätzlich wurde der Benchmark testweise auf dem Draco-Cluster ausgeführt.
+Diese Messung betrachten wir als explorativ und nicht als primäre Grundlage
+der Bewertung, weil die OpenMP-Werte dort auffällig nahe an den seriellen
+Zeiten liegen. Für die finale Interpretation verwenden wir deshalb vor allem
+die lokale, vollständig kontrollierte Messreihe aus der Tabelle oben.
 
 .. list-table:: Vollständiger WavePropagation2d-Zeitschritt
     :header-rows: 1
@@ -1103,7 +1111,7 @@ Hier nochmal Zeiten von den Berechnungen auf dem Draco Cluster.
       - 283,233x
     * - 1024 x 1024
       - 54,391
-      - 68,32o
+      - 68,320
       - 0,133
       - 408,660x
       - 513,316x
