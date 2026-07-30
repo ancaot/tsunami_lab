@@ -1079,7 +1079,7 @@ die lokale, vollständig kontrollierte Messreihe aus der Tabelle oben.
 
 
 10. Mögliche weitere Optimierungen
----------------------------------
+----------------------------------
 
 * Zustandsarrays dauerhaft im GPU-Speicher halten.
 * Kanten- und Zellupdates in zwei konfliktfreie Kernel aufteilen: Der erste
@@ -1091,8 +1091,8 @@ die lokale, vollständig kontrollierte Messreihe aus der Tabelle oben.
 * Speicherzugriffe, Occupancy, Registerverbrauch und Branch Divergence mit
   NVIDIA Nsight Compute untersuchen.
 * CUDA Graphs für die wiederkehrende Kernelabfolge eines Zeitschritts prüfen.
-* Nach Integration in den Anwendungspfad reale Tohoku- und Chile-Szenarien
-  benchmarken.
+* Nach vollständiger Integration in den produktiven Anwendungspfad reale
+  Tohoku- und Chile-Szenarien benchmarken.
 
 
 11. Lessons Learned
@@ -1117,14 +1117,16 @@ Die serielle CPU-Version, OpenMP und CUDA wurden für fünf Gittergrößen
 verglichen. Speedups und Transferkosten wurden berechnet und alle Ergebnisse
 auf Korrektheit geprüft.
 
-Der CUDA-Kernel zeigt ein deutliches Parallelisierungspotenzial. Der aktuelle
-End-to-End-Prototyp kann dieses Potenzial wegen der PCIe-Transfers noch nicht
-gegenüber OpenMP ausspielen. CUDA ist für den F-Wave-Kern und perspektivisch
-für die Tsunami-Simulation sinnvoll, wenn die gesamte zeitkritische
-Rechenkette auf der GPU bleibt. Eine isolierte Auslagerung von
-``fwave::netUpdates`` mit Transfers bei jedem Aufruf reicht dafür nicht aus. 
-Dementsprechend wurde dies bei der CUDA-Portierung von 
-``WavePropagation2d::timeStep`` angepasst. 
+Der CUDA-Kernel zeigt ein deutliches Parallelisierungspotenzial. Beim isolierten
+F-Wave-Test wird dieses Potenzial durch PCIe-Transfers noch stark begrenzt,
+weil Eingabe- und Ausgabearrays für jeden einzelnen Kernel kopiert werden.
+Deshalb wurde im nächsten Schritt der vollständige
+``WavePropagation2d::timeStep`` so portiert, dass die Zustandsarrays zwischen
+den Zeitschritten auf der GPU bleiben. In diesem residenten Modell ist CUDA ab
+mittleren Gittergrößen auch gegenüber OpenMP schneller.
 
-Ingesamt konnten wir unsere gesetzten Ziele erfüllen und unsere Frage, ob sich 
-CUDA-Portierung für unser Tsunami-Simulations-Programm lohnen würde, beantworten. 
+Insgesamt konnten wir unsere gesetzten Ziele erfüllen und unsere Frage, ob sich
+eine CUDA-Portierung für unser Tsunami-Simulations-Programm lohnt, beantworten.
+CUDA ist für große, regelmäßige Gitter sinnvoll, wenn die Rechenkette möglichst
+lange auf der GPU bleibt. Die vollständige Integration in den produktiven
+NetCDF-/Tohoku-/Chile-Pfad bleibt als nächster Entwicklungsschritt offen.
