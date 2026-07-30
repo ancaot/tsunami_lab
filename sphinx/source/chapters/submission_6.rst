@@ -238,7 +238,7 @@ zentriert ist, liegt der kürzeste Rand in westlicher Richtung nur etwa
 ``200 km`` entfernt. Die nördlichen und südlichen Ränder liegen jeweils etwa
 ``750 km`` entfernt.
 
-Mit der Flachwassergeschaetzung
+Mit der Flachwasserschätzung
 
 ``lambda = sqrt(g * h)``
 

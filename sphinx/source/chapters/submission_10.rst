@@ -683,6 +683,7 @@ Alle Laufzeiten sind in Millisekunden angegeben.
 
 
 Folgendes sind die Laufzeiten berechnet auf dem Draco Cluster. 
+Da die Berechnungen auf einem GPU-Knoten durchgeführt wurden, sind die OpenMP Ergebnisse schlecht. 
 
 .. list-table:: Laufzeiten von CPU, OpenMP und CUDA
     :header-rows: 1
@@ -806,7 +807,8 @@ OpenMP verliert CUDA mit dem aktuellen Transfermodell jedoch bei allen
 getesteten Größen.
 
 
-Die Speedups für die Berechnungen auf dem Draco Cluster.
+Die Speedups für die Berechnungen auf dem Draco Cluster. 
+Auch hier ist wieder die Durchführung auf einem GPU-Knoten zu beachten, wenn die OpenMP Werte verglichen/betrachtet werden.
 
 .. list-table:: Speedups der parallelen Varianten
     :header-rows: 1
@@ -916,74 +918,7 @@ auf der GPU bleibt. Der anschließend implementierte ``WavePropagation2d``-
 Prototyp überprüft genau dieses residente Ausführungsmodell.
 
 
-8. Grenzen der Implementierung
-------------------------------
-
-* ``WavePropagation2d::timeStep`` ist als CUDA-Prototyp portiert und über
-  ``compute_backend = cuda`` in der Hauptanwendung auswählbar, wenn das
-  separate CUDA-App-Buildskript verwendet wird.
-* Der CUDA-Pfad ist noch nicht in den normalen SCons-Build und nicht in den
-  vollständigen NetCDF-/Tohoku-/Chile-Produktionspfad integriert.
-* Die synthetischen Eingabedaten prüfen Wasserhöhen, Impulse, Bathymetrien und
-  trockene Zellen, ersetzen aber keinen vollständigen Tohoku- oder Chile-Lauf.
-* Die Ergebnisse gelten nur für die getestete CPU/GPU-Kombination.
-* Wiederholte Kernel arbeiten auf denselben Arrays. Kleine Gitter können
-  dadurch von GPU-Caches profitieren.
-* Der Prototyp verwendet zehn GPU-Arrays. Beim größten Test belegen diese etwa
-  336 MB. Eine vollständige Simulation braucht weitere Puffer.
-* Im 2D-Solver beeinflusst jede Kante zwei Zellen. Direkte parallele
-  Zellupdates können deshalb Race Conditions erzeugen.
-* Der CUDA-Prototyp ist noch separat vom SCons-Hauptbuild.
-
-
-9. Mögliche weitere Optimierungen
----------------------------------
-
-* Zustandsarrays dauerhaft im GPU-Speicher halten.
-* Kanten- und Zellupdates in zwei konfliktfreie Kernel aufteilen: Der erste
-  Kernel schreibt getrennte Kantenupdates, der zweite lässt jeden Thread genau
-  eine Zelle aktualisieren.
-* Kernel-Fusion untersuchen, um Zwischenarrays und Speicherzugriffe zu sparen.
-* Transfers mit ``cudaMemcpyAsync``, CUDA Streams und Pinned Memory überlappen.
-* Blockgrößen wie 128, 256 und 512 Threads systematisch benchmarken.
-* Speicherzugriffe, Occupancy, Registerverbrauch und Branch Divergence mit
-  NVIDIA Nsight Compute untersuchen.
-* CUDA Graphs für die wiederkehrende Kernelabfolge eines Zeitschritts prüfen.
-* Nach Integration in den Anwendungspfad reale Tohoku- und Chile-Szenarien
-  benchmarken.
-
-
-10. Lessons Learned
--------------------
-
-* Ein schneller Kernel allein garantiert noch keine schnelle Anwendung.
-* Datenbewegung kann teurer sein als die eigentliche Berechnung.
-* Kernelzeit und End-to-End-Zeit müssen getrennt ausgewiesen werden.
-* CPU- und GPU-Ergebnisse benötigen einen toleranzbasierten Vergleich.
-* Sonderfälle wie trockene Zellen müssen dasselbe Verhalten besitzen.
-* OpenMP ist einfacher in vorhandenen CPU-Code zu integrieren und bei häufigen
-  CPU-GPU-Transfers im Vorteil.
-* CUDA eignet sich besonders für große, regelmäßige und unabhängige Aufgaben.
-* Mehrere Rechenschritte auf der GPU sind sinnvoller als eine isolierte
-  Funktion mit Transfers bei jedem Aufruf.
-
-
-11. Fazit
----------
-
-Die serielle CPU-Version, OpenMP und CUDA wurden für fünf Gittergrößen
-verglichen. Speedups und Transferkosten wurden berechnet und alle Ergebnisse
-auf Korrektheit geprüft.
-
-Der CUDA-Kernel zeigt ein deutliches Parallelisierungspotenzial. Der aktuelle
-End-to-End-Prototyp kann dieses Potenzial wegen der PCIe-Transfers noch nicht
-gegenüber OpenMP ausspielen. CUDA ist für den F-Wave-Kern und perspektivisch
-für die Tsunami-Simulation sinnvoll, wenn die gesamte zeitkritische
-Rechenkette auf der GPU bleibt. Eine isolierte Auslagerung von
-``fwave::netUpdates`` mit Transfers bei jedem Aufruf reicht dafür nicht aus.
-
-
-12. CUDA-Portierung von WavePropagation2d
+8. CUDA-Portierung von WavePropagation2d
 -----------------------------------------
 
 Nach dem isolierten F-Wave-Benchmark wurde auch ein vollständiger
@@ -1121,3 +1056,75 @@ die lokale, vollständig kontrollierte Messreihe aus der Tabelle oben.
       - 0,523
       - 392,549x
       - 523,061x
+
+
+9. Grenzen der Implementierung
+------------------------------
+
+* ``WavePropagation2d::timeStep`` ist als CUDA-Prototyp portiert und über
+  ``compute_backend = cuda`` in der Hauptanwendung auswählbar, wenn das
+  separate CUDA-App-Buildskript verwendet wird.
+* Der CUDA-Pfad ist noch nicht in den normalen SCons-Build und nicht in den
+  vollständigen NetCDF-/Tohoku-/Chile-Produktionspfad integriert.
+* Die synthetischen Eingabedaten prüfen Wasserhöhen, Impulse, Bathymetrien und
+  trockene Zellen, ersetzen aber keinen vollständigen Tohoku- oder Chile-Lauf.
+* Die Ergebnisse gelten nur für die getestete CPU/GPU-Kombination.
+* Wiederholte Kernel arbeiten auf denselben Arrays. Kleine Gitter können
+  dadurch von GPU-Caches profitieren.
+* Der Prototyp verwendet zehn GPU-Arrays. Beim größten Test belegen diese etwa
+  336 MB. Eine vollständige Simulation braucht weitere Puffer.
+* Im 2D-Solver beeinflusst jede Kante zwei Zellen. Direkte parallele
+  Zellupdates können deshalb Race Conditions erzeugen.
+* Der CUDA-Prototyp ist noch separat vom SCons-Hauptbuild.
+
+
+10. Mögliche weitere Optimierungen
+---------------------------------
+
+* Zustandsarrays dauerhaft im GPU-Speicher halten.
+* Kanten- und Zellupdates in zwei konfliktfreie Kernel aufteilen: Der erste
+  Kernel schreibt getrennte Kantenupdates, der zweite lässt jeden Thread genau
+  eine Zelle aktualisieren.
+* Kernel-Fusion untersuchen, um Zwischenarrays und Speicherzugriffe zu sparen.
+* Transfers mit ``cudaMemcpyAsync``, CUDA Streams und Pinned Memory überlappen.
+* Blockgrößen wie 128, 256 und 512 Threads systematisch benchmarken.
+* Speicherzugriffe, Occupancy, Registerverbrauch und Branch Divergence mit
+  NVIDIA Nsight Compute untersuchen.
+* CUDA Graphs für die wiederkehrende Kernelabfolge eines Zeitschritts prüfen.
+* Nach Integration in den Anwendungspfad reale Tohoku- und Chile-Szenarien
+  benchmarken.
+
+
+11. Lessons Learned
+-------------------
+
+* Ein schneller Kernel allein garantiert noch keine schnelle Anwendung.
+* Datenbewegung kann teurer sein als die eigentliche Berechnung.
+* Kernelzeit und End-to-End-Zeit müssen getrennt ausgewiesen werden.
+* CPU- und GPU-Ergebnisse benötigen einen toleranzbasierten Vergleich.
+* Sonderfälle wie trockene Zellen müssen dasselbe Verhalten besitzen.
+* OpenMP ist einfacher in vorhandenen CPU-Code zu integrieren und bei häufigen
+  CPU-GPU-Transfers im Vorteil.
+* CUDA eignet sich besonders für große, regelmäßige und unabhängige Aufgaben.
+* Mehrere Rechenschritte auf der GPU sind sinnvoller als eine isolierte
+  Funktion mit Transfers bei jedem Aufruf.
+
+
+12. Fazit
+---------
+
+Die serielle CPU-Version, OpenMP und CUDA wurden für fünf Gittergrößen
+verglichen. Speedups und Transferkosten wurden berechnet und alle Ergebnisse
+auf Korrektheit geprüft.
+
+Der CUDA-Kernel zeigt ein deutliches Parallelisierungspotenzial. Der aktuelle
+End-to-End-Prototyp kann dieses Potenzial wegen der PCIe-Transfers noch nicht
+gegenüber OpenMP ausspielen. CUDA ist für den F-Wave-Kern und perspektivisch
+für die Tsunami-Simulation sinnvoll, wenn die gesamte zeitkritische
+Rechenkette auf der GPU bleibt. Eine isolierte Auslagerung von
+``fwave::netUpdates`` mit Transfers bei jedem Aufruf reicht dafür nicht aus. 
+Dementsprechend wurde dies bei der CUDA-Portierung von 
+``WavePropagation2d::timeStep`` angepasst. 
+
+Ingesamt konnten wir unsere gesetzten Ziele erfüllen und unsere Frage, ob sich 
+CUDA-Portierung für unser Tsunami-Simulations-Programm lohnen würde, beantworten. 

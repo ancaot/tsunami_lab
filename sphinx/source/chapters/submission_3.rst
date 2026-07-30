@@ -8,8 +8,8 @@ A "ShockShore" setup was added to demonstrate this effect, where in an existing 
 
 Task Reflecting Boundary Conditions
 ------------------------------------
-The Reflcing Boundary Condition has been implementd into the Fwave solver funktion, where relevant values will be automatically adjusted, whenever values implying a dry cell are entered.
-A "ShockLand" setup was added to demeonstrate this effect, where a shock wave impacts a reflective boundary.
+The Reflecting Boundary Condition has been implemented into the Fwave solver funktion, where relevant values will be automatically adjusted, whenever values implying a dry cell are entered.
+A "ShockLand" setup was added to demonstrate this effect, where a shock wave impacts a reflective boundary.
 
 Task Hydraulic Jumps
 ---------------------

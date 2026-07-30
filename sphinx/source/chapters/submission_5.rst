@@ -122,4 +122,9 @@ Um an die gewünschte Resolution und die Simulationszeit heranzukommen, wird bei
 Die Aufgabe **5.2.4** erwartet einen Korrektheitscheck für die Dateien-Input-Klasse, indem diese mit der künstlichen Tsunami Simulation verglichen wird. 
 Dafür soll die in der Aufgabenstellung verlinkten Input-Daten verwendet werden.
 
-**Test Ergebnisse**: nicht verfügbar
+**Test Ergebnisse**: nachgearbeitet
+
+.. raw:: html
+
+   <video src="../_static/artificial_tsunami_short.mp4" controls style="width: 72%; max-width: 760px; display: block; margin: 1rem auto;"></video>
+

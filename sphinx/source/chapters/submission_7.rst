@@ -105,7 +105,7 @@ Implementierung
 ---------------
 
 Der NetCDF-Writer besitzt nun einen Coarse-Faktor ``k``. Dieser Wert wird beim
-Erzeugen des Writers uebergeben und kann in der Konfiguration als
+Erzeugen des Writers übergeben und kann in der Konfiguration als
 ``coarse_factor`` gesetzt werden:
 
 .. code-block:: json
@@ -115,7 +115,7 @@ Erzeugen des Writers uebergeben und kann in der Konfiguration als
       "coarse_factor": 20
     }
 
-Fuer jedes Ausgabefeld wird aus dem feinen Rechengitter ein grobes Ausgabegitter
+Für jedes Ausgabefeld wird aus dem feinen Rechengitter ein grobes Ausgabegitter
 berechnet. Dabei werden jeweils bis zu ``k x k`` benachbarte Zellen gemittelt.
 Am Rand wird nicht abgeschnitten: Wenn die Zellzahl nicht durch ``k`` teilbar
 ist, wird die letzte grobe Zelle aus den noch vorhandenen feinen Zellen
